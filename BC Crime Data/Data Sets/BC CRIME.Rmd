@@ -680,8 +680,9 @@ ggplot(hood_concentration, aes(x = hood_pct, y = cumulative_pct)) +
 
 ## Neighbourhood Crime Change: 2018 vs 2023
 
-Which neighbourhoods saw the largest increases or decreases in crime between 2018
-and 2023? The diverging bar chart below makes this immediately clear.
+The overall crime trend (Part 1) showed the aggregate direction of change. But
+this masks variation: some neighbourhoods may have improved even as others worsened.
+The diverging bar chart below reveals which neighbourhoods drove the aggregate trend.
 
 ```{r neighbourhood-change, fig.height=8}
 hood_change <- crime_data %>%
@@ -948,6 +949,45 @@ cat(glue::glue("
 6. **Severity nuance:** Raw crime counts do not capture severity. The weighted
    severity index provides a complementary lens showing whether the *mix* of
    offences is becoming more or less serious over time.
+"))
+```
+
+## What to Watch
+
+```{r forward-looking, results='asis'}
+# Identify the fastest-growing crime type
+type_growth <- crime_data %>%
+  filter(YEAR %in% c(earliest_year, latest_year)) %>%
+  count(YEAR, TYPE) %>%
+  pivot_wider(names_from = YEAR, values_from = n, values_fill = 0) %>%
+  mutate(change = safe_pct_change(.data[[as.character(latest_year)]],
+                                   .data[[as.character(earliest_year)]])) %>%
+  filter(!is.na(change)) %>%
+  arrange(desc(change))
+
+fastest_growing <- type_growth %>% slice(1)
+fastest_declining <- type_growth %>% arrange(change) %>% slice(1)
+
+cat(glue::glue("
+Based on the trends identified in this report, the following areas warrant
+continued monitoring:
+
+1. **Fastest-growing crime type:** *{fastest_growing$TYPE}*
+   ({ifelse(fastest_growing$change > 0, '+', '')}{fastest_growing$change}% change,
+   {earliest_year}\u2013{latest_year}). If this trend continues, it will become an
+   increasingly large share of overall crime.
+
+2. **Fastest-declining crime type:** *{fastest_declining$TYPE}*
+   ({fastest_declining$change}% change). Worth investigating whether this reflects
+   genuine reduction or reclassification.
+
+3. **Neighbourhood hotspots:** The crime concentration analysis (Part 3) showed
+   that ~{hoods_for_80}% of neighbourhoods account for 80% of crime. Targeted
+   interventions in these areas could have outsized impact.
+
+4. **Post-pandemic trajectory:** With {latest_year} being the latest data point,
+   the next 1\u20132 years will reveal whether pandemic-era shifts are permanent or
+   temporary.
 "))
 ```
 
