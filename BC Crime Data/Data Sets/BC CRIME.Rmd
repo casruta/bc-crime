@@ -295,6 +295,21 @@ kable(
 )
 ```
 
+```{r trend-interpretation, results='asis'}
+# Simple linear trend test
+trend_model <- lm(n ~ YEAR, data = crime_by_year)
+slope <- coef(trend_model)[["YEAR"]]
+slope_dir <- ifelse(slope > 0, "increasing", "decreasing")
+slope_per_year <- round(abs(slope), 0)
+
+cat(glue::glue(
+  "> **Trend summary:** A simple linear fit suggests reported crimes are ",
+  "**{slope_dir}** by approximately **{comma(slope_per_year)} incidents per year** ",
+  "over the {min(crime_by_year$YEAR)}\u2013{max(crime_by_year$YEAR)} period. ",
+  "Note that this linear approximation does not capture non-linear pandemic effects.\n\n"
+))
+```
+
 ## Year-over-Year Momentum
 
 The bar chart below isolates the *direction and magnitude* of change each year.
