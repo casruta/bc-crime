@@ -573,6 +573,47 @@ ggplot(type_trends, aes(x = YEAR, y = n)) +
   )
 ```
 
+## Type Correlations
+
+Do different crime types move together or in opposite directions? This correlation
+matrix shows which crime types tend to increase in the same years.
+
+```{r type-correlation, fig.height=7, fig.width=8}
+type_cor_data <- crime_data %>%
+  filter(TYPE %in% top_types) %>%
+  count(YEAR, TYPE) %>%
+  pivot_wider(names_from = TYPE, values_from = n, values_fill = 0)
+
+# Compute correlation matrix (exclude YEAR column)
+cor_matrix <- cor(type_cor_data[, -1])
+
+# Convert to long format for ggplot
+cor_long <- as.data.frame(as.table(cor_matrix)) %>%
+  rename(Type1 = Var1, Type2 = Var2, Correlation = Freq)
+
+ggplot(cor_long, aes(x = Type1, y = Type2, fill = Correlation)) +
+  geom_tile(color = "white", linewidth = 0.5) +
+  geom_text(aes(label = round(Correlation, 2),
+                color = abs(Correlation) > 0.5),
+            size = 3, fontface = "bold", show.legend = FALSE) +
+  scale_color_manual(values = c("TRUE" = "white", "FALSE" = "grey20")) +
+  scale_fill_gradient2(low = bc_green, mid = "white", high = bc_red,
+                       midpoint = 0, limits = c(-1, 1), name = "Correlation") +
+  labs(
+    title = "Crime Type Correlation Matrix",
+    subtitle = "Do crime types rise and fall together? Red = positive correlation, Green = negative",
+    x = NULL, y = NULL,
+    caption = "Based on annual counts. Source: BC municipal crime data"
+  ) +
+  theme_bc_crime() +
+  theme(
+    panel.grid = element_blank(),
+    axis.text.x = element_text(angle = 40, hjust = 1, size = 8),
+    axis.text.y = element_text(size = 8),
+    legend.position = "right"
+  )
+```
+
 ## Indexed Comparison
 
 Comparing crime types of very different magnitudes (e.g., thousands of thefts vs
