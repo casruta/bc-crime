@@ -756,6 +756,36 @@ kable(
 )
 ```
 
+## Before & After
+
+A dumbbell chart shows the absolute crime count in both 2018 and 2023 for each
+neighbourhood, making it easy to see both the *level* and the *direction* of change.
+
+```{r dumbbell, fig.height=8}
+dumbbell_data <- hood_change %>%
+  arrange(desc(`2023`)) %>%
+  head(12)
+
+ggplot(dumbbell_data) +
+  geom_segment(aes(x = `2018`, xend = `2023`,
+                   y = reorder(NEIGHBOURHOOD, `2023`),
+                   yend = reorder(NEIGHBOURHOOD, `2023`)),
+               color = "grey70", linewidth = 0.8) +
+  geom_point(aes(x = `2018`, y = reorder(NEIGHBOURHOOD, `2023`)),
+             color = bc_accent, size = 3) +
+  geom_point(aes(x = `2023`, y = reorder(NEIGHBOURHOOD, `2023`)),
+             color = bc_red, size = 3) +
+  scale_x_continuous(labels = comma) +
+  labs(
+    title = "Neighbourhood Crime: 2018 (blue) vs 2023 (red)",
+    subtitle = "Top 12 neighbourhoods by 2023 volume; segment shows change",
+    x = "Total Reported Crimes", y = NULL,
+    caption = "Source: BC municipal crime data"
+  ) +
+  theme_bc_crime() +
+  theme(panel.grid.major.x = element_line(color = "grey92"))
+```
+
 ## Crime Profiles
 
 Different neighbourhoods may have different *types* of crime, not just different
