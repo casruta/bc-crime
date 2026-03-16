@@ -1,156 +1,437 @@
 ---
-title: "Exploring the Crime Landscape in British Colombia, Canada"
+title: "Exploring the Crime Landscape in British Columbia, Canada"
 author: "Casper Kacper Ruta"
 date: "2024-02-25"
 output:
-  pdf_document: default
-  html_document: default
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    theme: flatly
+    highlight: tango
+    code_folding: hide
+    fig_width: 10
+    fig_height: 6
+    fig_caption: true
+    df_print: kable
+  pdf_document:
+    toc: true
+    fig_width: 10
+    fig_height: 6
+    fig_caption: true
 ---
-```{r}
-# Loading and Installing the Necessary Documents. 
-packages <- c("here",
-              "readr",
-              "stringr", 
-              "clock",
-              "dplyr",
-              "ggplot2",
-              "rmarkdown",
-              "knitr", 
-              "magrittr",
-              "glue",
-              "xfun",
-              "fs",
-              "tidyr") 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  fig.align = "center",
+  fig.retina = 2
+)
+```
+
+# Introduction
+
+This report examines crime trends across British Columbia, Canada, using publicly
+available municipal crime data. The analysis covers the period from 2018 to 2023,
+with a particular focus on post-COVID-19 trends (2020 onward) and neighbourhood-level
+geographic patterns. The goal is to identify meaningful shifts in crime volume and
+composition over time.
+
+# Setup and Data Loading
+
+```{r load-packages}
+packages <- c("here", "readr", "stringr", "clock", "dplyr", "ggplot2",
+              "rmarkdown", "knitr", "magrittr", "glue", "xfun", "fs",
+              "tidyr", "scales")
 
 installed_packages <- packages %in% rownames(installed.packages())
-
 if (any(installed_packages == FALSE)) {
   install.packages(packages[!installed_packages])
 }
 
 library(ggplot2)
 library(dplyr)
+library(tidyr)
+library(scales)
+library(knitr)
 ```
 
-```{r}
-# Basic Summary of the Data
-crime_data  <- read.csv("bc_crime.csv")
-summary(crime_data)
-head(crime_data)
+```{r load-data}
+crime_data <- read.csv("bc_crime.csv")
 ```
 
-```{r}
-# Creating a basic dataframe. 
+```{r custom-theme}
+# Define a consistent theme used across all visualizations
+theme_bc_crime <- function() {
+  theme_minimal(base_size = 13) +
+    theme(
+      plot.title = element_text(face = "bold", size = 16, hjust = 0),
+      plot.subtitle = element_text(color = "grey40", size = 12, hjust = 0),
+      plot.caption = element_text(color = "grey60", size = 9, hjust = 1),
+      axis.title = element_text(face = "bold", size = 11),
+      axis.text = element_text(size = 10),
+      legend.position = "bottom",
+      legend.title = element_text(face = "bold", size = 10),
+      panel.grid.minor = element_blank(),
+      panel.grid.major.x = element_blank(),
+      strip.text = element_text(face = "bold", size = 11),
+      plot.margin = margin(10, 15, 10, 10)
+    )
+}
+
+# Consistent colour palette
+bc_blue_palette <- c("#08519c", "#3182bd", "#6baed6", "#9ecae1", "#c6dbef", "#deebf7")
+```
+
+# Data Overview
+
+```{r data-summary}
+cat("Dataset dimensions:", nrow(crime_data), "records x", ncol(crime_data), "columns\n")
+cat("Years covered:", paste(sort(unique(crime_data$YEAR)), collapse = ", "), "\n")
+cat("Crime types:", length(unique(crime_data$TYPE)), "\n")
+cat("Neighbourhoods:", length(unique(crime_data$NEIGHBOURHOOD)), "\n")
+```
+
+```{r data-structure}
+kable(
+  head(crime_data, 10),
+  caption = "Table 1: First 10 records of the BC crime dataset"
+)
+```
+
+---
+
+# Part 1: Overall Crime Trends
+
+This section examines how total crime volume has changed year over year, providing
+context for whether crime in British Columbia is increasing, decreasing, or holding
+steady.
+
+## Annual Crime Volume (2018--2023)
+
+```{r annual-crime-trend}
+crime_by_year <- crime_data %>%
+  count(YEAR) %>%
+  mutate(
+    pct_change = round((n / lag(n) - 1) * 100, 1),
+    label = comma(n)
+  )
+
+ggplot(crime_by_year, aes(x = YEAR, y = n)) +
+  geom_line(color = "#08519c", linewidth = 1.2) +
+  geom_point(color = "#08519c", size = 3) +
+  geom_text(aes(label = label), vjust = -1.2, size = 3.5, color = "grey30") +
+  scale_y_continuous(labels = comma, expand = expansion(mult = c(0.05, 0.12))) +
+  scale_x_continuous(breaks = unique(crime_by_year$YEAR)) +
+  labs(
+    title = "Total Reported Crimes by Year",
+    subtitle = "British Columbia, 2018\u20132023",
+    x = "Year",
+    y = "Number of Reported Crimes",
+    caption = "Source: BC municipal crime data"
+  ) +
+  theme_bc_crime()
+```
+
+```{r annual-change-table}
+kable(
+  crime_by_year %>% select(YEAR, n, pct_change) %>%
+    rename(Year = YEAR, `Total Crimes` = n, `Year-over-Year Change (%)` = pct_change),
+  caption = "Table 2: Annual crime counts with year-over-year percentage change",
+  format.args = list(big.mark = ",")
+)
+```
+
+## Year-over-Year Change
+
+```{r yoy-bar}
+crime_by_year_change <- crime_by_year %>% filter(!is.na(pct_change))
+
+ggplot(crime_by_year_change, aes(x = factor(YEAR), y = pct_change,
+                                  fill = pct_change > 0)) +
+  geom_col(width = 0.6, show.legend = FALSE) +
+  geom_hline(yintercept = 0, linewidth = 0.5) +
+  geom_text(aes(label = paste0(ifelse(pct_change > 0, "+", ""), pct_change, "%")),
+            vjust = ifelse(crime_by_year_change$pct_change > 0, -0.5, 1.5),
+            size = 3.8, fontface = "bold") +
+  scale_fill_manual(values = c("TRUE" = "#c0392b", "FALSE" = "#27ae60")) +
+  scale_y_continuous(labels = function(x) paste0(x, "%"),
+                     expand = expansion(mult = c(0.15, 0.15))) +
+  labs(
+    title = "Year-over-Year Change in Total Crimes",
+    subtitle = "Red = increase, Green = decrease",
+    x = "Year",
+    y = "Change from Previous Year (%)",
+    caption = "Source: BC municipal crime data"
+  ) +
+  theme_bc_crime()
+```
+
+---
+
+# Part 2: Crime Type Analysis
+
+Understanding the composition of crime by type reveals which categories drive
+overall trends and whether certain crime types are becoming more or less prevalent.
+
+## Crime Counts by Type and Year
+
+```{r crime-type-summary}
 crime_counts <- crime_data %>%
   filter(YEAR >= 2019) %>%
   group_by(YEAR, TYPE) %>%
-  summarise(Count = n(), .groups = 'drop') %>% 
+  summarise(Count = n(), .groups = "drop") %>%
   arrange(YEAR, desc(Count))
 
-print(crime_counts)
+crime_type_wide <- crime_counts %>%
+  pivot_wider(names_from = YEAR, values_from = Count, values_fill = 0)
+
+kable(
+  crime_type_wide,
+  caption = "Table 3: Crime counts by type and year (2019\u20132023)",
+  format.args = list(big.mark = ",")
+)
 ```
 
-```{r}
-# Creating a basic dataframe. 
-crime_counts <- crime_data %>%
-  filter(YEAR >= 2020) %>%
-  group_by(YEAR, TYPE) %>%
-  summarise(Count = n(), .groups = 'drop') %>% 
-  arrange(YEAR, desc(Count))
+## Crime Type Distribution (Stacked Area)
 
-print(crime_counts)
+```{r crime-type-area, fig.height=7}
+top_types <- crime_data %>%
+  count(TYPE, sort = TRUE) %>%
+  head(8) %>%
+  pull(TYPE)
+
+crime_type_trend <- crime_data %>%
+  mutate(TYPE_grouped = ifelse(TYPE %in% top_types, TYPE, "Other")) %>%
+  count(YEAR, TYPE_grouped) %>%
+  rename(TYPE = TYPE_grouped)
+
+ggplot(crime_type_trend, aes(x = YEAR, y = n, fill = TYPE)) +
+  geom_area(alpha = 0.8) +
+  scale_fill_brewer(palette = "Set2") +
+  scale_y_continuous(labels = comma) +
+  scale_x_continuous(breaks = unique(crime_type_trend$YEAR)) +
+  labs(
+    title = "Crime Composition Over Time",
+    subtitle = "Top 8 crime types shown individually; remaining types grouped as 'Other'",
+    x = "Year",
+    y = "Number of Crimes",
+    fill = "Crime Type",
+    caption = "Source: BC municipal crime data"
+  ) +
+  theme_bc_crime() +
+  theme(legend.position = "right")
 ```
 
-```{r}
-# Creating a basic dataframe. 
-crime_counts <- crime_data %>%
-  filter(YEAR >= 2021) %>%
-  group_by(YEAR, TYPE) %>%
-  summarise(Count = n(), .groups = 'drop') %>% 
-  arrange(YEAR, desc(Count))
+## Homicide Trends (Post-COVID Focus)
 
-print(crime_counts)
-```
+Homicides, while a small fraction of total crime, are the most severe category
+and deserve dedicated attention.
 
-```{r}
+```{r homicide-trend}
 homicide_count <- crime_data %>%
-  filter(YEAR %in% c(2019, 2020, 2021, 2022, 2023) & TYPE == "Homicide") %>%
-  group_by(YEAR) %>% 
-  summarise(Count = n())
+  filter(TYPE == "Homicide") %>%
+  count(YEAR) %>%
+  mutate(label = n)
 
-print(homicide_count)
+ggplot(homicide_count, aes(x = YEAR, y = n)) +
+  geom_col(fill = "#c0392b", width = 0.6, alpha = 0.85) +
+  geom_text(aes(label = n), vjust = -0.5, fontface = "bold", size = 4) +
+  scale_x_continuous(breaks = unique(homicide_count$YEAR)) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
+  labs(
+    title = "Homicide Count by Year",
+    subtitle = "British Columbia \u2014 all neighbourhoods",
+    x = "Year",
+    y = "Number of Homicides",
+    caption = "Source: BC municipal crime data"
+  ) +
+  theme_bc_crime()
 ```
 
-```{r}
-crime_data_selected_years <- crime_data %>%
-  filter(YEAR %in% c(2020, 2021, 2022, 2023)) %>%
-  count(YEAR)
-
-ggplot(crime_data_selected_years, aes(x = YEAR, y = n, fill = as.factor(YEAR))) + 
-  geom_bar(stat = "identity", width = 0.8) + 
-  scale_fill_brewer(palette = "Blues") + 
-  labs(title = "Crime Count per Year", x = "Year", y = "Count of Crimes") +
-  theme_minimal()
+```{r homicide-table}
+kable(
+  homicide_count %>% select(YEAR, n) %>% rename(Year = YEAR, Homicides = n),
+  caption = "Table 4: Annual homicide counts"
+)
 ```
 
-```{r}
-# Selecting for Homicides in Each Year Post Covid-19
-homicide_data_years <- crime_data %>%
-  filter(YEAR %in% c(2020, 2021, 2022, 2023) & TYPE == "Homicide") %>%
-  count(YEAR)
+---
 
-# Creating the Bar Chart
-ggplot(homicide_data_years, aes(x = YEAR, y = n, fill = as.factor(YEAR))) +
-  geom_bar(stat = "identity", width = 0.8) + 
-  scale_fill_brewer(palette = "Blues") +
-  labs(title = "Homicide Count per Year", x = "Year", y = "Count of Homicides") +
-  theme_minimal()
+# Part 3: Neighbourhood Analysis
+
+This section explores geographic variation in crime across neighbourhoods, helping
+identify which areas experience disproportionate crime levels and how those patterns
+shift over time.
+
+## Neighbourhood Crime Comparison (Faceted by Year)
+
+Rather than examining each year in isolation, the faceted view below allows direct
+visual comparison across years.
+
+```{r neighbourhood-facet, fig.height=10, fig.width=12}
+neighbourhood_data <- crime_data %>%
+  filter(YEAR %in% c(2018, 2019, 2023),
+         NEIGHBOURHOOD != "Central Business District") %>%
+  count(YEAR, NEIGHBOURHOOD) %>%
+  group_by(YEAR) %>%
+  mutate(rank = dense_rank(desc(n))) %>%
+  ungroup()
+
+ggplot(neighbourhood_data,
+       aes(x = reorder(NEIGHBOURHOOD, n), y = n, fill = n)) +
+  geom_col(show.legend = FALSE) +
+  coord_flip() +
+  facet_wrap(~ YEAR, scales = "free_x", ncol = 3) +
+  scale_fill_viridis_c(option = "D") +
+  scale_y_continuous(labels = comma) +
+  labs(
+    title = "Total Crimes by Neighbourhood",
+    subtitle = "Comparing 2018, 2019, and 2023 (Central Business District excluded)",
+    x = NULL,
+    y = "Total Reported Crimes",
+    caption = "Source: BC municipal crime data"
+  ) +
+  theme_bc_crime() +
+  theme(
+    axis.text.y = element_text(size = 8),
+    strip.text = element_text(size = 13)
+  )
 ```
 
-```{r}
-# Filter and aggregate data for 2018 excluding Central Business District.
-crime_data_2018_total <- crime_data %>%
-  filter(YEAR == 2018, NEIGHBOURHOOD != "Central Business District") %>%
-  count(NEIGHBOURHOOD)
+## Top 10 Neighbourhoods by Crime Volume (2023)
 
-# Create a colorful bar chart for 2018
-ggplot(crime_data_2018_total, aes(x = NEIGHBOURHOOD, y = n, fill = NEIGHBOURHOOD)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Total Crimes by Neighbourhood in 2019", x = "Neighbourhood", y = "Total Crimes") +
-  theme_minimal() +
-  theme(legend.key.size = unit(0.1, "cm"),
-        axis.text.x = element_text(angle = 90, hjust = 1)) +
-  scale_fill_viridis_d()
-```
-
-```{r}
-# Filter and aggregate data for 2019 excluding Central Business District.
-crime_data_2019_total <- crime_data %>%
-  filter(YEAR == 2019, NEIGHBOURHOOD != "Central Business District") %>%
-  count(NEIGHBOURHOOD)
-
-# Create a colorful bar chart for 2019
-ggplot(crime_data_2019_total, aes(x = NEIGHBOURHOOD, y = n, fill = NEIGHBOURHOOD)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Total Crimes by Neighbourhood in 2019", x = "Neighbourhood", y = "Total Crimes") +
-  theme_minimal() +
-  theme(legend.key.size = unit(0.1, "cm"),
-        axis.text.x = element_text(angle = 90, hjust = 1)) +
-  scale_fill_viridis_d()
-```
-
-```{r}
-# Filter and aggregate data for 2023 excluding Central Business District.
-crime_data_2023_total <- crime_data %>%
+```{r top-neighbourhoods-2023}
+top_neighbourhoods_2023 <- crime_data %>%
   filter(YEAR == 2023, NEIGHBOURHOOD != "Central Business District") %>%
-  count(NEIGHBOURHOOD)
+  count(NEIGHBOURHOOD, sort = TRUE) %>%
+  head(10)
 
-# Create a colorful bar chart for 2023
-ggplot(crime_data_2023_total, aes(x = NEIGHBOURHOOD, y = n, fill = NEIGHBOURHOOD)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Crime by Area 23", x = "Neighbourhood", y = "Total Crimes Committed") +
-  theme_minimal() +
-  theme(legend.key.size = unit(0.1, "cm"),
-        axis.text.x = element_text(angle = 90, hjust = 1)) +
-  scale_fill_viridis_d()
+ggplot(top_neighbourhoods_2023,
+       aes(x = reorder(NEIGHBOURHOOD, n), y = n, fill = n)) +
+  geom_col(show.legend = FALSE) +
+  geom_text(aes(label = comma(n)), hjust = -0.1, size = 3.5, fontface = "bold") +
+  coord_flip() +
+  scale_fill_viridis_c(option = "D", direction = -1) +
+  scale_y_continuous(labels = comma, expand = expansion(mult = c(0, 0.15))) +
+  labs(
+    title = "Top 10 Neighbourhoods by Crime Volume (2023)",
+    subtitle = "Central Business District excluded",
+    x = NULL,
+    y = "Total Reported Crimes",
+    caption = "Source: BC municipal crime data"
+  ) +
+  theme_bc_crime()
 ```
+
+## Neighbourhood Trend: Change from 2018 to 2023
+
+```{r neighbourhood-change, fig.height=8}
+neighbourhood_change <- crime_data %>%
+  filter(YEAR %in% c(2018, 2023),
+         NEIGHBOURHOOD != "Central Business District") %>%
+  count(YEAR, NEIGHBOURHOOD) %>%
+  pivot_wider(names_from = YEAR, values_from = n, values_fill = 0) %>%
+  mutate(
+    change_pct = round((`2023` / `2018` - 1) * 100, 1),
+    direction = ifelse(change_pct > 0, "Increase", "Decrease")
+  ) %>%
+  arrange(change_pct)
+
+ggplot(neighbourhood_change,
+       aes(x = reorder(NEIGHBOURHOOD, change_pct), y = change_pct, fill = direction)) +
+  geom_col(width = 0.7, show.legend = FALSE) +
+  geom_hline(yintercept = 0, linewidth = 0.5) +
+  coord_flip() +
+  scale_fill_manual(values = c("Increase" = "#c0392b", "Decrease" = "#27ae60")) +
+  scale_y_continuous(labels = function(x) paste0(x, "%")) +
+  labs(
+    title = "Crime Change by Neighbourhood: 2018 vs 2023",
+    subtitle = "Percentage change in total reported crimes",
+    x = NULL,
+    y = "Change (%)",
+    caption = "Source: BC municipal crime data"
+  ) +
+  theme_bc_crime()
+```
+
+```{r neighbourhood-change-table}
+kable(
+  neighbourhood_change %>%
+    select(NEIGHBOURHOOD, `2018`, `2023`, change_pct, direction) %>%
+    rename(Neighbourhood = NEIGHBOURHOOD, `Change (%)` = change_pct, Trend = direction) %>%
+    arrange(desc(`Change (%)`)),
+  caption = "Table 5: Crime volume change by neighbourhood, 2018 to 2023",
+  format.args = list(big.mark = ",")
+)
+```
+
+---
+
+# Part 4: Crime Type Heatmap
+
+```{r crime-heatmap, fig.height=8, fig.width=10}
+crime_type_year <- crime_data %>%
+  count(YEAR, TYPE) %>%
+  group_by(YEAR) %>%
+  mutate(proportion = n / sum(n) * 100) %>%
+  ungroup()
+
+ggplot(crime_type_year, aes(x = factor(YEAR), y = reorder(TYPE, n), fill = proportion)) +
+  geom_tile(color = "white", linewidth = 0.5) +
+  geom_text(aes(label = round(proportion, 1)), size = 3, color = "white") +
+  scale_fill_viridis_c(option = "C", name = "Share (%)") +
+  labs(
+    title = "Crime Type Proportions by Year",
+    subtitle = "Cell values show the percentage share of each crime type within that year",
+    x = "Year",
+    y = NULL,
+    caption = "Source: BC municipal crime data"
+  ) +
+  theme_bc_crime() +
+  theme(
+    legend.position = "right",
+    panel.grid = element_blank()
+  )
+```
+
+---
+
+# Summary and Key Findings
+
+```{r summary-stats, results='asis'}
+total_latest <- crime_data %>% filter(YEAR == max(YEAR)) %>% nrow()
+total_earliest <- crime_data %>% filter(YEAR == min(YEAR)) %>% nrow()
+overall_change <- round((total_latest / total_earliest - 1) * 100, 1)
+latest_year <- max(crime_data$YEAR)
+earliest_year <- min(crime_data$YEAR)
+
+top_type <- crime_data %>%
+  filter(YEAR == latest_year) %>%
+  count(TYPE, sort = TRUE) %>%
+  slice(1)
+
+cat(glue::glue("
+**Key findings from the analysis:**
+
+1. **Overall trend:** From {earliest_year} to {latest_year}, total reported crimes
+   changed by **{ifelse(overall_change > 0, '+', '')}{overall_change}%**
+   ({comma(total_earliest)} to {comma(total_latest)} incidents).
+
+2. **Most common crime type ({latest_year}):** {top_type$TYPE}
+   with **{comma(top_type$n)}** reported incidents.
+
+3. **Geographic concentration:** The Central Business District was excluded from
+   neighbourhood comparisons due to its disproportionately high volume, which
+   compressed the visual scale for other areas.
+
+4. **Post-COVID patterns:** The 2020\u20132023 period shows how crime patterns shifted
+   following the COVID-19 pandemic and subsequent recovery.
+"))
+```
+
+---
+
+*Report generated on `r Sys.Date()` using R `r getRversion()`.*
