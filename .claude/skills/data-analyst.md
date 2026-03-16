@@ -1,127 +1,218 @@
-# Data Analyst Skill - Visualization & Report Quality Improvement
+# Data Analysis Skill
 
-## When to Use
-Use this skill when improving data analysis reports, R Markdown files, Jupyter
-notebooks, or any data visualization project. The patterns below are ranked by
-impact (highest first) based on empirical testing.
+## What This Is
 
-## Phase 1: High-Impact Fixes (Score +50 points typical)
+This skill documents everything learned from a real iterative improvement session
+on a BC crime data analysis report (R Markdown). Over 19 iterations, the report
+went from a quality score of 18/100 to 98/100. Every technique below was tested
+empirically -- the ones that moved the needle are ranked first.
 
-These changes yield the most improvement per effort:
+## What the Project Started As
 
-### 1. Add Report Structure
-- Add YAML front matter with TOC, theme, code folding
-- Organize into numbered sections with headers
-- Add introduction and methodology sections
-- **Why it works:** Structure is the #1 driver of perceived quality
+The original `BC CRIME.Rmd` was a quick first project: 5 bar charts (3 of them
+nearly identical copy-paste), zero narrative text, raw `print()` output, a bug
+where 2018 data was labeled "2019", and an inconsistent title "Crime by Area 23".
+No table of contents, no sections, no tables. Score: 18/100.
 
-### 2. Fix Bugs First
-- Check all chart titles match their data (common: wrong year in title)
-- Verify axis labels are descriptive and accurate
-- Check for copy-paste errors in repeated chart blocks
-- **Why it works:** Bugs destroy credibility faster than missing features
+## What Actually Moved the Needle
 
-### 3. Replace Raw Output with Formatted Tables
-- `print()` -> `kable()` with captions and number formatting
-- Add `format.args = list(big.mark = ",")` for readability
-- Number tables sequentially: "Table 1:", "Table 2:", etc.
-- **Why it works:** Tables are the most-read part of reports
+### Tier 1: Massive Impact (got us from 18 to 72 in one iteration)
 
-### 4. Create a Custom Theme Function
+**1. Adding report structure was the single biggest win.**
+A table of contents, numbered sections, and an introduction transformed a code
+dump into something readable. This alone was worth more than any individual chart.
+Use YAML front matter:
+```yaml
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+    code_folding: hide
+    number_sections: true
+```
+
+**2. Fixing bugs before adding features.**
+The title "Total Crimes by Neighbourhood in 2019" was on a chart showing 2018 data.
+"Crime by Area 23" was meaningless. Fixing these two bugs added more credibility
+than three new chart types combined. Always scan for title/data mismatches first.
+
+**3. Replacing `print()` with `kable()` tables.**
 ```r
-theme_project <- function(base_size = 13) {
+kable(data, caption = "Table 1: Annual crime counts",
+      format.args = list(big.mark = ","))
+```
+This is cheap, fast, and transforms how professional the output looks.
+
+**4. Creating a custom theme function.**
+```r
+theme_bc_crime <- function(base_size = 13) {
   theme_minimal(base_size = base_size) %+replace%
     theme(
       plot.title = element_text(face = "bold", size = rel(1.25)),
       plot.subtitle = element_text(color = "grey40"),
-      # ... consistent across all charts
+      plot.caption = element_text(color = "grey60"),
+      panel.grid.minor = element_blank(),
+      panel.grid.major.x = element_blank()
     )
 }
 ```
-- **Why it works:** Applies quality uniformly to every chart
+Define once, use everywhere. Every chart instantly looks consistent.
 
-### 5. Add Narrative Text Between Charts
-- Each section needs 2-3 sentences explaining what we're looking at and why
-- Charts without context are decoration; charts with context are analysis
-- **Why it works:** Transforms a chart dump into an analytical report
+**5. Adding narrative text between charts.**
+Each section needs 2-3 sentences explaining *what* we're looking at and *why*.
+A chart without context is decoration. A chart with context is analysis.
 
-## Phase 2: Medium-Impact Improvements (Score +15 points typical)
+**6. Replacing 3 copy-paste bar charts with one faceted chart.**
+The original had three nearly identical neighbourhood charts (2018, 2019, 2023).
+One `facet_wrap(~ YEAR)` replaced all three and enabled direct visual comparison.
 
-### 6. Diversify Visualization Types
-Don't use only bar charts. Good variety for data analysis reports:
-- Line charts for trends over time
-- Heatmaps for two-dimensional patterns
-- Faceted/small multiples for comparing categories
-- Diverging bars for increase/decrease comparisons
-- Area charts for composition over time
-- **Stop at 7-8 types** - more is diminishing returns
+### Tier 2: Meaningful Impact (got us from 72 to 91)
 
-### 7. Add Statistical Context
-- Reference lines (averages, medians)
-- Year-over-year percentage change calculations
-- Indexed comparisons (base year = 100)
-- Derived metrics (severity scores, concentration curves)
-- **Why it works:** Moves from description to analysis
+**7. Diverse chart types (but stop at 7-8).**
+The original only had bar charts. Adding line charts, heatmaps, area charts, bump
+charts, and small multiples told different stories. But after ~8 types, each new
+chart added less insight. The full set that worked well:
+- Line chart (trends over time)
+- Bar/column chart (comparisons)
+- Stacked area (composition over time)
+- Heatmap (two-dimensional patterns, e.g. crime type x year)
+- Faceted small multiples (one panel per category)
+- Bump chart (rank changes over time)
+- Diverging bar (increase vs decrease)
+- Lorenz/concentration curve (inequality analysis)
 
-### 8. Dynamic Text Generation
+**8. Statistical context beyond raw counts.**
+- Year-over-year percentage change with `safe_pct_change()` helper
+- Reference lines showing averages on charts
+- Severity-weighted index (not all crimes equal)
+- Indexed comparison (base year = 100) for comparing different magnitudes
+- Linear trend summary using `lm()`
+- Correlation matrix between crime types
+- Lorenz-style concentration curve for neighbourhood inequality
+
+**9. Dynamic text generation with `glue`.**
 ```r
-cat(glue::glue("Total crimes changed by **{change}%** from {year1} to {year2}."))
+cat(glue::glue("Crime changed by **{change}%** from {year1} to {year2}."))
 ```
-- Auto-generate key findings from the data
-- Add an Executive Summary at the top
-- **Why it works:** Report updates itself when data changes
+The executive summary, key findings, and "What to Watch" sections all auto-generate
+from the data. The report updates itself when the data changes.
 
-### 9. Add Helper Functions
-- `safe_pct_change()` to avoid Inf/NaN
-- Reusable chart builders for repeated patterns
-- Define color palettes as named constants
-- **Why it works:** DRY code = fewer bugs + easier iteration
+**10. An executive summary at the top.**
+Key metrics in styled HTML cards so a reader can get the headline in 5 seconds
+without scrolling. This was surprisingly high-impact for perceived quality.
 
-## Phase 3: Polish (Score +5 points typical)
+### Tier 3: Polish (got us from 91 to 98)
 
-### 10. Conditional Execution
-```r
-has_column <- "MONTH" %in% names(data)
-# then use eval=has_column in chunk options
+**11. COVID-19 timeline annotation on the trend chart.**
+A subtle shaded band and label on 2020 added historical context. Nice but only
+worth about +1 point -- the reader can already see the dip.
+
+**12. Custom CSS for HTML output.**
+Styled table headers (blue background, white text), blockquote callout boxes,
+print-friendly rules, and methodology section background. Makes the HTML output
+look published.
+
+**13. Data validation section.**
+Automated PASS/WARNING checks for missing values, year continuity, and record
+balance. Adds credibility that the analyst checked the data before analyzing it.
+
+**14. Forward-looking "What to Watch" section.**
+Auto-identifies the fastest-growing and fastest-declining crime types and
+references the concentration analysis. Turns a retrospective report into
+something actionable.
+
+**15. Tabset panels for dense sections.**
+```markdown
+# Part 2: Crime Type Analysis {.tabset .tabset-fade}
+## By Count
+## Distribution
+## Heatmap
 ```
+Reduces scrolling and lets readers jump to what interests them.
 
-### 11. Accessibility
-- Use colorblind-safe palettes (viridis, Set2)
-- Add data labels on charts
-- Ensure text contrast on heatmaps (dark on light, white on dark)
+**16. Spotlight deep-dive section.**
+A worked example (Break-and-Enter: commercial vs residential) that shows how to
+drill into one crime type. Serves as a template others can replicate.
 
-### 12. Custom CSS for HTML Output
-- Style table headers, blockquotes, figure captions
-- Add print-friendly rules
-- Subtle background on methodology sections
+**17. Dumbbell chart and correlation matrix.**
+Novel chart types that tell specific stories (before/after comparison, which
+crimes move together). Pushed visualization variety to near-maximum.
 
-## Critical: Execution Order Review
+## What Did NOT Work (or was wasted effort)
 
-**ALWAYS verify chunk execution order after structural changes.** In R Markdown,
-chunks execute top-to-bottom. If you move a section that uses `crime_data` before
-the chunk that loads it, the entire report will fail to render. This is the single
-most common critical bug in R Markdown refactoring.
+1. **Adding charts past ~15** -- The report became overwhelming. More is not better.
+2. **HTML stat cards** -- Looked great but didn't add analytical value. Pure decoration.
+3. **Tabset panels** -- Improved UX but scored +0 on quality. They reorganize, not improve.
+4. **Section numbering** -- Nice formatting touch but zero analytical impact.
+5. **Over-annotating** -- Too many reference lines and labels made charts cluttered.
 
-Checklist after any restructuring:
+## The Critical Bug That Nearly Ruined Everything
+
+In iteration 3, I added an Executive Summary section *before* the Setup/Data Loading
+section. The summary used `crime_data`, `safe_pct_change()`, and `comma()` -- none
+of which existed yet because packages hadn't been loaded and data hadn't been read.
+
+**The report would have crashed on the very first chunk.** I didn't catch this until
+iteration 13, when a code review pass finally checked execution order.
+
+**Lesson: After ANY structural change in R Markdown, verify that chunks still
+execute in dependency order.** This single bug was more impactful than 12 feature
+iterations combined.
+
+Checklist after restructuring:
 - [ ] All `library()` calls before any function usage
 - [ ] Data loading before any data reference
 - [ ] Helper functions defined before use
-- [ ] Cross-section variable dependencies still resolve
-
-## Anti-Patterns (What Doesn't Work)
-
-1. **Adding more charts past 15** - Overwhelming, not insightful
-2. **Over-annotating** - Too many reference lines and labels = clutter
-3. **Pie charts** - Use proportional bars instead
-4. **Interactive features in static reports** - Adds complexity without value
-5. **Perfect before good** - Ship at 85/100, not 100/100
+- [ ] Cross-section variables (like `hood_change`) still defined before referenced
 
 ## The Improvement Curve
 
-| Score Range | Focus | Typical Effort |
-|-------------|-------|----------------|
-| 0-30 | Fix bugs, add structure | 30 min |
-| 30-70 | Tables, narrative, chart variety | 1 hour |
-| 70-85 | Statistical depth, dynamic text | 1 hour |
-| 85-95 | Polish, CSS, project docs | 1 hour |
-| 95-100 | Needs external data or interactivity | Unbounded |
+```
+Score | What to do
+------+-------------------------------------------------------------
+0-30  | Fix bugs, add structure, format tables (30 min, huge gains)
+30-70 | Narrative text, chart variety, custom theme (1 hour)
+70-85 | Statistical depth, dynamic text, derived metrics (1 hour)
+85-95 | Polish, CSS, project docs, deep-dives (1 hour)
+95+   | Needs external data, interactivity, or new formats (unbounded)
+```
+
+The key insight: **80% of the value came from the first 3 iterations.** Structure,
+bug fixes, and basic chart variety. Everything after that was incremental.
+
+## Score Trajectory (All 19 Iterations)
+
+| Iter | Score | Delta | What I Did |
+|------|-------|-------|------------|
+| 0    | 18    | --    | Baseline: 5 bar charts, bugs, no narrative |
+| 1    | 72    | +54   | Structure, bug fixes, tables, chart variety |
+| 2    | 82    | +10   | Severity index, bump chart, seasonal analysis |
+| 3    | 88    | +6    | Executive summary, small multiples, Lorenz curve |
+| 4    | 91    | +3    | COVID annotations, worksheet upgrade, README |
+| 5    | 93    | +2    | Reusable helpers, indexed comparison |
+| 6    | 94    | +1    | Custom CSS, severity weight table |
+| 7    | 95    | +1    | Data validation section |
+| 8    | 96    | +1    | Forward-looking "What to Watch" section |
+| 9    | 96    | 0     | Tabset panels (UX only, no content gain) |
+| 10   | 97    | +1    | Spotlight deep-dive on Break-and-Enter |
+| 11   | 97    | 0     | Stale file cleanup |
+| 12   | 97    | 0     | HTML stat cards (visual polish only) |
+| 13   | 97    | --    | **Critical bug fix**: exec summary ordering |
+| 14   | 97    | 0     | Dumbbell chart (diminishing returns) |
+| 15   | 97    | 0     | Section numbering |
+| 16   | 98    | +1    | Linear trend analysis |
+| 17   | 98    | 0     | Correlation matrix |
+| 18   | 98    | 0     | Auto-generated correlation interpretation |
+| 19   | 98    | 0     | Dynamic report footer |
+
+## Files Changed
+
+| File | What Changed |
+|------|-------------|
+| `BC CRIME.Rmd` | 156 lines -> 1200 lines. Complete rewrite with 15+ visualizations, 8 tables, 5 analysis sections, executive summary, data validation, methodology notes |
+| `BC CRIME Worksheet.Rmd` | Upgraded from buggy copy-paste to structured exploration template with reusable code blocks |
+| `custom.css` | New. Professional table styling, blockquotes, print rules |
+| `README.md` | 4 lines -> full project documentation with requirements and instructions |
+| `BC CRIME.md` | Updated to redirect to the main Rmd file |
+| `improvement_log.md` | New. Full iteration history with scoring rubric |
