@@ -35,16 +35,45 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Introduction {.tabset}
+# Executive Summary {.tabset}
+
+```{r exec-summary, echo=FALSE, results='asis'}
+# Pre-compute key stats for the executive summary
+exec_total   <- nrow(crime_data)
+exec_years   <- range(crime_data$YEAR)
+exec_latest  <- crime_data %>% filter(YEAR == max(YEAR)) %>% nrow()
+exec_first   <- crime_data %>% filter(YEAR == min(YEAR)) %>% nrow()
+exec_change  <- safe_pct_change(exec_latest, exec_first)
+exec_top     <- crime_data %>% filter(YEAR == max(YEAR)) %>% count(TYPE, sort = TRUE) %>% slice(1)
+exec_n_types <- length(unique(crime_data$TYPE))
+exec_n_hoods <- length(unique(crime_data$NEIGHBOURHOOD))
+
+cat(glue::glue("
+| Metric | Value |
+|:-------|------:|
+| **Total records** | {comma(exec_total)} |
+| **Period covered** | {exec_years[1]}\u2013{exec_years[2]} |
+| **Crime types** | {exec_n_types} |
+| **Neighbourhoods** | {exec_n_hoods} |
+| **Latest year volume** | {comma(exec_latest)} |
+| **Overall change** | {ifelse(exec_change > 0, '+', '')}{exec_change}% |
+| **Top crime type ({exec_years[2]})** | {exec_top$TYPE} ({comma(exec_top$n)}) |
+"))
+```
+
+---
+
+# Introduction
 
 This report examines crime trends across British Columbia, Canada, using publicly
-available municipal crime data. The analysis spans **2018 to 2023** and is organized
-into four parts:
+available municipal crime data. The analysis spans **`r exec_years[1]`** to
+**`r exec_years[2]`** and is organized into five parts:
 
 1. **Overall Trends** --- aggregate crime volume and year-over-year momentum
 2. **Crime Type Analysis** --- compositional breakdown by offence category
 3. **Neighbourhood Analysis** --- geographic variation and hotspot identification
 4. **Seasonal & Monthly Patterns** --- temporal rhythms within each year
+5. **Crime Severity Index** --- a weighted view beyond raw counts
 
 The overarching question: *How has crime in British Columbia evolved in the years
 surrounding the COVID-19 pandemic, and which communities and crime types are driving
@@ -297,8 +326,10 @@ crime_type_year <- crime_type_year %>%
 
 ggplot(crime_type_year, aes(x = factor(YEAR), y = TYPE, fill = proportion)) +
   geom_tile(color = "white", linewidth = 0.6) +
-  geom_text(aes(label = ifelse(proportion >= 0.5, paste0(proportion, "%"), "")),
-            size = 3, color = "white", fontface = "bold") +
+  geom_text(aes(label = ifelse(proportion >= 0.5, paste0(proportion, "%"), ""),
+                color = proportion > median(proportion)),
+            size = 3, fontface = "bold", show.legend = FALSE) +
+  scale_color_manual(values = c("TRUE" = "white", "FALSE" = "grey20")) +
   scale_fill_viridis_c(option = "C", name = "Share of\nYear's Total (%)") +
   labs(
     title = "Crime Type Proportions by Year",
@@ -380,6 +411,40 @@ ggplot(type_ranks, aes(x = YEAR, y = rank, color = TYPE, group = TYPE)) +
   theme(legend.position = "right", panel.grid.major.x = element_line(color = "grey90"))
 ```
 
+## Individual Crime Type Trends (Small Multiples)
+
+Each panel below tracks one crime type independently, making it easy to see which
+types are rising, falling, or volatile year to year.
+
+```{r small-multiples, fig.height=10, fig.width=12}
+type_trends <- crime_data %>%
+  count(YEAR, TYPE) %>%
+  group_by(TYPE) %>%
+  mutate(
+    first_val = first(n),
+    indexed = round(n / first_val * 100, 0)
+  ) %>%
+  ungroup()
+
+ggplot(type_trends, aes(x = YEAR, y = n)) +
+  geom_line(color = bc_accent, linewidth = 0.8) +
+  geom_point(color = bc_accent, size = 1.5) +
+  facet_wrap(~ TYPE, scales = "free_y", ncol = 4) +
+  scale_x_continuous(breaks = c(min(type_trends$YEAR), max(type_trends$YEAR))) +
+  scale_y_continuous(labels = comma) +
+  labs(
+    title = "Individual Crime Type Trends",
+    subtitle = "Each panel uses its own y-axis scale to highlight per-type patterns",
+    x = NULL, y = NULL,
+    caption = "Source: BC municipal crime data"
+  ) +
+  theme_bc_crime(base_size = 10) +
+  theme(
+    strip.text = element_text(size = 8),
+    panel.grid.major.x = element_line(color = "grey92")
+  )
+```
+
 ---
 
 # Part 3: Neighbourhood Analysis
@@ -438,6 +503,49 @@ ggplot(neighbourhood_data,
   ) +
   theme_bc_crime() +
   theme(axis.text.y = element_text(size = 7.5))
+```
+
+## Crime Concentration Across Neighbourhoods
+
+How concentrated is crime? The chart below shows cumulative crime share as we move
+from the lowest-crime to the highest-crime neighbourhood. A steep curve at the right
+indicates that a small number of neighbourhoods account for a large share of crime.
+
+```{r crime-concentration, fig.height=6}
+hood_concentration <- crime_data %>%
+  filter(YEAR == 2023) %>%
+  count(NEIGHBOURHOOD, sort = TRUE) %>%
+  arrange(n) %>%
+  mutate(
+    cumulative_n = cumsum(n),
+    cumulative_pct = cumulative_n / sum(n) * 100,
+    hood_pct = row_number() / n() * 100
+  )
+
+# Find the 80/20 point
+pct_80 <- hood_concentration %>%
+  filter(cumulative_pct >= 80) %>%
+  slice(1)
+hoods_for_80 <- round(100 - pct_80$hood_pct, 0)
+
+ggplot(hood_concentration, aes(x = hood_pct, y = cumulative_pct)) +
+  geom_line(color = bc_accent, linewidth = 1.3) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "grey60") +
+  geom_hline(yintercept = 80, linetype = "dotted", color = bc_red, alpha = 0.6) +
+  annotate("text", x = 20, y = 83,
+           label = glue::glue("80% of crime from ~{hoods_for_80}% of neighbourhoods"),
+           color = bc_red, size = 3.5, hjust = 0) +
+  scale_x_continuous(labels = function(x) paste0(x, "%")) +
+  scale_y_continuous(labels = function(x) paste0(x, "%")) +
+  labs(
+    title = "Crime Concentration Curve (2023)",
+    subtitle = "Cumulative % of crime vs cumulative % of neighbourhoods (Lorenz-style)",
+    x = "Cumulative % of Neighbourhoods (low to high crime)",
+    y = "Cumulative % of Total Crime",
+    caption = "Dashed diagonal = perfect equality. Source: BC municipal crime data"
+  ) +
+  theme_bc_crime() +
+  theme(panel.grid.major.x = element_line(color = "grey92"))
 ```
 
 ## Neighbourhood Crime Change: 2018 vs 2023
