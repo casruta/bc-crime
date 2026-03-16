@@ -12,6 +12,7 @@ output:
     theme: flatly
     highlight: tango
     code_folding: hide
+    number_sections: true
     fig_width: 10
     fig_height: 6
     fig_caption: true
