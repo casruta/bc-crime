@@ -95,6 +95,19 @@ has_column <- "MONTH" %in% names(data)
 - Add print-friendly rules
 - Subtle background on methodology sections
 
+## Critical: Execution Order Review
+
+**ALWAYS verify chunk execution order after structural changes.** In R Markdown,
+chunks execute top-to-bottom. If you move a section that uses `crime_data` before
+the chunk that loads it, the entire report will fail to render. This is the single
+most common critical bug in R Markdown refactoring.
+
+Checklist after any restructuring:
+- [ ] All `library()` calls before any function usage
+- [ ] Data loading before any data reference
+- [ ] Helper functions defined before use
+- [ ] Cross-section variable dependencies still resolve
+
 ## Anti-Patterns (What Doesn't Work)
 
 1. **Adding more charts past 15** - Overwhelming, not insightful

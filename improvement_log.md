@@ -27,6 +27,11 @@
 | 6         | 94    | +1    | Custom CSS, severity weight table |
 | 7         | 95    | +1    | Data validation section, data-analyst skill |
 | 8         | 96    | +1    | Forward-looking analysis, cross-references |
+| 9         | 96    | 0     | Tabset panels (UX, not content) |
+| 10        | 97    | +1    | Spotlight deep-dive (Break-and-Enter) |
+| 11        | 97    | 0     | Stale file cleanup |
+| 12        | 97    | 0     | HTML stat cards (visual polish only) |
+| 13        | 97    | --    | **Critical bug fix**: exec summary before data load |
 
 ## Iteration History
 
@@ -120,6 +125,13 @@
 10. **Over-annotation** - Too many labels and reference lines can clutter
 11. **Interpretive annotations** - COVID bands are nice but only +1 point;
     the reader can see the dip themselves
+
+### Critical Lesson: Always Review Execution Order
+12. **Code review catches critical bugs that feature additions miss** - Adding
+    the Executive Summary before the Setup section meant the report wouldn't
+    render at all. No amount of chart improvement matters if the code crashes.
+13. **Review after structural changes** - When you move sections around, verify
+    all variable dependencies still resolve in the new order.
 
 ### Key Insight: The Improvement Curve
 - **Phase 1 (0-70):** Structure, bug fixes, and basic chart variety yield
