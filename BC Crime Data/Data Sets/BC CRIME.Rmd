@@ -35,69 +35,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Executive Summary {.tabset}
-
-```{r exec-summary, echo=FALSE, results='asis'}
-# Pre-compute key stats for the executive summary
-exec_total   <- nrow(crime_data)
-exec_years   <- range(crime_data$YEAR)
-exec_latest  <- crime_data %>% filter(YEAR == max(YEAR)) %>% nrow()
-exec_first   <- crime_data %>% filter(YEAR == min(YEAR)) %>% nrow()
-exec_change  <- safe_pct_change(exec_latest, exec_first)
-exec_top     <- crime_data %>% filter(YEAR == max(YEAR)) %>% count(TYPE, sort = TRUE) %>% slice(1)
-exec_n_types <- length(unique(crime_data$TYPE))
-exec_n_hoods <- length(unique(crime_data$NEIGHBOURHOOD))
-
-change_color <- ifelse(exec_change > 0, "#c0392b", "#27ae60")
-change_sign  <- ifelse(exec_change > 0, "+", "")
-
-cat(glue::glue('
-<div style="display: flex; flex-wrap: wrap; gap: 12px; margin: 1rem 0;">
-<div style="flex: 1; min-width: 140px; background: #f0f4f8; border-left: 4px solid #08519c; padding: 12px 16px; border-radius: 0 6px 6px 0;">
-<div style="font-size: 0.8em; color: #666; text-transform: uppercase; letter-spacing: 0.5px;">Total Records</div>
-<div style="font-size: 1.5em; font-weight: bold; color: #08519c;">{comma(exec_total)}</div>
-</div>
-<div style="flex: 1; min-width: 140px; background: #f0f4f8; border-left: 4px solid #08519c; padding: 12px 16px; border-radius: 0 6px 6px 0;">
-<div style="font-size: 0.8em; color: #666; text-transform: uppercase; letter-spacing: 0.5px;">Period</div>
-<div style="font-size: 1.5em; font-weight: bold; color: #08519c;">{exec_years[1]}&ndash;{exec_years[2]}</div>
-</div>
-<div style="flex: 1; min-width: 140px; background: #f0f4f8; border-left: 4px solid {change_color}; padding: 12px 16px; border-radius: 0 6px 6px 0;">
-<div style="font-size: 0.8em; color: #666; text-transform: uppercase; letter-spacing: 0.5px;">Overall Change</div>
-<div style="font-size: 1.5em; font-weight: bold; color: {change_color};">{change_sign}{exec_change}%</div>
-</div>
-<div style="flex: 1; min-width: 140px; background: #f0f4f8; border-left: 4px solid #08519c; padding: 12px 16px; border-radius: 0 6px 6px 0;">
-<div style="font-size: 0.8em; color: #666; text-transform: uppercase; letter-spacing: 0.5px;">Top Crime ({exec_years[2]})</div>
-<div style="font-size: 1.1em; font-weight: bold; color: #08519c;">{exec_top$TYPE}</div>
-<div style="font-size: 0.9em; color: #888;">{comma(exec_top$n)} incidents</div>
-</div>
-</div>
-
-| Metric | Value |
-|:-------|------:|
-| **Crime types** | {exec_n_types} |
-| **Neighbourhoods** | {exec_n_hoods} |
-| **Latest year volume** | {comma(exec_latest)} |
-'))
-```
-
----
-
-# Introduction
-
-This report examines crime trends across British Columbia, Canada, using publicly
-available municipal crime data. The analysis spans **`r exec_years[1]`** to
-**`r exec_years[2]`** and is organized into five parts:
-
-1. **Overall Trends** --- aggregate crime volume and year-over-year momentum
-2. **Crime Type Analysis** --- compositional breakdown by offence category
-3. **Neighbourhood Analysis** --- geographic variation and hotspot identification
-4. **Seasonal & Monthly Patterns** --- temporal rhythms within each year
-5. **Crime Severity Index** --- a weighted view beyond raw counts
-
-The overarching question: *How has crime in British Columbia evolved in the years
-surrounding the COVID-19 pandemic, and which communities and crime types are driving
-those changes?*
-
 # Setup and Data Loading
 
 ```{r load-packages}
@@ -173,6 +110,68 @@ plot_hood_bar <- function(data, title, subtitle = NULL, show_labels = TRUE) {
   p
 }
 ```
+
+# Executive Summary
+
+```{r exec-summary, echo=FALSE, results='asis'}
+exec_total   <- nrow(crime_data)
+exec_years   <- range(crime_data$YEAR)
+exec_latest  <- crime_data %>% filter(YEAR == max(YEAR)) %>% nrow()
+exec_first   <- crime_data %>% filter(YEAR == min(YEAR)) %>% nrow()
+exec_change  <- safe_pct_change(exec_latest, exec_first)
+exec_top     <- crime_data %>% filter(YEAR == max(YEAR)) %>% count(TYPE, sort = TRUE) %>% slice(1)
+exec_n_types <- length(unique(crime_data$TYPE))
+exec_n_hoods <- length(unique(crime_data$NEIGHBOURHOOD))
+
+change_color <- ifelse(exec_change > 0, "#c0392b", "#27ae60")
+change_sign  <- ifelse(exec_change > 0, "+", "")
+
+cat(glue::glue('
+<div style="display: flex; flex-wrap: wrap; gap: 12px; margin: 1rem 0;">
+<div style="flex: 1; min-width: 140px; background: #f0f4f8; border-left: 4px solid #08519c; padding: 12px 16px; border-radius: 0 6px 6px 0;">
+<div style="font-size: 0.8em; color: #666; text-transform: uppercase; letter-spacing: 0.5px;">Total Records</div>
+<div style="font-size: 1.5em; font-weight: bold; color: #08519c;">{comma(exec_total)}</div>
+</div>
+<div style="flex: 1; min-width: 140px; background: #f0f4f8; border-left: 4px solid #08519c; padding: 12px 16px; border-radius: 0 6px 6px 0;">
+<div style="font-size: 0.8em; color: #666; text-transform: uppercase; letter-spacing: 0.5px;">Period</div>
+<div style="font-size: 1.5em; font-weight: bold; color: #08519c;">{exec_years[1]}&ndash;{exec_years[2]}</div>
+</div>
+<div style="flex: 1; min-width: 140px; background: #f0f4f8; border-left: 4px solid {change_color}; padding: 12px 16px; border-radius: 0 6px 6px 0;">
+<div style="font-size: 0.8em; color: #666; text-transform: uppercase; letter-spacing: 0.5px;">Overall Change</div>
+<div style="font-size: 1.5em; font-weight: bold; color: {change_color};">{change_sign}{exec_change}%</div>
+</div>
+<div style="flex: 1; min-width: 140px; background: #f0f4f8; border-left: 4px solid #08519c; padding: 12px 16px; border-radius: 0 6px 6px 0;">
+<div style="font-size: 0.8em; color: #666; text-transform: uppercase; letter-spacing: 0.5px;">Top Crime ({exec_years[2]})</div>
+<div style="font-size: 1.1em; font-weight: bold; color: #08519c;">{exec_top$TYPE}</div>
+<div style="font-size: 0.9em; color: #888;">{comma(exec_top$n)} incidents</div>
+</div>
+</div>
+
+| Metric | Value |
+|:-------|------:|
+| **Crime types** | {exec_n_types} |
+| **Neighbourhoods** | {exec_n_hoods} |
+| **Latest year volume** | {comma(exec_latest)} |
+'))
+```
+
+# Introduction
+
+This report examines crime trends across British Columbia, Canada, using publicly
+available municipal crime data. The analysis spans **`r exec_years[1]`** to
+**`r exec_years[2]`** and is organized into five parts:
+
+1. **Overall Trends** --- aggregate crime volume and year-over-year momentum
+2. **Crime Type Analysis** --- compositional breakdown by offence category
+3. **Neighbourhood Analysis** --- geographic variation and hotspot identification
+4. **Seasonal & Monthly Patterns** --- temporal rhythms within each year
+5. **Crime Severity Index** --- a weighted view beyond raw counts
+
+The overarching question: *How has crime in British Columbia evolved in the years
+surrounding the COVID-19 pandemic, and which communities and crime types are driving
+those changes?*
+
+---
 
 # Data Quality Check
 
@@ -764,8 +763,8 @@ volumes. This heatmap shows what fraction of each neighbourhood's crime falls in
 each category, revealing distinct neighbourhood "profiles."
 
 ```{r hood-profiles, fig.height=10, fig.width=12}
-# Use top 5 neighbourhoods and top 6 crime types for readability
-top5_hoods <- crime_data %>%
+# Use top 8 neighbourhoods and top 6 crime types for readability
+top8_hoods <- crime_data %>%
   filter(YEAR == 2023, NEIGHBOURHOOD != "Central Business District") %>%
   count(NEIGHBOURHOOD, sort = TRUE) %>%
   head(8) %>%
@@ -778,7 +777,7 @@ top6_types <- crime_data %>%
   pull(TYPE)
 
 hood_profile <- crime_data %>%
-  filter(YEAR == 2023, NEIGHBOURHOOD %in% top5_hoods, TYPE %in% top6_types) %>%
+  filter(YEAR == 2023, NEIGHBOURHOOD %in% top8_hoods, TYPE %in% top6_types) %>%
   count(NEIGHBOURHOOD, TYPE) %>%
   group_by(NEIGHBOURHOOD) %>%
   mutate(pct = round(n / sum(n) * 100, 1)) %>%
@@ -949,7 +948,7 @@ severity_weights <- data.frame(
 kable(
   severity_weights %>% arrange(desc(weight)) %>%
     rename(`Crime Type` = TYPE, `Severity Weight` = weight),
-  caption = "Table 8: Severity weight assignments (all other types default to 2)"
+  caption = "Table 7: Severity weight assignments (all other types default to 2)"
 )
 ```
 
@@ -990,7 +989,7 @@ kable(
   severity_by_year %>%
     rename(Year = YEAR, `Total Crimes` = total_crimes,
            `Severity Sum` = severity_score, `Avg Severity` = avg_severity),
-  caption = "Table 7: Annual severity index",
+  caption = "Table 8: Annual severity index",
   format.args = list(big.mark = ",")
 )
 ```
