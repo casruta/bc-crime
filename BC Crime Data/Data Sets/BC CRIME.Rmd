@@ -614,6 +614,24 @@ ggplot(cor_long, aes(x = Type1, y = Type2, fill = Correlation)) +
   )
 ```
 
+```{r cor-interpretation, results='asis'}
+# Find the strongest positive and negative correlations (excluding self-correlations)
+cor_filtered <- cor_long %>%
+  filter(as.character(Type1) < as.character(Type2)) %>%
+  arrange(desc(Correlation))
+
+strongest_pos <- cor_filtered %>% slice(1)
+strongest_neg <- cor_filtered %>% arrange(Correlation) %>% slice(1)
+
+cat(glue::glue(
+  "> **Correlation insight:** The strongest positive correlation is between ",
+  "*{strongest_pos$Type1}* and *{strongest_pos$Type2}* (r = {round(strongest_pos$Correlation, 2)}), ",
+  "suggesting these crimes move in tandem. ",
+  "The weakest correlation involves *{strongest_neg$Type1}* and *{strongest_neg$Type2}* ",
+  "(r = {round(strongest_neg$Correlation, 2)}).\n\n"
+))
+```
+
 ## Indexed Comparison
 
 Comparing crime types of very different magnitudes (e.g., thousands of thefts vs
