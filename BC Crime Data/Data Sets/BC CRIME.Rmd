@@ -137,6 +137,22 @@ bc_palette  <- c("#08519c", "#3182bd", "#6baed6", "#9ecae1", "#c6dbef", "#deebf7
 safe_pct_change <- function(new, old) {
   ifelse(old == 0, NA_real_, round((new / old - 1) * 100, 1))
 }
+
+# Reusable horizontal bar chart for neighbourhood data
+plot_hood_bar <- function(data, title, subtitle = NULL, show_labels = TRUE) {
+  p <- ggplot(data, aes(x = reorder(NEIGHBOURHOOD, n), y = n, fill = n)) +
+    geom_col(show.legend = FALSE) +
+    coord_flip() +
+    scale_fill_viridis_c(option = "D", direction = -1) +
+    scale_y_continuous(labels = comma, expand = expansion(mult = c(0, 0.15))) +
+    labs(title = title, subtitle = subtitle, x = NULL, y = "Total Reported Crimes",
+         caption = "Source: BC municipal crime data") +
+    theme_bc_crime()
+  if (show_labels) {
+    p <- p + geom_text(aes(label = comma(n)), hjust = -0.05, size = 3.2, fontface = "bold")
+  }
+  p
+}
 ```
 
 # Data Overview
@@ -272,6 +288,40 @@ kable(
   caption = glue::glue("Table 4: Crime counts by type and year ({yr_range[1]}\u2013{yr_range[2]})"),
   format.args = list(big.mark = ",")
 )
+```
+
+## Crime Type Distribution (Latest Year)
+
+Before examining trends, here is the overall breakdown for the most recent year.
+This proportional bar chart replaces a pie chart --- it is easier to compare
+relative sizes accurately.
+
+```{r crime-type-proportion}
+type_dist <- crime_data %>%
+  filter(YEAR == max(YEAR)) %>%
+  count(TYPE, sort = TRUE) %>%
+  mutate(
+    pct = round(n / sum(n) * 100, 1),
+    label = ifelse(pct >= 2, paste0(TYPE, "\n", pct, "%"), "")
+  )
+
+ggplot(type_dist, aes(x = 1, y = n, fill = reorder(TYPE, -n))) +
+  geom_col(width = 1, color = "white", linewidth = 0.3, show.legend = TRUE) +
+  coord_flip() +
+  scale_fill_brewer(palette = "Set3", name = "Crime Type") +
+  labs(
+    title = glue::glue("Crime Type Distribution ({max(crime_data$YEAR)})"),
+    subtitle = "Proportional bar; each segment represents one crime type's share",
+    x = NULL, y = NULL,
+    caption = "Source: BC municipal crime data"
+  ) +
+  theme_bc_crime() +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    legend.position = "right"
+  )
 ```
 
 ## Crime Composition Over Time
@@ -447,6 +497,42 @@ ggplot(type_trends, aes(x = YEAR, y = n)) +
     strip.text = element_text(size = 8),
     panel.grid.major.x = element_line(color = "grey92")
   )
+```
+
+## Indexed Comparison (Base Year = 100)
+
+Comparing crime types of very different magnitudes (e.g., thousands of thefts vs
+dozens of homicides) on the same scale is misleading. By indexing each type to
+100 in the first available year, we can compare *relative* trajectories regardless
+of absolute volume.
+
+```{r indexed-comparison, fig.height=7}
+indexed_trends <- crime_data %>%
+  count(YEAR, TYPE) %>%
+  group_by(TYPE) %>%
+  mutate(
+    base_val = first(n),
+    index = round(n / base_val * 100, 0)
+  ) %>%
+  ungroup() %>%
+  filter(TYPE %in% top_types)
+
+base_year <- min(indexed_trends$YEAR)
+
+ggplot(indexed_trends, aes(x = YEAR, y = index, color = TYPE, group = TYPE)) +
+  geom_hline(yintercept = 100, linetype = "dashed", color = "grey60", linewidth = 0.4) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  scale_x_continuous(breaks = unique(indexed_trends$YEAR)) +
+  scale_color_brewer(palette = "Set2", name = "Crime Type") +
+  labs(
+    title = glue::glue("Indexed Crime Trends (Base Year {base_year} = 100)"),
+    subtitle = "Values above 100 = growth vs base year; below 100 = decline",
+    x = NULL, y = glue::glue("Index ({base_year} = 100)"),
+    caption = "Top 8 crime types. Source: BC municipal crime data"
+  ) +
+  theme_bc_crime() +
+  theme(legend.position = "right", panel.grid.major.x = element_line(color = "grey92"))
 ```
 
 ---
