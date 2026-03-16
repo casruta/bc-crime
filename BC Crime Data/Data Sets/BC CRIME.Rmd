@@ -16,7 +16,7 @@ output:
     fig_height: 6
     fig_caption: true
     df_print: kable
-    css: !expr NULL
+    css: custom.css
   pdf_document:
     toc: true
     fig_width: 10
@@ -808,8 +808,7 @@ Not all crimes carry equal weight. A simple severity-weighted index gives a more
 nuanced view than raw counts alone. The weights below are illustrative and based
 on common criminal justice severity scales.
 
-```{r severity-index, fig.height=6}
-# Illustrative severity weights (1 = lowest, 10 = highest)
+```{r severity-weights-table}
 severity_weights <- data.frame(
   TYPE = c("Homicide", "Offence Against a Person",
            "Break and Enter Commercial", "Break and Enter Residential/Other",
@@ -818,6 +817,15 @@ severity_weights <- data.frame(
   weight = c(10, 7, 5, 5, 9, 4),
   stringsAsFactors = FALSE
 )
+
+kable(
+  severity_weights %>% arrange(desc(weight)) %>%
+    rename(`Crime Type` = TYPE, `Severity Weight` = weight),
+  caption = "Table 8: Severity weight assignments (all other types default to 2)"
+)
+```
+
+```{r severity-index, fig.height=6}
 
 crime_with_weight <- crime_data %>%
   left_join(severity_weights, by = "TYPE") %>%
