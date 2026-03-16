@@ -307,13 +307,13 @@ ggplot(yoy_data, aes(x = factor(YEAR), y = pct_change, fill = pct_change > 0)) +
 
 ---
 
-# Part 2: Crime Type Analysis
+# Part 2: Crime Type Analysis {.tabset .tabset-fade}
 
 Not all crimes are equal in severity or frequency. This section decomposes the
 aggregate trend by offence type to understand *what kinds* of crime are rising or
-falling.
+falling. Use the tabs below to explore different angles.
 
-## Crime Counts by Type and Year
+## By Count
 
 ```{r crime-type-table}
 crime_counts <- crime_data %>%
@@ -330,7 +330,7 @@ kable(
 )
 ```
 
-## Crime Type Distribution (Latest Year)
+## Distribution
 
 Before examining trends, here is the overall breakdown for the most recent year.
 This proportional bar chart replaces a pie chart --- it is easier to compare
@@ -364,7 +364,7 @@ ggplot(type_dist, aes(x = 1, y = n, fill = reorder(TYPE, -n))) +
   )
 ```
 
-## Crime Composition Over Time
+## Composition
 
 The stacked area chart reveals how the *mix* of crime types shifts across years.
 The top 8 categories are shown individually; less common types are grouped.
@@ -395,7 +395,7 @@ ggplot(crime_type_trend, aes(x = YEAR, y = n, fill = TYPE)) +
   theme(legend.position = "right")
 ```
 
-## Crime Type Proportions Heatmap
+## Heatmap
 
 This heatmap normalizes each year's data to show the *percentage share* of each
 crime type, making it easy to spot shifts in crime composition independent of
@@ -435,7 +435,7 @@ ggplot(crime_type_year, aes(x = factor(YEAR), y = TYPE, fill = proportion)) +
   theme(legend.position = "right", panel.grid = element_blank())
 ```
 
-## Homicide Trends
+## Homicides
 
 Homicides, while a small fraction of total crime, represent the most severe
 category. The dedicated chart below tracks their year-over-year trajectory.
@@ -476,7 +476,7 @@ kable(
 )
 ```
 
-## Top Crime Types: Rank Change Over Time
+## Rankings
 
 This bump chart shows how the relative ranking of crime types has shifted. A rising
 line means a crime type is becoming relatively more common.
@@ -505,7 +505,7 @@ ggplot(type_ranks, aes(x = YEAR, y = rank, color = TYPE, group = TYPE)) +
   theme(legend.position = "right", panel.grid.major.x = element_line(color = "grey90"))
 ```
 
-## Individual Crime Type Trends (Small Multiples)
+## Individual Trends
 
 Each panel below tracks one crime type independently, making it easy to see which
 types are rising, falling, or volatile year to year.
@@ -539,7 +539,7 @@ ggplot(type_trends, aes(x = YEAR, y = n)) +
   )
 ```
 
-## Indexed Comparison (Base Year = 100)
+## Indexed Comparison
 
 Comparing crime types of very different magnitudes (e.g., thousands of thefts vs
 dozens of homicides) on the same scale is misleading. By indexing each type to
@@ -577,14 +577,16 @@ ggplot(indexed_trends, aes(x = YEAR, y = index, color = TYPE, group = TYPE)) +
 
 ---
 
-# Part 3: Neighbourhood Analysis
+# Part 3: Neighbourhood Analysis {.tabset .tabset-fade}
 
 Geographic analysis reveals *where* crime concentrates and how neighbourhood-level
 patterns differ from the aggregate trend. The Central Business District is excluded
 from these comparisons because its disproportionate volume compresses the visual
 scale for other areas.
 
-## Top 10 Neighbourhoods (2023)
+Click the tabs below to explore different neighbourhood perspectives.
+
+## Top 10 (2023)
 
 ```{r top-neighbourhoods-2023}
 top_hoods_2023 <- crime_data %>%
@@ -610,7 +612,7 @@ ggplot(top_hoods_2023,
   theme_bc_crime()
 ```
 
-## Neighbourhood Comparison Across Years (Faceted)
+## Year Comparison
 
 ```{r neighbourhood-facet, fig.height=10, fig.width=12}
 neighbourhood_data <- crime_data %>%
@@ -635,7 +637,7 @@ ggplot(neighbourhood_data,
   theme(axis.text.y = element_text(size = 7.5))
 ```
 
-## Crime Concentration Across Neighbourhoods
+## Concentration
 
 How concentrated is crime? The chart below shows cumulative crime share as we move
 from the lowest-crime to the highest-crime neighbourhood. A steep curve at the right
@@ -678,7 +680,7 @@ ggplot(hood_concentration, aes(x = hood_pct, y = cumulative_pct)) +
   theme(panel.grid.major.x = element_line(color = "grey92"))
 ```
 
-## Neighbourhood Crime Change: 2018 vs 2023
+## Change 2018-2023
 
 The overall crime trend (Part 1) showed the aggregate direction of change. But
 this masks variation: some neighbourhoods may have improved even as others worsened.
@@ -736,7 +738,7 @@ kable(
 )
 ```
 
-## Neighbourhood Crime Profiles (2023)
+## Crime Profiles
 
 Different neighbourhoods may have different *types* of crime, not just different
 volumes. This heatmap shows what fraction of each neighbourhood's crime falls into
