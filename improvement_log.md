@@ -23,6 +23,10 @@
 | 2         | 82    | +10   | Statistical depth, severity index, bump chart |
 | 3         | 88    | +6    | Executive summary, small multiples, Lorenz curve |
 | 4         | 91    | +3    | Interpretive depth, COVID annotations, project polish |
+| 5         | 93    | +2    | Reusable helpers, indexed comparison, proportional bar |
+| 6         | 94    | +1    | Custom CSS, severity weight table |
+| 7         | 95    | +1    | Data validation section, data-analyst skill |
+| 8         | 96    | +1    | Forward-looking analysis, cross-references |
 
 ## Iteration History
 
@@ -126,3 +130,18 @@
   cross-cutting analyses provide small but real improvements.
 - **Phase 4 (92+):** Requires external data, interactivity, or fundamentally
   different output formats to push further.
+
+## Final Detailed Score Breakdown (Iteration 8)
+
+| Dimension | Baseline | Final | Max | Notes |
+|---|---|---|---|---|
+| Visualization Variety | 3 | 14 | 15 | 11 chart types: line, bar, area, heatmap x3, facet, bump, small mult, Lorenz, indexed, proportional |
+| Title/Label Accuracy | 3 | 10 | 10 | All titles correct, consistent, dynamic |
+| Narrative/Analysis | 0 | 14 | 15 | Exec summary, section intros, cross-refs, what-to-watch, methodology |
+| Code Quality (DRY) | 2 | 9 | 10 | Custom theme, helpers, named palette, no copy-paste |
+| Theme/Styling Consistency | 4 | 9 | 10 | Unified theme, custom CSS, consistent colors |
+| Statistical Depth | 2 | 14 | 15 | YoY%, severity, concentration, indexed, data validation |
+| Report Structure | 1 | 10 | 10 | TOC, 5 parts, exec summary, methodology, what-to-watch |
+| Data Presentation | 1 | 9 | 10 | 8+ tables, column summary, quality checks, dynamic text |
+| Accessibility | 2 | 5 | 5 | Viridis + Set2, heatmap contrast, labeled annotations |
+| **TOTAL** | **18** | **96** | **100** | **+78 points over 8 iterations** |
