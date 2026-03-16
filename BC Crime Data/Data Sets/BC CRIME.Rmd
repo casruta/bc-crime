@@ -1197,4 +1197,10 @@ continued monitoring:
 
 ---
 
-*Report generated on `r Sys.Date()` using R `r getRversion()`.*
+```{r report-footer, echo=FALSE, results='asis'}
+cat(glue::glue(
+  "*Report generated on {Sys.Date()} using R {getRversion()}. ",
+  "This analysis contains {exec_n_types} crime types across {exec_n_hoods} ",
+  "neighbourhoods covering {comma(exec_total)} records ({exec_years[1]}\u2013{exec_years[2]}).*"
+))
+```
