@@ -786,6 +786,72 @@ ggplot(hood_profile, aes(x = TYPE, y = NEIGHBOURHOOD, fill = pct)) +
   )
 ```
 
+# Spotlight: Break-and-Enter Analysis
+
+As a worked example of how to drill deeper into a specific crime category, this
+section examines break-and-enter offences (both commercial and residential) in
+more detail. This pattern can be replicated for any crime type of interest.
+
+```{r be-spotlight, fig.height=6}
+be_types <- c("Break and Enter Commercial", "Break and Enter Residential/Other")
+
+be_data <- crime_data %>%
+  filter(TYPE %in% be_types) %>%
+  count(YEAR, TYPE)
+
+ggplot(be_data, aes(x = YEAR, y = n, color = TYPE, group = TYPE)) +
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 3) +
+  geom_text(aes(label = comma(n)), vjust = -1, size = 3, show.legend = FALSE) +
+  scale_x_continuous(breaks = unique(be_data$YEAR)) +
+  scale_y_continuous(labels = comma, expand = expansion(mult = c(0.05, 0.15))) +
+  scale_color_manual(values = c("Break and Enter Commercial" = bc_accent,
+                                 "Break and Enter Residential/Other" = bc_red),
+                     name = NULL) +
+  labs(
+    title = "Break-and-Enter Trends: Commercial vs Residential",
+    subtitle = "Tracking both sub-categories independently over time",
+    x = NULL, y = "Number of Incidents",
+    caption = "Source: BC municipal crime data"
+  ) +
+  theme_bc_crime() +
+  theme(legend.position = "bottom")
+```
+
+```{r be-by-neighbourhood, fig.height=7}
+top_be_hoods <- crime_data %>%
+  filter(TYPE %in% be_types, YEAR == max(YEAR),
+         NEIGHBOURHOOD != "Central Business District") %>%
+  count(NEIGHBOURHOOD, sort = TRUE) %>%
+  head(10) %>%
+  pull(NEIGHBOURHOOD)
+
+be_by_hood <- crime_data %>%
+  filter(TYPE %in% be_types, YEAR == max(YEAR),
+         NEIGHBOURHOOD %in% top_be_hoods) %>%
+  count(NEIGHBOURHOOD, TYPE) %>%
+  group_by(NEIGHBOURHOOD) %>%
+  mutate(total = sum(n)) %>%
+  ungroup()
+
+ggplot(be_by_hood,
+       aes(x = reorder(NEIGHBOURHOOD, total), y = n, fill = TYPE)) +
+  geom_col() +
+  coord_flip() +
+  scale_fill_manual(values = c("Break and Enter Commercial" = bc_accent,
+                                "Break and Enter Residential/Other" = bc_red),
+                    name = NULL) +
+  scale_y_continuous(labels = comma) +
+  labs(
+    title = glue::glue("Break-and-Enter by Neighbourhood ({max(crime_data$YEAR)})"),
+    subtitle = "Top 10 neighbourhoods; stacked by commercial vs residential",
+    x = NULL, y = "Number of Incidents",
+    caption = "Source: BC municipal crime data"
+  ) +
+  theme_bc_crime() +
+  theme(legend.position = "bottom")
+```
+
 ---
 
 # Part 4: Seasonal and Monthly Patterns
