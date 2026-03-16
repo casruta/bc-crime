@@ -32,6 +32,12 @@
 | 11        | 97    | 0     | Stale file cleanup |
 | 12        | 97    | 0     | HTML stat cards (visual polish only) |
 | 13        | 97    | --    | **Critical bug fix**: exec summary before data load |
+| 14        | 97    | 0     | Dumbbell chart (new chart type, diminishing returns) |
+| 15        | 97    | 0     | Section numbering |
+| 16        | 98    | +1    | Linear trend analysis with statistical interpretation |
+| 17        | 98    | 0     | Crime type correlation matrix |
+| 18        | 98    | 0     | Auto-generated correlation interpretation |
+| 19        | 98    | 0     | Dynamic report footer |
 
 ## Iteration History
 
@@ -156,4 +162,4 @@
 | Report Structure | 1 | 10 | 10 | TOC, 5 parts, exec summary, methodology, what-to-watch |
 | Data Presentation | 1 | 9 | 10 | 8+ tables, column summary, quality checks, dynamic text |
 | Accessibility | 2 | 5 | 5 | Viridis + Set2, heatmap contrast, labeled annotations |
-| **TOTAL** | **18** | **96** | **100** | **+78 points over 8 iterations** |
+| **TOTAL** | **18** | **98** | **100** | **+80 points over 19 iterations** |
