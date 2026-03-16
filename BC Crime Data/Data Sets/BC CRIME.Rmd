@@ -48,17 +48,36 @@ exec_top     <- crime_data %>% filter(YEAR == max(YEAR)) %>% count(TYPE, sort = 
 exec_n_types <- length(unique(crime_data$TYPE))
 exec_n_hoods <- length(unique(crime_data$NEIGHBOURHOOD))
 
-cat(glue::glue("
+change_color <- ifelse(exec_change > 0, "#c0392b", "#27ae60")
+change_sign  <- ifelse(exec_change > 0, "+", "")
+
+cat(glue::glue('
+<div style="display: flex; flex-wrap: wrap; gap: 12px; margin: 1rem 0;">
+<div style="flex: 1; min-width: 140px; background: #f0f4f8; border-left: 4px solid #08519c; padding: 12px 16px; border-radius: 0 6px 6px 0;">
+<div style="font-size: 0.8em; color: #666; text-transform: uppercase; letter-spacing: 0.5px;">Total Records</div>
+<div style="font-size: 1.5em; font-weight: bold; color: #08519c;">{comma(exec_total)}</div>
+</div>
+<div style="flex: 1; min-width: 140px; background: #f0f4f8; border-left: 4px solid #08519c; padding: 12px 16px; border-radius: 0 6px 6px 0;">
+<div style="font-size: 0.8em; color: #666; text-transform: uppercase; letter-spacing: 0.5px;">Period</div>
+<div style="font-size: 1.5em; font-weight: bold; color: #08519c;">{exec_years[1]}&ndash;{exec_years[2]}</div>
+</div>
+<div style="flex: 1; min-width: 140px; background: #f0f4f8; border-left: 4px solid {change_color}; padding: 12px 16px; border-radius: 0 6px 6px 0;">
+<div style="font-size: 0.8em; color: #666; text-transform: uppercase; letter-spacing: 0.5px;">Overall Change</div>
+<div style="font-size: 1.5em; font-weight: bold; color: {change_color};">{change_sign}{exec_change}%</div>
+</div>
+<div style="flex: 1; min-width: 140px; background: #f0f4f8; border-left: 4px solid #08519c; padding: 12px 16px; border-radius: 0 6px 6px 0;">
+<div style="font-size: 0.8em; color: #666; text-transform: uppercase; letter-spacing: 0.5px;">Top Crime ({exec_years[2]})</div>
+<div style="font-size: 1.1em; font-weight: bold; color: #08519c;">{exec_top$TYPE}</div>
+<div style="font-size: 0.9em; color: #888;">{comma(exec_top$n)} incidents</div>
+</div>
+</div>
+
 | Metric | Value |
 |:-------|------:|
-| **Total records** | {comma(exec_total)} |
-| **Period covered** | {exec_years[1]}\u2013{exec_years[2]} |
 | **Crime types** | {exec_n_types} |
 | **Neighbourhoods** | {exec_n_hoods} |
 | **Latest year volume** | {comma(exec_latest)} |
-| **Overall change** | {ifelse(exec_change > 0, '+', '')}{exec_change}% |
-| **Top crime type ({exec_years[2]})** | {exec_top$TYPE} ({comma(exec_top$n)}) |
-"))
+'))
 ```
 
 ---
