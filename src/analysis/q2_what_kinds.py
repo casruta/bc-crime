@@ -53,7 +53,7 @@ SPECIFIC_VIOLATIONS = [
     "Assault, level 3, aggravated [1410]",
     "Total sexual violations against children [130]",
     "Sexual assault, level 1 [1610]",
-    "Robbery [1610]",
+    "Robbery [160]",
     "Total robbery [160]",
     "Breaking and entering [2120]",
     "Total theft of motor vehicle [220]",
@@ -158,7 +158,12 @@ def chart_stacked_area(save_path: Path | None = None) -> tuple[plt.Figure, str]:
 
     ax.stackplot(wide.index, [wide[c].values for c in cols], labels=cols, colors=colors, alpha=0.85)
     ax.set_title("BC Crime Composition by Category (rate per 100,000)")
-    add_subtitle(ax, f"Total crime rate peaked near {int(wide.loc[wide.sum(axis=1).idxmax()].name)} and has declined {((wide.iloc[0].sum() - wide.iloc[-1].sum()) / wide.iloc[0].sum() * 100):.0f}% since")
+    first_sum = wide.iloc[0].sum()
+    if first_sum != 0:
+        pct_decline = ((first_sum - wide.iloc[-1].sum()) / first_sum * 100)
+        add_subtitle(ax, f"Total crime rate peaked near {int(wide.loc[wide.sum(axis=1).idxmax()].name)} and has declined {pct_decline:.0f}% since")
+    else:
+        add_subtitle(ax, f"Total crime rate peaked near {int(wide.loc[wide.sum(axis=1).idxmax()].name)}")
     ax.set_xlabel("Year")
     ax.set_ylabel("Rate per 100,000")
     ax.legend(loc="upper left", fontsize=9)
@@ -261,7 +266,10 @@ def chart_top_changes(save_path: Path | None = None) -> tuple[plt.Figure, str]:
 
     ax.axvline(0, color="black", linewidth=0.8)
     ax.set_title(f"Top 10 Violations by Absolute Rate Change ({start}–{latest})")
-    add_subtitle(ax, f"Property theft drives declines; child exploitation and shoplifting are largest increases")
+    # Data-driven subtitle from actual top declining and top rising violations
+    top_declining_name = df_top[df_top["abs_change"] < 0].iloc[0]["label"] if (df_top["abs_change"] < 0).any() else "N/A"
+    top_rising_name = df_top[df_top["abs_change"] > 0].iloc[-1]["label"] if (df_top["abs_change"] > 0).any() else "N/A"
+    add_subtitle(ax, f"{top_declining_name} drives declines; {top_rising_name} is the largest increase")
     ax.set_xlabel("Change in Rate per 100,000")
     style_axes(ax)
     ax.grid(axis="y", visible=False)
@@ -436,7 +444,10 @@ def chart_category_cagr(save_path: Path | None = None) -> tuple[plt.Figure, str]
         cat = cats[(cats["category"] == label)]
         s = cat[cat["year"] == start_yr]["rate"]
         e = cat[cat["year"] == latest_yr]["rate"]
-        if s.empty or e.empty or s.values[0] == 0:
+        if s.empty or e.empty:
+            continue
+        if s.values[0] == 0:
+            logger.warning("Skipping CAGR for '%s': zero starting rate in %d", label, start_yr)
             continue
         cagr = ((e.values[0] / s.values[0]) ** (1 / 5) - 1) * 100
         records.append({"category": label, "cagr": cagr})
@@ -618,9 +629,16 @@ def chart_rising_violations_spotlight(save_path: Path | None = None) -> tuple[pl
 
     ax.set_title(f"Fastest-Rising Specific Violations in BC ({start_year}–{latest_year})")
 
-    # Build data-driven subtitle from top 3 names
+    # Build data-driven subtitle from top names (guard for fewer than 3)
     subtitle_names = legend_labels[:3]
-    subtitle_text = ", ".join(subtitle_names[:2]) + f", and {subtitle_names[2]} lead recent increases"
+    if len(subtitle_names) >= 3:
+        subtitle_text = ", ".join(subtitle_names[:2]) + f", and {subtitle_names[2]} lead recent increases"
+    elif len(subtitle_names) == 2:
+        subtitle_text = f"{subtitle_names[0]} and {subtitle_names[1]} lead recent increases"
+    elif len(subtitle_names) == 1:
+        subtitle_text = f"{subtitle_names[0]} leads recent increases"
+    else:
+        subtitle_text = "Rising violations spotlight"
     add_subtitle(ax, subtitle_text)
 
     ax.set_xlabel("Year")
@@ -656,11 +674,11 @@ def chart_bcgov_yoy_2022_2023(save_path: Path | None = None) -> tuple[plt.Figure
     totals_pattern = r"(?i)^total|^CRIMINAL CODE|^TOTAL"
     df = df[~df["crime_category"].str.contains(totals_pattern, regex=True)].copy()
 
+    # Filter out zero base counts before computing pct_change to avoid inf/NaN
+    df = df[df["count_2022"] > 0].reset_index(drop=True)
+
     # Compute YoY percentage change based on incident counts
     df["pct_change"] = (df["count_2023"] - df["count_2022"]) / df["count_2022"] * 100
-
-    # Drop rows where base count is zero (would produce inf)
-    df = df[df["count_2022"] > 0].reset_index(drop=True)
 
     # Sort by magnitude for the diverging bar
     df = df.sort_values("pct_change")
