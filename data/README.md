@@ -266,16 +266,16 @@ The following 23-entry mapping links BC Government jurisdiction names to their S
                         │ q1_is_crime_rising.run_all()
                         │ q2_what_kinds.run_all()
                         │ q3_justice.run_all()
-                        │ q3_costs.run_all()
+                        │ q3_costs.run_all()  ←── also reads raw 35100076 & 35100059 directly
                         │ q5_perception.run_all()
                         │ q4_geography.run_all()
                         ▼
 ┌──────────────────────────────────────────────────┐
 │  outputs/charts/                                 │
 │  ├── q1_*.png  (8 charts)                        │
-│  ├── q2_*.png  (8 charts)                        │
-│  ├── q3_*.png  (11 charts)                       │
-│  ├── q4_*.png  (7 charts)                        │
+│  ├── q2_*.png  (9 charts)                        │
+│  ├── q3_*.png  (13 charts: 7 justice + 6 costs)  │
+│  ├── q4_*.png  (8 charts)                        │
 │  ├── q4_interactive_map.html                     │
 │  └── q5_*.png  (3 charts)                        │
 └──────────────────────────────────────────────────┘

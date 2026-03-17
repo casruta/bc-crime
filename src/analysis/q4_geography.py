@@ -349,6 +349,8 @@ def chart_total_vs_violent(save_path: Path | None = None) -> tuple[plt.Figure, s
         x_line = np.linspace(valid["total_count"].min(), valid["total_count"].max(), 100)
         ax.plot(x_line, p(x_line), "--", color=PALETTE["bc_slate"], linewidth=1, alpha=0.5)
         corr = valid["total_count"].corr(valid["violent_count"])
+        if pd.isna(corr):
+            corr = 0.0
         ax.text(
             0.02, 0.95,
             f"r = {corr:.2f}",

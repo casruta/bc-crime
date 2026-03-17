@@ -28,7 +28,7 @@ class TestCrimeSeverityBC:
         df = _load("crime_severity_bc.parquet")
         years = df["year"].dropna()
         assert years.min() <= 1998
-        assert years.max() >= 2022
+        assert years.max() >= 2024
 
     def test_no_bracket_codes_in_geo(self):
         df = _load("crime_severity_bc.parquet")
@@ -126,3 +126,33 @@ class TestJurisdictionMapping:
         df = _load("jurisdiction_mapping.parquet")
         assert "bcgov_name" in df.columns
         assert "statcan_name" in df.columns
+
+
+class TestGSSPerception:
+    def test_columns(self):
+        df = _load("gss_perception.parquet")
+        for col in ["year", "geo", "response", "value"]:
+            assert col in df.columns
+
+    def test_year_range(self):
+        df = _load("gss_perception.parquet")
+        years = df["year"].dropna().unique()
+        for y in [2009, 2014, 2019]:
+            assert y in years
+
+    def test_has_bc_and_canada(self):
+        df = _load("gss_perception.parquet")
+        geos = df["geo"].unique()
+        assert "British Columbia" in geos
+        assert "Canada" in geos
+
+
+class TestGSSConfidence:
+    def test_columns(self):
+        df = _load("gss_confidence.parquet")
+        for col in ["year", "geo", "confidence_level", "value"]:
+            assert col in df.columns
+
+    def test_has_bc(self):
+        df = _load("gss_confidence.parquet")
+        assert "British Columbia" in df["geo"].unique()

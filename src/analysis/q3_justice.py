@@ -297,8 +297,10 @@ def chart_youth_vs_adult_csi(
 
     # Data-driven subtitle
     latest_yr = int(merged["year"].max())
-    latest_adult = merged.loc[merged["year"] == latest_yr, "adult_csi"].values[0]
-    latest_youth = merged.loc[merged["year"] == latest_yr, "youth_csi"].values[0]
+    _adult_s = merged.loc[merged["year"] == latest_yr, "adult_csi"]
+    _youth_s = merged.loc[merged["year"] == latest_yr, "youth_csi"]
+    latest_adult = _adult_s.values[0] if len(_adult_s) > 0 else 0.0
+    latest_youth = _youth_s.values[0] if len(_youth_s) > 0 else 0.0
     gap = latest_adult - latest_youth
     add_subtitle(
         ax,

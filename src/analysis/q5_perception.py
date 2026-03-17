@@ -142,20 +142,22 @@ def _load_csi_bc() -> pd.DataFrame:
     return bc.dropna(subset=["csi"]).sort_values("year").reset_index(drop=True)
 
 
-def _get_perception_data() -> pd.DataFrame:
-    """Return GSS perception data, falling back to hard-coded values."""
+def _get_perception_data() -> tuple[pd.DataFrame, bool]:
+    """Return GSS perception data and whether fallback was used."""
     loaded = _load_gss_perception()
     if loaded is not None:
-        return loaded
-    return FALLBACK_PERCEPTION.copy()
+        return loaded, False
+    logger.warning("Using hardcoded fallback GSS data — parquet files not found")
+    return FALLBACK_PERCEPTION.copy(), True
 
 
-def _get_confidence_data() -> pd.DataFrame:
-    """Return GSS confidence data, falling back to hard-coded values."""
+def _get_confidence_data() -> tuple[pd.DataFrame, bool]:
+    """Return GSS confidence data and whether fallback was used."""
     loaded = _load_gss_confidence()
     if loaded is not None:
-        return loaded
-    return FALLBACK_CONFIDENCE.copy()
+        return loaded, False
+    logger.warning("Using hardcoded fallback GSS data — parquet files not found")
+    return FALLBACK_CONFIDENCE.copy(), True
 
 
 # ---------------------------------------------------------------------------
@@ -171,7 +173,7 @@ def chart_perception_vs_reality(save_path: Path | None = None) -> tuple[plt.Figu
     period, revealing the gap between perception and reality.
     """
     apply_theme()
-    perception = _get_perception_data()
+    perception, _perception_fallback = _get_perception_data()
     csi = _load_csi_bc()
 
     # Filter perception to "Increased" responses only
@@ -265,7 +267,7 @@ def chart_perception_vs_reality(save_path: Path | None = None) -> tuple[plt.Figu
     csi_latest_val = csi_at_latest["csi"].values[0] if not csi_at_latest.empty else None
 
     if csi_latest_val is not None:
-        decline_pct = ((csi_peak - csi_latest_val) / csi_peak) * 100
+        decline_pct = ((csi_peak - csi_latest_val) / csi_peak) * 100 if csi_peak != 0 else 0.0
         add_fig_subtitle(
             fig,
             f"{latest_bc_pct:.0f}% of BC residents said crime increased in {latest_gss_year}, "
@@ -293,6 +295,9 @@ def chart_perception_vs_reality(save_path: Path | None = None) -> tuple[plt.Figu
             f"this view. Source: Statistics Canada, General Social Survey on Canadians' Safety (2019)."
         )
 
+    if _perception_fallback:
+        narrative += " (fallback data)"
+
     fig.tight_layout(pad=2.0)
     add_source(fig, "Source: Statistics Canada, General Social Survey on Canadians' Safety (2019); Table 35-10-0063-01")
     if save_path:
@@ -308,7 +313,7 @@ def chart_confidence_by_province(save_path: Path | None = None) -> tuple[plt.Fig
     in blue; other provinces are in grey.
     """
     apply_theme()
-    confidence = _get_confidence_data()
+    confidence, _confidence_fallback = _get_confidence_data()
 
     # Pivot to get provinces as rows and confidence levels as columns
     pivot = confidence.pivot_table(
@@ -403,6 +408,9 @@ def chart_confidence_by_province(save_path: Path | None = None) -> tuple[plt.Fig
             "The chart compares confidence in police across provinces. "
             "Source: Statistics Canada, General Social Survey on Canadians' Safety (2019)."
         )
+
+    if _confidence_fallback:
+        narrative += " (fallback data)"
 
     add_source(fig, "Source: Statistics Canada, General Social Survey on Canadians' Safety (2019)")
     if save_path:

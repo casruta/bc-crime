@@ -440,7 +440,11 @@ def chart_bc_canada_gap(save_path: Path | None = None) -> tuple[plt.Figure, str]
     annotate_events(ax)
 
     latest_gap_pct = ((merged["bc"].iloc[-1] / merged["canada"].iloc[-1]) - 1) * 100
-    add_subtitle(ax, f"BC has exceeded the national average by {latest_gap_pct:+.0f}% — the gap is persistent")
+    if latest_gap_pct >= 0:
+        gap_desc = f"BC has exceeded the national average by {latest_gap_pct:+.0f}% — the gap is persistent"
+    else:
+        gap_desc = f"BC has fallen below the national average by {abs(latest_gap_pct):.0f}%"
+    add_subtitle(ax, gap_desc)
     first_gap_pct = ((merged["bc"].iloc[0] / merged["canada"].iloc[0]) - 1) * 100
     narrative = (
         f"BC's crime rate has consistently exceeded the national average. In {int(merged.index[0])}, "

@@ -216,7 +216,7 @@ def chart_bc_expenditure_trend(save_path: Path | None = None) -> tuple[plt.Figur
         alpha=0.12, color=PALETTE["bc_amber"], label="Inflation gap",
     )
 
-    ax.set_title("BC Total Policing Expenditure (1986–2009)")
+    ax.set_title(f"BC Total Policing Expenditure ({int(data['year'].min())}–{int(data['year'].max())})")
     ax.set_xlabel("Year")
     ax.set_ylabel("Expenditure ($ millions)")
     ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"${x:,.0f}M"))
