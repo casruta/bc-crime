@@ -145,6 +145,23 @@ Every data project must have a `data/README.md` with:
 - Export the mapping as a processed file for downstream use
 - Document the full mapping in the data dictionary
 
+## Narrative Writing Quality
+
+All narrative text — chart descriptions, section summaries, key findings, executive summaries — must follow the writing skill at `/.claude/skills/writing.md`. Core principles:
+
+- **Point-first:** Lead every narrative with the conclusion, not the context
+- **Verb intensity:** Match verb strength to data magnitude (see the verb intensity ladder)
+- **Embed "so what":** Every statistic needs context — temporal, relative, or tangible
+- **Three forms:** Present key numbers as percentage + absolute + comparison
+- **Describe charts analytically:** State the headline finding first, call out the exception, give the reader a reason to look at the chart
+- **Kill filler:** Eliminate "in order to", "it should be noted", and passive-voice defaults
+- **Hedge calibration:** One hedge per claim, proportioned 70/20/10 (confident/light/strong)
+
+- **Key findings:** Each bullet = [what happened] + [how much] + [why it matters]
+- **Revision protocol:** Run the 8-pass revision protocol from the writing skill before finalizing any report text
+
+See the writing skill for the full verb intensity ladder, self-check checklist, paragraph templates, and anti-pattern reference.
+
 ## Anti-Patterns (What Doesn't Work)
 
 1. **Adding more charts past 15** - Overwhelming, not insightful
