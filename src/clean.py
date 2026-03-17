@@ -83,28 +83,6 @@ def clean_crime_incidents_national() -> pd.DataFrame:
     return df
 
 
-def clean_crime_incidents_bc() -> pd.DataFrame:
-    """Clean 35100184 — incident-based crime by police service in BC.
-
-    This file is ~6 GB. We read in chunks to manage memory.
-    """
-    path = RAW_STATSCAN_DIR / "35100184.csv"
-    logger.info("Cleaning %s (chunked, ~6 GB) ...", path.name)
-
-    chunks: list[pd.DataFrame] = []
-    for i, chunk in enumerate(pd.read_csv(path, dtype=str, encoding="utf-8-sig", chunksize=500_000)):
-        chunk = _clean_statcan_columns(chunk)
-        chunk = _parse_ref_date(chunk)
-        chunk = chunk.rename(columns={"violations": "violation", "statistics": "statistic"})
-        chunks.append(chunk)
-        if (i + 1) % 20 == 0:
-            logger.info("  Processed %d chunks (%d rows so far)", i + 1, sum(len(c) for c in chunks))
-
-    df = pd.concat(chunks, ignore_index=True)
-    logger.info("  %d rows, %d cols", len(df), len(df.columns))
-    return df
-
-
 def clean_cpi() -> pd.DataFrame:
     """Clean 18100005 — CPI annual averages.
 
@@ -359,11 +337,8 @@ def get_jurisdiction_mapping() -> pd.DataFrame:
 # Orchestrator
 # ---------------------------------------------------------------------------
 
-def clean_all(skip_large: bool = False) -> dict[str, pd.DataFrame]:
-    """Clean all datasets and save to data/processed/. Return dict of DataFrames.
-
-    Set skip_large=True to skip the 6 GB crime incidents BC file.
-    """
+def clean_all() -> dict[str, pd.DataFrame]:
+    """Clean all datasets and save to data/processed/. Return dict of DataFrames."""
     PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
     results: dict[str, pd.DataFrame] = {}
 
@@ -373,9 +348,6 @@ def clean_all(skip_large: bool = False) -> dict[str, pd.DataFrame]:
         "crime_incidents_national": (clean_crime_incidents_national, "crime_incidents_national.parquet"),
         "cpi": (clean_cpi, "cpi.parquet"),
     }
-
-    if not skip_large:
-        cleaners["crime_incidents_bc"] = (clean_crime_incidents_bc, "crime_incidents_bc.parquet")
 
     for name, (fn, filename) in cleaners.items():
         try:
@@ -421,7 +393,7 @@ if __name__ == "__main__":
         level=logging.INFO,
         format="%(asctime)s  %(levelname)-8s  %(message)s",
     )
-    results = clean_all(skip_large=True)
+    results = clean_all()
     logger.info("Cleaned %d datasets.", len(results))
     for name, df in results.items():
         logger.info("  %-35s  %d rows  x  %d cols", name, len(df), len(df.columns))

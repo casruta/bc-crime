@@ -647,6 +647,94 @@ def chart_crime_concentration(save_path: Path | None = None) -> tuple[plt.Figure
     return fig, narrative
 
 
+def chart_region_comparison(save_path: Path | None = None) -> tuple[plt.Figure, str]:
+    """Small multiples: total crime trend by region (2014-2023)."""
+    apply_theme()
+    jur = _load_jurisdiction()
+
+    # Aggregate total crime by region and year
+    region_totals = (
+        jur[jur["category"] == CAT_TOTAL]
+        .groupby(["region", "year"], as_index=False)["count"]
+        .sum()
+    )
+    region_totals = region_totals.dropna(subset=["count"])
+
+    # Rank regions by latest-year total to pick the top ones
+    latest_year = int(region_totals["year"].max())
+    min_yr = int(region_totals["year"].min())
+    latest_totals = (
+        region_totals[region_totals["year"] == latest_year]
+        .sort_values("count", ascending=False)
+    )
+    top_regions = latest_totals.head(12)["region"].tolist()
+
+    ncols = 4
+    nrows = (len(top_regions) + ncols - 1) // ncols
+    fig, axes = plt.subplots(nrows, ncols, figsize=FIGSIZE_WIDE, sharex=True)
+    axes = axes.flatten()
+
+    for i, region in enumerate(top_regions):
+        ax = axes[i]
+        r_data = region_totals[region_totals["region"] == region].sort_values("year")
+
+        color = ORDERED[i % len(ORDERED)]
+        ax.plot(r_data["year"], r_data["count"], color=color, linewidth=2, marker="o", markersize=3)
+        ax.fill_between(r_data["year"], r_data["count"], alpha=0.1, color=color)
+
+        ax.set_title(region, fontsize=10, fontweight="bold")
+        ax.xaxis.set_major_locator(mticker.MultipleLocator(2))
+        ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{x:,.0f}"))
+        ax.tick_params(axis="x", rotation=45, labelsize=8)
+        ax.tick_params(axis="y", labelsize=8)
+        style_axes(ax)
+
+    # Hide unused panels
+    for j in range(len(top_regions), len(axes)):
+        axes[j].set_visible(False)
+
+    fig.suptitle(
+        f"Crime Trends by Region — Top 12 BC Regions ({min_yr}–{latest_year})",
+        fontsize=14, fontweight="bold", y=1.04,
+    )
+    add_fig_subtitle(fig, "Regions ranked by total Criminal Code Offences in the latest year")
+    fig.supylabel("Criminal Code Offences (count)")
+    fig.tight_layout(pad=2.0)
+
+    # Narrative — identify which regions are trending up vs down
+    trends = []
+    for region in top_regions:
+        r_data = region_totals[region_totals["region"] == region].sort_values("year")
+        if len(r_data) >= 2:
+            first = r_data.iloc[0]["count"]
+            last = r_data.iloc[-1]["count"]
+            if pd.notna(first) and pd.notna(last) and first > 0:
+                pct = ((last - first) / first) * 100
+                trends.append((region, pct))
+
+    rising = [(r, p) for r, p in trends if p > 0]
+    falling = [(r, p) for r, p in trends if p <= 0]
+
+    rising_str = ", ".join(f"{r} (+{p:.0f}%)" for r, p in sorted(rising, key=lambda x: -x[1])[:3])
+    falling_str = ", ".join(f"{r} ({p:.0f}%)" for r, p in sorted(falling, key=lambda x: x[1])[:3])
+
+    narrative = (
+        f"Among BC's 12 highest-volume regions, those with the largest {min_yr}–{latest_year} "
+        f"increases include {rising_str or 'none'}. "
+    )
+    if falling_str:
+        narrative += f"Regions with declining or stable counts include {falling_str}. "
+    narrative += (
+        f"Metro Vancouver dominates in absolute volume but regional trends vary widely. "
+        f"Source: BC Government Police Resources in British Columbia."
+    )
+
+    add_source(fig, "Source: BC Government, Police Resources in British Columbia")
+    if save_path:
+        save_fig(fig, str(save_path))
+    return fig, narrative
+
+
 def chart_violent_share_distribution(save_path: Path | None = None) -> tuple[plt.Figure, str]:
     """Strip plot: distribution of violent crime share across jurisdictions."""
     apply_theme()
@@ -727,6 +815,7 @@ def run_all() -> dict[str, str]:
         ("q4_total_vs_violent", chart_total_vs_violent),
         ("q4_cma_comparison", chart_cma_comparison),
         ("q4_cma_trends", chart_cma_trends),
+        ("q4_region_comparison", chart_region_comparison),
         ("q4_crime_concentration", chart_crime_concentration),
         ("q4_violent_share_distribution", chart_violent_share_distribution),
     ]

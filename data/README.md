@@ -15,11 +15,10 @@ python -m src.clean
 
 | Table ID | Filename | Description | Coverage | Approx Size |
 |----------|----------|-------------|----------|-------------|
-| 35-10-0184-01 | `statscan/35100184.csv` | Incident-based crime statistics by police service in BC | 1998--2024 | ~5.8 GB |
 | 35-10-0063-01 | `statscan/35100063.csv` | Crime Severity Index by police service in BC | 1998--2024 | ~21 MB |
 | 35-10-0177-01 | `statscan/35100177.csv` | Incident-based crime statistics by province/CMA (national) | 1998--2024 | ~1.5 GB |
 | 18-10-0005-01 | `statscan/18100005.csv` | Consumer Price Index, annual averages | 1914--2024 | ~13 MB |
-| 35-10-0076-01 | `statscan/35100076.csv` | Police personnel and selected crime statistics | 1986--2009 | ~1.1 MB |
+| 35-10-0076-01 | `statscan/35100076.csv` | Police personnel and selected crime statistics | 1986--2023 | ~1.1 MB |
 | 35-10-0059-01 | `statscan/35100059.csv` | Police services expenditures (Canada) | 2018--2023 | ~16 KB |
 
 Each table has a companion `*_MetaData.csv` file containing variable descriptions, footnotes, and correction notices.
@@ -30,7 +29,7 @@ Each table has a companion `*_MetaData.csv` file containing variable description
 https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=XXXXXXXX01
 ```
 
-Replace dashes in the Table ID to form the `pid`. For example, `35-10-0184-01` becomes `pid=3510018401`.
+Replace dashes in the Table ID to form the `pid`. For example, `35-10-0063-01` becomes `pid=3510006301`.
 
 **Citation format:**
 
@@ -216,7 +215,6 @@ The following 23-entry mapping links BC Government jurisdiction names to their S
                                  ▼
 ┌──────────────────────────────────────────────────┐
 │  data/raw/statscan/                              │
-│  ├── 35100184.csv + _MetaData.csv                │
 │  ├── 35100063.csv + _MetaData.csv                │
 │  ├── 35100177.csv + _MetaData.csv                │
 │  ├── 18100005.csv + _MetaData.csv                │
@@ -225,7 +223,6 @@ The following 23-entry mapping links BC Government jurisdiction names to their S
 └───────────────────────┬──────────────────────────┘
                         │ clean_crime_severity_bc()
                         │ clean_crime_incidents_national()
-                        │ clean_crime_incidents_bc()
                         │ clean_cpi()
                         ▼
 ┌──────────────────────────────────────────────────┐

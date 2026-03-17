@@ -14,9 +14,10 @@ pip install -r requirements.txt          # Install dependencies
 python -m src.download                   # Download all datasets (~8 GB)
 python -m src.clean                      # Clean and normalize to parquet
 python -m src.analysis.q1_is_crime_rising  # Section 1 charts (8 PNG)
-python -m src.analysis.q2_what_kinds       # Section 2 charts (8 PNG)
+python -m src.analysis.q2_what_kinds       # Section 2 charts (9 PNG)
 python -m src.analysis.q3_justice          # Section 3 charts (7 PNG)
-python -m src.analysis.q4_geography        # Section 4 charts (7 PNG + 1 HTML)
+python -m src.analysis.q3_costs            # Policing costs charts (6 PNG)
+python -m src.analysis.q4_geography        # Section 4 charts (8 PNG + 1 HTML)
 pytest                                     # Run tests
 ```
 

@@ -51,6 +51,14 @@
 | 28 | Total vs violent scatter | Total vs violent offences by jurisdiction | r = 0.99 — high-crime areas have proportionally more violence |
 | 29 | Pareto concentration curve | Cumulative share of crime by jurisdiction | 5% of jurisdictions account for 50% of all crime |
 | 30 | Violent share distribution | Distribution of violent crime share across jurisdictions | Average violent share ~26%, but wide variance (15%--50%+) |
+| S1 | BC policing expenditure trend | Real vs nominal policing spending over time | Policing costs have outpaced inflation |
+| S2 | Per-capita policing comparison | Per-capita policing spending across provinces | BC spending above national average |
+| S3 | CSI vs expenditure | Crime severity overlaid with policing expenditure | Rising spending has not proportionally reduced crime severity |
+| S4 | Expenditure breakdown | Policing expenditure by component | Personnel costs dominate total expenditure |
+| S5 | Police staffing trend | Officers per 100,000 population over time | Staffing adequacy relative to population |
+| S6 | Crimes per officer | Criminal Code incidents per officer with CSI overlay | Workload per officer trends |
+| — | BC Gov YoY 2022-2023 | Year-over-year change by crime category (BC Gov data) | 17 categories rising, 14 declining between 2022 and 2023 |
+| — | Region comparison | Small multiples of crime trends by BC region | Strathcona, Central Okanagan fastest-growing; Metro Vancouver declining |
 | -- | Interactive jurisdiction map | Plotly HTML with hover details for 50 jurisdictions | Explore violent, property, and total offence breakdowns interactively |
 
 ---
@@ -156,6 +164,11 @@ Focusing on the violations that are rising fastest, the overlay chart highlights
 ![Rising violations spotlight overlay](outputs/charts/q2_rising_violations_spotlight.png)
 *Figure 16. Overlay of the fastest-rising Criminal Code violations in BC. These emerging trends are not yet visible in aggregate statistics. Source: Statistics Canada, Table 35-10-0177-01.*
 
+BC Government data provides a complementary lens on the most recent year-over-year changes. Comparing 2022 and 2023 incident counts across individual crime categories reveals a mixed picture: 17 categories rose while 14 declined, with the largest percentage increases in categories that are often underrepresented in aggregate statistics.
+
+![Year-over-year change by crime category, 2022-2023](outputs/charts/q2_bcgov_yoy_2022_2023.png)
+*Year-over-year percentage change in incident counts by crime category, 2022 vs 2023. Red bars indicate increases; teal bars indicate decreases. Source: BC Government, Crime Statistics in BC 2023 (Appendix F).*
+
 ---
 
 ## 3. How Effectively Is Crime Being Addressed?
@@ -211,6 +224,32 @@ To investigate, we can examine proxy indicators available in the police data its
 
 **Assessment.** The proxy data provides partial support for the underreporting hypothesis. Property crime -- which has a higher reporting rate and is therefore less sensitive to reporting changes -- has declined more steeply than violent crime. This is the *opposite* of what we would expect if declining reporting rates were the sole driver. However, the GSS data confirms that the vast majority of crime goes unreported, making it impossible to fully distinguish genuine crime reduction from reporting changes using police data alone. The most defensible conclusion is that underreporting likely contributes to some of the property crime decline (particularly for low-value theft) but cannot explain the violent crime trends, which are driven by distinct factors including the opioid crisis and changing enforcement priorities.
 
+### Policing Costs and Cost-Effectiveness
+
+How much does BC spend on policing, and is the investment producing results? Statistics Canada's police administration survey (Table 35-10-0076-01) provides expenditure, staffing, and workload data spanning 1986--2023, enabling a long-run view of cost-effectiveness.
+
+![BC policing expenditure trend](outputs/charts/q3_bc_expenditure_trend.png)
+*Figure S1. BC policing expenditure over time in nominal and CPI-adjusted (real) dollars. Spending has risen steadily, outpacing general inflation. Source: Statistics Canada, Table 35-10-0076-01.*
+
+![Per-capita policing cost comparison across provinces](outputs/charts/q3_per_capita_comparison.png)
+*Figure S2. Per-capita policing expenditure across Canadian provinces. BC consistently ranks above the national average. Source: Statistics Canada, Table 35-10-0076-01.*
+
+![CSI overlaid with policing expenditure](outputs/charts/q3_csi_vs_expenditure.png)
+*Figure S3. BC Crime Severity Index overlaid with policing expenditure. Rising spending has not translated into proportional reductions in crime severity, raising questions about cost-effectiveness. Sources: Statistics Canada, Tables 35-10-0076-01 and 35-10-0063-01.*
+
+![Policing expenditure breakdown by component](outputs/charts/q3_expenditure_breakdown.png)
+*Figure S4. Policing expenditure breakdown. Personnel costs dominate, accounting for the majority of total policing expenditure. Source: Statistics Canada, Table 35-10-0076-01.*
+
+Staffing levels provide another dimension. The number of police officers per 100,000 population measures whether the force is keeping pace with a growing province.
+
+![Police officers per 100,000 population over time](outputs/charts/q3_staffing_trend.png)
+*Figure S5. Police officers per 100,000 population in BC. Staffing adequacy relative to population growth. Source: Statistics Canada, Table 35-10-0076-01.*
+
+Combining staffing with crime data yields a workload measure: how many Criminal Code incidents does each officer handle? When overlaid with the Crime Severity Index, this reveals whether declining crime has translated into reduced workload or whether other demands have absorbed the capacity.
+
+![Criminal Code incidents per police officer](outputs/charts/q3_crimes_per_officer.png)
+*Figure S6. Criminal Code incidents per police officer in BC, with CSI trend overlay. Source: Statistics Canada, Tables 35-10-0076-01 and 35-10-0063-01.*
+
 ---
 
 ## 4. Where Is Crime Concentrated?
@@ -236,6 +275,11 @@ The CMA trend charts add temporal context. Abbotsford-Mission's rate roughly hal
 
 ![CMA crime rate trends over time](outputs/charts/q4_cma_trends.png)
 *Figure 27. Crime rate trends across BC CMAs, 2004--2024. Trajectories diverge -- Abbotsford-Mission declined sharply while Kelowna held steady. Source: Statistics Canada, Table 35-10-0177-01.*
+
+Aggregating jurisdiction-level data by region reveals which parts of BC are experiencing the sharpest increases. The small multiples below show crime count trends for the top 12 regions by volume, highlighting divergent trajectories -- with some interior regions seeing substantial increases while Metro Vancouver's counts have declined.
+
+![Region comparison small multiples](outputs/charts/q4_region_comparison.png)
+*Crime count trends by BC region (top 12 by volume), 2014--2023. Strathcona, Central Okanagan, and Thompson Nicola show the largest increases; Metro Vancouver is the only declining region among the top 12. Source: BC Government, Police Resources in British Columbia.*
 
 A scatter plot of total offences against violent offences reveals a near-perfect linear relationship (r = 0.99). Jurisdictions with more crime overall have proportionally more violent crime -- not just more property crime. This undermines the narrative that high-crime areas are driven solely by property offences.
 
@@ -322,6 +366,7 @@ python -m src.clean
 python -m src.analysis.q1_is_crime_rising
 python -m src.analysis.q2_what_kinds
 python -m src.analysis.q3_justice
+python -m src.analysis.q3_costs
 python -m src.analysis.q4_geography
 ```
 
@@ -337,10 +382,10 @@ src/
   analysis/
     theme.py                  # Shared chart theme and palette (kds wrapper)
     q1_is_crime_rising.py     # CSI trends, provincial comparison (8 charts)
-    q2_what_kinds.py          # Crime type breakdown (8 charts)
+    q2_what_kinds.py          # Crime type breakdown (9 charts)
     q3_justice.py             # Justice system effectiveness (7 charts)
-    q3_costs.py               # Policing expenditure analysis (4 charts)
-    q4_geography.py           # Jurisdiction and CMA analysis (7 charts + 1 HTML)
+    q3_costs.py               # Policing expenditure and staffing analysis (6 charts)
+    q4_geography.py           # Jurisdiction and CMA analysis (8 charts + 1 HTML)
 data/
   README.md                   # Data dictionary — full citations and schemas
   raw/
@@ -350,7 +395,7 @@ data/
 notebooks/
   bc_crime_report.ipynb       # Full narrative report
 outputs/
-  charts/                     # Generated charts (34 PNG + 1 HTML)
+  charts/                     # Generated charts (38 PNG + 1 HTML)
     README.md                 # Chart index with figure numbers and sources
 tests/
   test_download.py            # Download verification tests
@@ -364,11 +409,11 @@ See [`data/README.md`](data/README.md) for full data source citations, column sc
 | Script | PNG | HTML | Figures |
 |--------|-----|------|---------|
 | q1_is_crime_rising.py | 8 | 0 | 1--8 |
-| q2_what_kinds.py | 8 | 0 | 9--16 |
+| q2_what_kinds.py | 9 | 0 | 9--16 + BC Gov YoY |
 | q3_justice.py | 7 | 0 | 17--23 |
-| q3_costs.py | 4 | 0 | S1--S4 (supplementary) |
-| q4_geography.py | 7 | 1 | 24--30 + interactive |
-| **Total** | **34** | **1** | **34 + 1** |
+| q3_costs.py | 6 | 0 | S1--S6 (supplementary) |
+| q4_geography.py | 8 | 1 | 24--30 + region + interactive |
+| **Total** | **38** | **1** | **38 + 1** |
 
 ### Processed Data
 

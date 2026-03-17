@@ -59,11 +59,6 @@ class BCGovFile:
 
 STATCAN_TABLES = [
     StatCanTable(
-        table_id="35-10-0184-01",
-        name="crime_incidents_bc",
-        description="Incident-based crime statistics by police service in BC",
-    ),
-    StatCanTable(
         table_id="35-10-0063-01",
         name="crime_severity_bc",
         description="Crime Severity Index by police service in BC",

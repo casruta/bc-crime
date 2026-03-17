@@ -498,6 +498,154 @@ def chart_expenditure_breakdown(save_path: Path | None = None) -> tuple[plt.Figu
     return fig, narrative
 
 
+def chart_staffing_trend(save_path: Path | None = None) -> tuple[plt.Figure, str]:
+    """Line chart: BC police officers per 100,000 population over time."""
+    apply_theme()
+    pp = _load_police_personnel()
+
+    bc = pp[
+        (pp["geo"] == "British Columbia")
+        & (pp["statistic"] == "Police officers per 100,000 population")
+    ][["year", "value"]].copy()
+    bc = bc.sort_values("year").reset_index(drop=True)
+
+    if bc.empty:
+        logger.warning("No staffing data found for BC")
+        fig, ax = plt.subplots(figsize=(12, 6))
+        ax.text(0.5, 0.5, "No data available", ha="center", va="center", transform=ax.transAxes)
+        return fig, "No BC staffing data available."
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    ax.plot(
+        bc["year"], bc["value"],
+        color=PALETTE["bc_blue"], linewidth=2.5,
+        marker="o", markersize=4,
+        label="Officers per 100,000",
+    )
+
+    first_yr = int(bc["year"].iloc[0])
+    last_yr = int(bc["year"].iloc[-1])
+
+    ax.set_title(f"BC Police Officers per 100,000 Population ({first_yr}–{last_yr})")
+    ax.set_xlabel("Year")
+    ax.set_ylabel("Officers per 100,000 population")
+    ax.xaxis.set_major_locator(mticker.MultipleLocator(2))
+    ax.legend(loc="best")
+    style_axes(ax)
+
+    # Narrative
+    val_start = bc["value"].iloc[0]
+    val_end = bc["value"].iloc[-1]
+    val_peak = bc["value"].max()
+    peak_yr = int(bc.loc[bc["value"].idxmax(), "year"])
+    pct_change = ((val_end / val_start) - 1) * 100
+
+    narrative = (
+        f"BC had {val_start:.0f} police officers per 100,000 population in {first_yr}, "
+        f"reaching a peak of {val_peak:.0f} in {peak_yr} before settling at {val_end:.0f} "
+        f"by {last_yr} ({pct_change:+.0f}% overall). "
+    )
+    if val_end < val_peak:
+        narrative += (
+            f"The decline from peak staffing suggests that officer counts have not kept "
+            f"pace with population growth. "
+        )
+    narrative += "Source: Statistics Canada Table 35-10-0076-01."
+
+    if save_path:
+        save_fig(fig, str(save_path))
+    return fig, narrative
+
+
+def chart_crimes_per_officer(save_path: Path | None = None) -> tuple[plt.Figure, str]:
+    """Line chart: BC Criminal Code incidents per police officer, with CSI overlay."""
+    apply_theme()
+    pp = _load_police_personnel()
+
+    bc = pp[
+        (pp["geo"] == "British Columbia")
+        & (pp["statistic"] == "Criminal Code incidents per police officer")
+    ][["year", "value"]].copy()
+    bc = bc.rename(columns={"value": "crimes_per_officer"})
+    bc = bc.sort_values("year").reset_index(drop=True)
+
+    if bc.empty:
+        logger.warning("No crimes-per-officer data found for BC")
+        fig, ax = plt.subplots(figsize=(12, 6))
+        ax.text(0.5, 0.5, "No data available", ha="center", va="center", transform=ax.transAxes)
+        return fig, "No BC crimes-per-officer data available."
+
+    first_yr = int(bc["year"].iloc[0])
+    last_yr = int(bc["year"].iloc[-1])
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    ax.plot(
+        bc["year"], bc["crimes_per_officer"],
+        color=PALETTE["bc_blue"], linewidth=2.5,
+        marker="o", markersize=4,
+        label="Criminal Code incidents per officer",
+    )
+
+    # Overlay CSI on secondary axis for context
+    ax2 = None
+    try:
+        csi = _csi_for_overlay()
+        merged = bc.merge(csi, on="year", how="inner")
+        if not merged.empty:
+            ax2 = ax.twinx()
+            ax2.plot(
+                merged["year"], merged["csi"],
+                color=PALETTE["bc_red"], linewidth=2, linestyle="--",
+                marker="s", markersize=3,
+                label="Crime Severity Index",
+            )
+            ax2.set_ylabel("Crime Severity Index", color=PALETTE["bc_red"])
+            ax2.tick_params(axis="y", labelcolor=PALETTE["bc_red"])
+            ax2.spines["right"].set_visible(True)
+            ax2.spines["right"].set_color(PALETTE["bc_red"])
+    except Exception:
+        logger.debug("CSI overlay unavailable; plotting crimes-per-officer alone")
+
+    ax.set_title(f"BC Criminal Code Incidents per Police Officer ({first_yr}–{last_yr})")
+    ax.set_xlabel("Year")
+    ax.set_ylabel("Incidents per officer")
+    ax.xaxis.set_major_locator(mticker.MultipleLocator(2))
+    style_axes(ax)
+
+    # Combined legend
+    lines, labels = ax.get_legend_handles_labels()
+    if ax2 is not None:
+        lines2, labels2 = ax2.get_legend_handles_labels()
+        lines += lines2
+        labels += labels2
+    ax.legend(lines, labels, loc="best")
+
+    # Narrative
+    val_start = bc["crimes_per_officer"].iloc[0]
+    val_end = bc["crimes_per_officer"].iloc[-1]
+    val_peak = bc["crimes_per_officer"].max()
+    peak_yr = int(bc.loc[bc["crimes_per_officer"].idxmax(), "year"])
+    pct_change = ((val_end / val_start) - 1) * 100
+
+    narrative = (
+        f"Each BC police officer handled an average of {val_start:.0f} Criminal Code incidents "
+        f"in {first_yr}, peaking at {val_peak:.0f} in {peak_yr} and declining to {val_end:.0f} "
+        f"by {last_yr} ({pct_change:+.0f}% overall). "
+    )
+    if val_end < val_peak:
+        narrative += (
+            "The post-peak decline in workload per officer may reflect both falling crime rates "
+            "and incremental staffing improvements. "
+        )
+    narrative += "Source: Statistics Canada Table 35-10-0076-01."
+
+    if save_path:
+        save_fig(fig, str(save_path))
+    return fig, narrative
+
+
 # ---------------------------------------------------------------------------
 # Run all
 # ---------------------------------------------------------------------------
@@ -513,6 +661,8 @@ def run_all() -> dict[str, str]:
         ("q3_per_capita_comparison", chart_per_capita_comparison),
         ("q3_csi_vs_expenditure", chart_csi_vs_expenditure),
         ("q3_expenditure_breakdown", chart_expenditure_breakdown),
+        ("q3_staffing_trend", chart_staffing_trend),
+        ("q3_crimes_per_officer", chart_crimes_per_officer),
     ]
 
     for name, fn in charts:

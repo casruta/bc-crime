@@ -625,6 +625,75 @@ def chart_rising_violations_spotlight(save_path: Path | None = None) -> tuple[pl
     return fig, narrative
 
 
+def chart_bcgov_yoy_2022_2023(save_path: Path | None = None) -> tuple[plt.Figure, str]:
+    """Horizontal diverging bar chart: YoY % change 2022–2023 from BC Gov data."""
+    apply_theme()
+    df = pd.read_parquet(PROCESSED_DIR / "bc_gov_stats_2023.parquet")
+
+    # Drop rows with NaN counts (header rows, footnotes, sources)
+    df = df.dropna(subset=["count_2022", "count_2023"])
+
+    # Filter out total/aggregate rows
+    totals_pattern = r"(?i)^total|^CRIMINAL CODE|^TOTAL"
+    df = df[~df["crime_category"].str.contains(totals_pattern, regex=True)].copy()
+
+    # Compute YoY percentage change based on incident counts
+    df["pct_change"] = (df["count_2023"] - df["count_2022"]) / df["count_2022"] * 100
+
+    # Drop rows where base count is zero (would produce inf)
+    df = df[df["count_2022"] > 0].reset_index(drop=True)
+
+    # Sort by magnitude for the diverging bar
+    df = df.sort_values("pct_change")
+
+    # Clean labels: strip trailing footnote numbers (e.g., "Homicide 1,2" -> "Homicide")
+    df["label"] = df["crime_category"].str.replace(r"\s*\d[\d,]*$", "", regex=True).str.strip()
+
+    fig, ax = plt.subplots(figsize=FIGSIZE_SINGLE)
+    colors = [PALETTE["bc_red"] if v > 0 else PALETTE["bc_teal"] for v in df["pct_change"]]
+    ax.barh(df["label"], df["pct_change"], color=colors, edgecolor="white")
+
+    for i, (val, label) in enumerate(zip(df["pct_change"], df["label"])):
+        ax.text(
+            val + (1.5 if val >= 0 else -1.5),
+            i,
+            f"{val:+.1f}%",
+            ha="left" if val >= 0 else "right",
+            va="center",
+            fontsize=8,
+        )
+
+    ax.axvline(0, color="black", linewidth=0.8)
+    ax.set_title("BC Crime Year-over-Year Change by Category (2022–2023)")
+
+    # Data-driven subtitle: count increases vs decreases
+    n_up = int((df["pct_change"] > 0).sum())
+    n_down = int((df["pct_change"] < 0).sum())
+    biggest_rise = df.iloc[-1]
+    add_subtitle(ax, f"{n_up} categories rose, {n_down} fell; {biggest_rise['label']} led increases at {biggest_rise['pct_change']:+.1f}%")
+
+    ax.set_xlabel("Year-over-Year Change (%)")
+    style_axes(ax)
+    ax.grid(axis="y", visible=False)
+    fig.subplots_adjust(left=0.35)
+
+    # Narrative
+    biggest_drop = df.iloc[0]
+    narrative = (
+        f"BC Government data shows {n_up} offence categories increased and {n_down} decreased "
+        f"from 2022 to 2023. The largest increase was {biggest_rise['label']} "
+        f"({biggest_rise['pct_change']:+.1f}%), while the largest decrease was "
+        f"{biggest_drop['label']} ({biggest_drop['pct_change']:+.1f}%). "
+        f"Source: BC Government, Crime Statistics in BC 2023 (Appendix F)."
+    )
+
+    add_source(fig, "Source: BC Government, Crime Statistics in BC 2023 (Appendix F)")
+
+    if save_path:
+        save_fig(fig, str(save_path))
+    return fig, narrative
+
+
 # ---------------------------------------------------------------------------
 # Run all
 # ---------------------------------------------------------------------------
@@ -643,6 +712,7 @@ def run_all() -> dict[str, str]:
         ("q2_category_cagr", chart_category_cagr),
         ("q2_specific_violation_trends", chart_specific_violation_trends),
         ("q2_rising_violations_spotlight", chart_rising_violations_spotlight),
+        ("q2_bcgov_yoy_2022_2023", chart_bcgov_yoy_2022_2023),
     ]
 
     for name, fn in charts:
