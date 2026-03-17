@@ -8,9 +8,9 @@ from pathlib import Path
 
 import requests
 
-logger = logging.getLogger(__name__)
+from src.paths import RAW_BCGOV_DIR, RAW_STATSCAN_DIR
 
-RAW_DIR = Path(__file__).resolve().parent.parent / "data" / "raw"
+logger = logging.getLogger(__name__)
 
 TIMEOUT_SECONDS = 120
 USER_AGENT = (
@@ -163,13 +163,19 @@ def download_bcgov_file(bcfile: BCGovFile, dest: Path) -> Path:
 
 
 def download_all(dest: Path | None = None) -> dict[str, list[Path]]:
-    """Download every dataset. Return a dict mapping name -> list of paths."""
-    dest = dest or RAW_DIR
+    """Download every dataset. Return a dict mapping name -> list of paths.
+
+    When *dest* is provided (e.g. by tests), all files go to that single
+    directory.  When *dest* is None (production), StatCan files go to
+    ``data/raw/statscan/`` and BC Gov files to ``data/raw/bcgov/``.
+    """
+    statcan_dest = dest or RAW_STATSCAN_DIR
+    bcgov_dest = dest or RAW_BCGOV_DIR
     results: dict[str, list[Path]] = {}
 
     for table in STATCAN_TABLES:
         try:
-            paths = download_statcan_table(table, dest)
+            paths = download_statcan_table(table, statcan_dest)
             results[table.name] = paths
         except Exception:
             logger.exception("Failed to download StatCan %s", table.table_id)
@@ -177,7 +183,7 @@ def download_all(dest: Path | None = None) -> dict[str, list[Path]]:
 
     for bcfile in BCGOV_FILES:
         try:
-            path = download_bcgov_file(bcfile, dest)
+            path = download_bcgov_file(bcfile, bcgov_dest)
             results[bcfile.name] = [path]
         except Exception:
             logger.exception("Failed to download BC Gov %s", bcfile.name)

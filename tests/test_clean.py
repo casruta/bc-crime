@@ -1,11 +1,9 @@
 """Tests for src/clean.py — verify cleaned datasets have expected shape and content."""
 
-from pathlib import Path
-
 import pandas as pd
 import pytest
 
-PROCESSED_DIR = Path(__file__).resolve().parent.parent / "data" / "processed"
+from src.paths import PROCESSED_DIR
 
 
 def _load(name: str) -> pd.DataFrame:

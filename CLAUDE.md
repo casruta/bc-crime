@@ -26,6 +26,7 @@ pytest                                     # Run tests
 BC-CRIME-/
   src/
     __init__.py
+    paths.py               # Centralized path constants (single source of truth)
     download.py            # Fetch raw CSVs from StatsCan / BC Gov
     clean.py               # Normalize, rename columns, write parquet
     analysis/
@@ -34,12 +35,17 @@ BC-CRIME-/
       q1_is_crime_rising.py
       q2_what_kinds.py
       q3_justice.py
+      q3_costs.py
       q4_geography.py
   data/
-    raw/                   # Downloaded CSVs (gitignored)
+    README.md              # Comprehensive data dictionary with citations
+    raw/
+      statscan/            # Statistics Canada CSVs + metadata (gitignored)
+      bcgov/               # BC Government XLSX files (gitignored)
     processed/             # Cleaned parquet files (gitignored)
   outputs/
     charts/                # Generated PNGs and HTML
+      README.md            # Chart index mapping filenames to figure numbers
   tests/
   notebooks/               # Exploratory Jupyter notebooks
   requirements.txt
@@ -73,8 +79,11 @@ BC-CRIME-/
 
 **Safe to edit:**
 - `src/analysis/*.py`
+- `src/paths.py`
 - `tests/`
 - `notebooks/`
+- `data/README.md`
+- `outputs/charts/README.md`
 - `README.md`
 - `CLAUDE.md`
 

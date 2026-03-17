@@ -26,10 +26,9 @@ from src.analysis.theme import (
     style_axes,
 )
 
-logger = logging.getLogger(__name__)
+from src.paths import CHARTS_DIR, PROCESSED_DIR
 
-PROCESSED_DIR = Path(__file__).resolve().parent.parent.parent / "data" / "processed"
-CHARTS_DIR = Path(__file__).resolve().parent.parent.parent / "outputs" / "charts"
+logger = logging.getLogger(__name__)
 
 # Five main crime categories used across charts
 CATEGORIES = {

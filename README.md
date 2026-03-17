@@ -331,6 +331,7 @@ Charts are saved to `outputs/charts/`. Open `notebooks/bc_crime_report.ipynb` fo
 
 ```
 src/
+  paths.py                    # Centralized path constants
   download.py                 # Fetch all raw data from StatCan and BC Gov
   clean.py                    # Parse, normalize, save to parquet
   analysis/
@@ -338,18 +339,25 @@ src/
     q1_is_crime_rising.py     # CSI trends, provincial comparison (8 charts)
     q2_what_kinds.py          # Crime type breakdown (8 charts)
     q3_justice.py             # Justice system effectiveness (7 charts)
+    q3_costs.py               # Policing expenditure analysis (4 charts)
     q4_geography.py           # Jurisdiction and CMA analysis (7 charts + 1 HTML)
 data/
-  raw/                        # Downloaded files (gitignored)
+  README.md                   # Data dictionary — full citations and schemas
+  raw/
+    statscan/                 # Statistics Canada CSVs (gitignored)
+    bcgov/                    # BC Government XLSX files (gitignored)
   processed/                  # Cleaned parquet files (gitignored)
 notebooks/
   bc_crime_report.ipynb       # Full narrative report
 outputs/
-  charts/                     # Generated charts (30 PNG + 1 HTML)
+  charts/                     # Generated charts (34 PNG + 1 HTML)
+    README.md                 # Chart index with figure numbers and sources
 tests/
   test_download.py            # Download verification tests
   test_clean.py               # Data quality tests
 ```
+
+See [`data/README.md`](data/README.md) for full data source citations, column schemas, and data lineage.
 
 ### Chart Count
 
@@ -358,8 +366,9 @@ tests/
 | q1_is_crime_rising.py | 8 | 0 | 1--8 |
 | q2_what_kinds.py | 8 | 0 | 9--16 |
 | q3_justice.py | 7 | 0 | 17--23 |
+| q3_costs.py | 4 | 0 | S1--S4 (supplementary) |
 | q4_geography.py | 7 | 1 | 24--30 + interactive |
-| **Total** | **30** | **1** | **30 + 1** |
+| **Total** | **34** | **1** | **34 + 1** |
 
 ### Processed Data
 

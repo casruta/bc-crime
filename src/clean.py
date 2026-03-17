@@ -6,10 +6,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-logger = logging.getLogger(__name__)
+from src.paths import PROCESSED_DIR, RAW_BCGOV_DIR, RAW_STATSCAN_DIR
 
-RAW_DIR = Path(__file__).resolve().parent.parent / "data" / "raw"
-PROCESSED_DIR = Path(__file__).resolve().parent.parent / "data" / "processed"
+logger = logging.getLogger(__name__)
 
 # StatCan suppression codes that should become NaN
 SUPPRESSION_CODES = frozenset({"..", "x", "F", "...", ""})
@@ -62,7 +61,7 @@ def _parse_ref_date(df: pd.DataFrame) -> pd.DataFrame:
 
 def clean_crime_severity_bc() -> pd.DataFrame:
     """Clean 35100063 — Crime Severity Index by police service in BC."""
-    path = RAW_DIR / "35100063.csv"
+    path = RAW_STATSCAN_DIR / "35100063.csv"
     logger.info("Cleaning %s ...", path.name)
     df = pd.read_csv(path, dtype=str, encoding="utf-8-sig")
     df = _clean_statcan_columns(df)
@@ -74,7 +73,7 @@ def clean_crime_severity_bc() -> pd.DataFrame:
 
 def clean_crime_incidents_national() -> pd.DataFrame:
     """Clean 35100177 — incident-based crime by province/CMA (national)."""
-    path = RAW_DIR / "35100177.csv"
+    path = RAW_STATSCAN_DIR / "35100177.csv"
     logger.info("Cleaning %s ...", path.name)
     df = pd.read_csv(path, dtype=str, encoding="utf-8-sig")
     df = _clean_statcan_columns(df)
@@ -89,7 +88,7 @@ def clean_crime_incidents_bc() -> pd.DataFrame:
 
     This file is ~6 GB. We read in chunks to manage memory.
     """
-    path = RAW_DIR / "35100184.csv"
+    path = RAW_STATSCAN_DIR / "35100184.csv"
     logger.info("Cleaning %s (chunked, ~6 GB) ...", path.name)
 
     chunks: list[pd.DataFrame] = []
@@ -111,7 +110,7 @@ def clean_cpi() -> pd.DataFrame:
 
     We extract the All-items, 2002=100 series for Canada and BC.
     """
-    path = RAW_DIR / "18100005.csv"
+    path = RAW_STATSCAN_DIR / "18100005.csv"
     logger.info("Cleaning %s ...", path.name)
     df = pd.read_csv(path, dtype=str, encoding="utf-8-sig")
     df = _clean_statcan_columns(df)
@@ -200,7 +199,7 @@ def clean_bc_gov_trends() -> pd.DataFrame:
 
     Extracts the 'Criminal Code Offences' sheet as the primary dataset.
     """
-    path = RAW_DIR / "appendix_g_-_bc_crime_trends_2014-2023.xlsx"
+    path = RAW_BCGOV_DIR / "appendix_g_-_bc_crime_trends_2014-2023.xlsx"
     logger.info("Cleaning %s ...", path.name)
 
     sheets_to_extract = ["Criminal Code Offences", "Drug Offences", "Crime Severity Index"]
@@ -228,7 +227,7 @@ def clean_bc_gov_jurisdiction_trends() -> pd.DataFrame:
 
     Row 1 = headers: REGION, TYPE OF POLICING, POLICING JURISDICTION, 2014...2023, ENDNOTE
     """
-    path = RAW_DIR / "appendix_i_-_bc_policing_jurisdiction_crime_trends_2014-2023.xlsx"
+    path = RAW_BCGOV_DIR / "appendix_i_-_bc_policing_jurisdiction_crime_trends_2014-2023.xlsx"
     logger.info("Cleaning %s ...", path.name)
 
     sheets = ["Criminal Code Offences", "Violent Offences", "Property Offences"]
@@ -283,7 +282,7 @@ def clean_bc_gov_stats_2023() -> pd.DataFrame:
 
     Complex layout with sub-headers. Extract Table 1 sheet.
     """
-    path = RAW_DIR / "appendix_f_-_crime_statistics_in_bc_2023.xlsx"
+    path = RAW_BCGOV_DIR / "appendix_f_-_crime_statistics_in_bc_2023.xlsx"
     logger.info("Cleaning %s ...", path.name)
 
     df_raw = pd.read_excel(path, sheet_name="Table 1", header=None)

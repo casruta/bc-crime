@@ -29,12 +29,9 @@ from src.analysis.theme import (
     style_axes,
 )
 
-logger = logging.getLogger(__name__)
+from src.paths import CHARTS_DIR, PROCESSED_DIR, RAW_STATSCAN_DIR
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
-RAW_DIR = PROJECT_ROOT / "data" / "raw"
-PROCESSED_DIR = PROJECT_ROOT / "data" / "processed"
-CHARTS_DIR = PROJECT_ROOT / "outputs" / "charts"
+logger = logging.getLogger(__name__)
 
 CPI_BASE_YEAR = 2020
 COMPARISON_PROVINCES = [
@@ -95,7 +92,7 @@ def _load_police_personnel() -> pd.DataFrame:
     Returns long-form DataFrame with columns:
         year, geo, statistic, value, uom, scalar_factor
     """
-    path = RAW_DIR / "35100076.csv"
+    path = RAW_STATSCAN_DIR / "35100076.csv"
     df = pd.read_csv(path, dtype=str, encoding="utf-8")
 
     df = df.rename(columns={
@@ -124,7 +121,7 @@ def _load_expenditure_breakdown() -> pd.DataFrame:
     Returns DataFrame with columns: year, category, value_thousands.
     Values are in thousands of current dollars.
     """
-    path = RAW_DIR / "35100059.csv"
+    path = RAW_STATSCAN_DIR / "35100059.csv"
     df = pd.read_csv(path, dtype=str, encoding="utf-8")
 
     df = df.rename(columns={

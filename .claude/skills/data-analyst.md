@@ -108,6 +108,43 @@ Checklist after any restructuring:
 - [ ] Helper functions defined before use
 - [ ] Cross-section variable dependencies still resolve
 
+## Data Project Organization
+
+### Path Constants
+- **Always centralize path constants** in a single `src/paths.py` (or equivalent) file
+- Never define `Path(__file__).resolve().parent...` in individual modules — import from the central file
+- Standard constants: `PROJECT_ROOT`, `RAW_DIR`, `PROCESSED_DIR`, `CHARTS_DIR`
+- All modules import from this single source of truth
+- **Why it works:** Eliminates drift when directories change; one edit updates everything
+
+### Raw Data Directory Structure
+- **Organize raw data by source**, not by file type
+- Pattern: `data/raw/<source>/` (e.g., `data/raw/statscan/`, `data/raw/bcgov/`)
+- Keep metadata files alongside their data files in the same source directory
+- Download scripts should route files to source-specific subdirectories by default
+- Maintain backward compatibility: when a `dest` parameter is provided (e.g., in tests), route all files to that single directory
+- **Why it works:** Prevents flat-directory sprawl; makes provenance obvious at a glance
+
+### Data Dictionary (`data/README.md`)
+Every data project must have a `data/README.md` with:
+1. **Overview** — purpose, how to regenerate (download + clean commands)
+2. **Raw Data Sources** — table per source with: ID, filename, description, coverage, size, URL, formal citation
+3. **Cleaning Pipeline** — step-by-step transformations (column normalization, code stripping, coercion, drops)
+4. **Processed Files Schema** — for each output file: column name, type, description, example value
+5. **Data Lineage** — ASCII diagram showing raw source -> cleaning function -> processed output
+6. **External References** — any external sources cited in analysis (e.g., survey data, reports)
+- **Why it works:** New contributors can understand the data without reading code; citations prevent "where did this come from?" questions
+
+### Chart Index (`outputs/charts/README.md`)
+- Table mapping every output file to: figure number, section, generating function, primary data source
+- Include both numbered figures (from the report) and supplementary/interactive outputs
+- **Why it works:** Bridges the gap between filenames and the narrative report
+
+### Naming & Jurisdiction Mappings
+- When working with data from multiple sources that use different names for the same entities, create an explicit mapping table (e.g., `JURISDICTION_MAP` linking BC Gov names to StatCan GEO names)
+- Export the mapping as a processed file for downstream use
+- Document the full mapping in the data dictionary
+
 ## Anti-Patterns (What Doesn't Work)
 
 1. **Adding more charts past 15** - Overwhelming, not insightful
