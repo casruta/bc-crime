@@ -194,7 +194,7 @@ Not all reported incidents result in founded criminal cases. The unfounded rate 
 
 ### The Reporting Gap: Could Underreporting Explain the Decline?
 
-A natural question arises from the data in Sections 1--2: could the apparent decline in crime rates reflect less crime being *reported* rather than less crime actually occurring? This is not a hypothetical concern. Statistics Canada's [General Social Survey on Canadians' Safety (2019)](https://www150.statcan.gc.ca/n1/pub/85-002-x/2021001/article/00014-eng.htm) found that only **29% of criminal victimizations** were reported to police. Reporting rates vary dramatically by offence type: property crime sits at roughly 35%, violent crime at 24%, and sexual assault at just 6%.
+A natural question arises from the data in Sections 1--2: could the apparent decline in crime rates reflect less crime being *reported* rather than less crime actually occurring? This is not a hypothetical concern. Statistics Canada's [General Social Survey on Canadians' Safety (2019)](https://www150.statcan.gc.ca/n1/pub/85-002-x/2021001/article/00014-eng.htm) found that only **29% of criminal victimizations** were reported to police (Cotter, 2021, *Juristat*, Catalogue no. 85-002-X). Reporting rates vary dramatically by offence type: property crime sits at roughly 35%, violent crime at 24%, and sexual assault at just 6%.
 
 This means the police-reported data underlying every chart in this analysis captures less than a third of actual criminal victimization. If reporting rates are declining over time, then falling police-reported rates could coexist with stable or even rising actual crime.
 
