@@ -14,8 +14,15 @@ import numpy as np
 import pandas as pd
 
 from src.analysis.theme import (
+    FIGSIZE_DOUBLE,
+    FIGSIZE_SINGLE,
+    FIGSIZE_SMALL,
+    FIGSIZE_WIDE,
     ORDERED,
     PALETTE,
+    add_source,
+    add_subtitle,
+    annotate_events,
     apply_theme,
     save_fig,
     style_axes,
@@ -152,7 +159,7 @@ def chart_top_jurisdictions(save_path: Path | None = None) -> tuple[plt.Figure, 
 
     top = ranked.head(TOP_N_BAR).sort_values("count", ascending=True)
 
-    fig, ax = plt.subplots(figsize=(12, 8))
+    fig, ax = plt.subplots(figsize=FIGSIZE_DOUBLE)
 
     # Colour the bars: Metro Vancouver jurisdictions in blue, others in teal
     colors = [
@@ -188,6 +195,7 @@ def chart_top_jurisdictions(save_path: Path | None = None) -> tuple[plt.Figure, 
 
     # Narrative
     top1 = ranked.iloc[0]
+    add_subtitle(ax, f"Municipal police forces dominate — {top1['policing_jurisdiction']} leads with {top1['count']:,.0f} offences")
     top3_names = ", ".join(ranked["policing_jurisdiction"].head(3).tolist())
     narrative = (
         f"In {latest_year}, {top1['policing_jurisdiction']} recorded the highest crime count at "
@@ -197,6 +205,7 @@ def chart_top_jurisdictions(save_path: Path | None = None) -> tuple[plt.Figure, 
         f"Source: BC Government Police Resources in British Columbia."
     )
 
+    add_source(fig, "Source: BC Government, Police Resources in British Columbia")
     if save_path:
         save_fig(fig, str(save_path))
     return fig, narrative
@@ -211,7 +220,7 @@ def chart_jurisdiction_trends(save_path: Path | None = None) -> tuple[plt.Figure
     # Get the top N jurisdictions by latest-year total
     top_jurisdictions = ranked.head(TOP_N_TREND)["policing_jurisdiction"].tolist()
 
-    fig, axes = plt.subplots(2, 4, figsize=(18, 8), sharex=True)
+    fig, axes = plt.subplots(2, 4, figsize=FIGSIZE_WIDE, sharex=True)
     axes = axes.flatten()
 
     for i, jurisdiction in enumerate(top_jurisdictions):
@@ -231,10 +240,13 @@ def chart_jurisdiction_trends(save_path: Path | None = None) -> tuple[plt.Figure
         ax.tick_params(axis="y", labelsize=8)
         style_axes(ax)
 
+    min_yr = int(jur["year"].min())
+    max_yr = int(jur["year"].max())
     fig.suptitle(
-        "Crime Trends in BC's 8 Largest Policing Jurisdictions (2014–2023)",
+        f"Crime Trends in BC's 8 Largest Policing Jurisdictions ({min_yr}–{max_yr})",
         fontsize=14, fontweight="bold", y=1.02,
     )
+    fig.text(0.5, 0.99, "Tracking the 8 highest-volume jurisdictions over a decade", ha="center", fontsize=10, color=PALETTE["bc_slate"], style="italic")
     fig.supylabel("Criminal Code Offences (count)")
     fig.tight_layout()
 
@@ -265,6 +277,7 @@ def chart_jurisdiction_trends(save_path: Path | None = None) -> tuple[plt.Figure
         narrative += f"Jurisdictions with declining or stable counts include {falling_str}. "
     narrative += "Source: BC Government Police Resources in British Columbia."
 
+    add_source(fig, "Source: BC Government, Police Resources in British Columbia")
     if save_path:
         save_fig(fig, str(save_path))
     return fig, narrative
@@ -291,7 +304,7 @@ def chart_total_vs_violent(save_path: Path | None = None) -> tuple[plt.Figure, s
     merged = merged.dropna(subset=["total_count", "violent_count"])
     merged["violent_share"] = (merged["violent_count"] / merged["total_count"]) * 100
 
-    fig, ax = plt.subplots(figsize=(12, 8))
+    fig, ax = plt.subplots(figsize=FIGSIZE_DOUBLE)
 
     ax.scatter(
         merged["total_count"],
@@ -324,8 +337,9 @@ def chart_total_vs_violent(save_path: Path | None = None) -> tuple[plt.Figure, s
             xy=(row["total_count"], row["violent_count"]),
             xytext=(5, 5),
             textcoords="offset points",
-            fontsize=7,
+            fontsize=8,
             color=PALETTE["bc_slate"],
+            bbox={"boxstyle": "round,pad=0.2", "facecolor": "white", "alpha": 0.7, "edgecolor": "none"},
         )
 
     # Trend line
@@ -343,6 +357,7 @@ def chart_total_vs_violent(save_path: Path | None = None) -> tuple[plt.Figure, s
             fontsize=10,
             color=PALETTE["bc_slate"],
         )
+        add_subtitle(ax, f"Strong correlation (r = {corr:.2f}) — high-crime jurisdictions are also high-violence")
 
     ax.set_title(f"Total Crime vs Violent Crime by Jurisdiction ({latest_year})")
     ax.set_xlabel("Total Criminal Code Offences")
@@ -371,6 +386,7 @@ def chart_total_vs_violent(save_path: Path | None = None) -> tuple[plt.Figure, s
         )
     narrative += "Source: BC Government Police Resources in British Columbia."
 
+    add_source(fig, "Source: BC Government, Police Resources in British Columbia")
     if save_path:
         save_fig(fig, str(save_path))
     return fig, narrative
@@ -385,7 +401,7 @@ def chart_cma_comparison(save_path: Path | None = None) -> tuple[plt.Figure, str
     latest = cma[cma["year"] == latest_year].copy()
     latest = latest.sort_values("crime_rate", ascending=True)
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=FIGSIZE_SMALL)
 
     # Colour palette: highlight the 4 original CMAs differently
     highlight_cmas = {"Vancouver", "Victoria", "Kelowna", "Abbotsford-Mission"}
@@ -417,6 +433,7 @@ def chart_cma_comparison(save_path: Path | None = None) -> tuple[plt.Figure, str
     highest = latest.iloc[-1]
     lowest = latest.iloc[0]
     ratio = highest["crime_rate"] / lowest["crime_rate"] if lowest["crime_rate"] > 0 else 0
+    add_subtitle(ax, f"Interior CMAs report up to {ratio:.1f}x higher per-capita crime than coastal metros")
 
     narrative = (
         f"In {latest_year}, {highest['cma_label']} had the highest criminal offence rate at "
@@ -427,6 +444,7 @@ def chart_cma_comparison(save_path: Path | None = None) -> tuple[plt.Figure, str
         f"Source: Statistics Canada Table 35-10-0177-01."
     )
 
+    add_source(fig, "Source: Statistics Canada, Table 35-10-0177-01")
     if save_path:
         save_fig(fig, str(save_path))
     return fig, narrative
@@ -515,6 +533,187 @@ def chart_interactive_jurisdiction(save_path: Path | None = None) -> str:
 # Run all
 # ---------------------------------------------------------------------------
 
+def chart_cma_trends(save_path: Path | None = None) -> tuple[plt.Figure, str]:
+    """Small multiples: crime rate trends over time for each BC CMA."""
+    apply_theme()
+    cma = _load_cma_rates()
+    cma = cma[cma["year"] >= 2004]
+
+    cma_labels = sorted(cma["cma_label"].dropna().unique())
+    n_cmas = len(cma_labels)
+    if n_cmas == 0:
+        fig, ax = plt.subplots(figsize=(12, 6))
+        ax.text(0.5, 0.5, "No CMA data available", ha="center", va="center", transform=ax.transAxes)
+        return fig, "No CMA trend data available."
+
+    ncols = min(4, n_cmas)
+    nrows = (n_cmas + ncols - 1) // ncols
+    fig, axes = plt.subplots(nrows, ncols, figsize=(16, 4 * nrows), sharex=True, sharey=True)
+    if nrows == 1 and ncols == 1:
+        axes = np.array([axes])
+    axes = axes.flatten()
+
+    for i, label in enumerate(cma_labels):
+        ax = axes[i]
+        c_data = cma[cma["cma_label"] == label].sort_values("year")
+        color = ORDERED[i % len(ORDERED)]
+        ax.plot(c_data["year"], c_data["crime_rate"], color=color, linewidth=2, marker="o", markersize=3)
+        ax.fill_between(c_data["year"], c_data["crime_rate"], alpha=0.1, color=color)
+        ax.set_title(label, fontsize=10, fontweight="bold")
+        ax.xaxis.set_major_locator(mticker.MultipleLocator(4))
+        ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{x:,.0f}"))
+        ax.tick_params(axis="x", rotation=45, labelsize=8)
+        style_axes(ax)
+        annotate_events(ax)
+
+    for j in range(n_cmas, len(axes)):
+        axes[j].set_visible(False)
+
+    fig.suptitle("Crime Rate Trends Across BC Census Metropolitan Areas",
+                 fontsize=14, fontweight="bold", y=1.02)
+    fig.text(0.5, 0.99, "Interior CMAs have consistently higher rates than coastal metros", ha="center", fontsize=10, color=PALETTE["bc_slate"], style="italic")
+    fig.supylabel("Rate per 100,000")
+    fig.tight_layout()
+
+    narrative = (
+        "The CMA trend charts reveal whether high-crime metro areas have always been high "
+        "or recently surged. This temporal context complements the single-year snapshot. "
+        "Source: Statistics Canada Table 35-10-0177-01."
+    )
+
+    add_source(fig, "Source: Statistics Canada, Table 35-10-0177-01")
+
+    if save_path:
+        save_fig(fig, str(save_path))
+    return fig, narrative
+
+
+def chart_crime_concentration(save_path: Path | None = None) -> tuple[plt.Figure, str]:
+    """Pareto curve: cumulative share of total crime by jurisdiction."""
+    apply_theme()
+    jur = _load_jurisdiction()
+    ranked = _rank_latest_total(jur)
+    latest_year = int(jur["year"].max())
+
+    total_crime = ranked["count"].sum()
+    ranked["cumulative_share"] = ranked["count"].cumsum() / total_crime * 100
+    ranked["jurisdiction_pct"] = np.arange(1, len(ranked) + 1) / len(ranked) * 100
+
+    fig, ax = plt.subplots(figsize=FIGSIZE_SMALL)
+    ax.plot(ranked["jurisdiction_pct"], ranked["cumulative_share"],
+            color=PALETTE["bc_blue"], linewidth=2.5)
+    ax.plot([0, 100], [0, 100], "--", color=PALETTE["light_grey"], linewidth=1, label="Perfect equality")
+    ax.fill_between(ranked["jurisdiction_pct"], ranked["cumulative_share"],
+                     ranked["jurisdiction_pct"], alpha=0.1, color=PALETTE["bc_blue"])
+
+    # Annotate the 50% and 80% thresholds
+    for threshold in [50, 80]:
+        idx = (ranked["cumulative_share"] >= threshold).idxmax()
+        x_val = ranked.loc[idx, "jurisdiction_pct"]
+        ax.axhline(threshold, color=PALETTE["bc_slate"], linewidth=0.5, linestyle=":")
+        ax.axvline(x_val, color=PALETTE["bc_slate"], linewidth=0.5, linestyle=":")
+        ax.annotate(
+            f"{threshold}% of crime\n← {x_val:.0f}% of jurisdictions",
+            xy=(x_val, threshold), xytext=(x_val + 10, threshold - 8),
+            fontsize=9, color=PALETTE["bc_slate"],
+            arrowprops={"arrowstyle": "->", "color": PALETTE["bc_slate"], "lw": 0.8},
+        )
+
+    ax.set_title(f"Crime Concentration Across BC Jurisdictions ({latest_year})")
+    ax.set_xlabel("Cumulative % of Jurisdictions (ranked by crime volume)")
+    ax.set_ylabel("Cumulative % of Total Crime")
+    ax.set_xlim(0, 100)
+    ax.set_ylim(0, 105)
+    ax.legend(loc="lower right", fontsize=9)
+    style_axes(ax)
+
+    # Find the jurisdiction % that accounts for 50% of crime
+    idx_50 = (ranked["cumulative_share"] >= 50).idxmax()
+    pct_50 = ranked.loc[idx_50, "jurisdiction_pct"]
+    add_subtitle(ax, f"Just {pct_50:.0f}% of jurisdictions account for 50% of all crime")
+
+    narrative = (
+        f"Crime in BC is highly concentrated: just {pct_50:.0f}% of jurisdictions account for "
+        f"50% of all Criminal Code offences. The Pareto curve shows a steep initial rise, "
+        f"meaning a small number of high-volume jurisdictions dominate provincial crime statistics. "
+        f"Source: BC Government Police Resources in British Columbia."
+    )
+
+    add_source(fig, "Source: BC Government, Police Resources in British Columbia")
+
+    if save_path:
+        save_fig(fig, str(save_path))
+    return fig, narrative
+
+
+def chart_violent_share_distribution(save_path: Path | None = None) -> tuple[plt.Figure, str]:
+    """Strip plot: distribution of violent crime share across jurisdictions."""
+    apply_theme()
+    jur = _load_jurisdiction()
+    latest_year = int(jur["year"].max())
+
+    total = (
+        jur[(jur["year"] == latest_year) & (jur["category"] == CAT_TOTAL)]
+        [["policing_jurisdiction", "count"]]
+        .rename(columns={"count": "total_count"})
+    )
+    violent = (
+        jur[(jur["year"] == latest_year) & (jur["category"] == CAT_VIOLENT)]
+        [["policing_jurisdiction", "count"]]
+        .rename(columns={"count": "violent_count"})
+    )
+
+    merged = total.merge(violent, on="policing_jurisdiction")
+    merged = merged.dropna(subset=["total_count", "violent_count"])
+    merged = merged[merged["total_count"] >= 100]  # Exclude tiny jurisdictions
+    merged["violent_share"] = (merged["violent_count"] / merged["total_count"]) * 100
+    merged = merged.sort_values("violent_share", ascending=True).reset_index(drop=True)
+
+    fig, ax = plt.subplots(figsize=FIGSIZE_SMALL)
+    avg_share = merged["violent_share"].mean()
+
+    colors = [
+        PALETTE["bc_red"] if v > avg_share + 10 else
+        PALETTE["bc_teal"] if v < avg_share - 10 else
+        PALETTE["bc_slate"]
+        for v in merged["violent_share"]
+    ]
+    ax.scatter(merged["violent_share"], range(len(merged)), c=colors, s=40, zorder=5)
+    ax.axvline(avg_share, color=PALETTE["bc_blue"], linewidth=1.5, linestyle="--",
+               label=f"Average: {avg_share:.1f}%")
+
+    # Label outliers (top 5 and bottom 5)
+    for idx in list(merged.index[:3]) + list(merged.index[-3:]):
+        row = merged.loc[idx]
+        ax.annotate(
+            row["policing_jurisdiction"].replace(" Mun", "").replace(" Prov", ""),
+            xy=(row["violent_share"], idx),
+            xytext=(5, 0), textcoords="offset points",
+            fontsize=9, color=PALETTE["bc_slate"],
+        )
+
+    ax.set_title(f"Distribution of Violent Crime Share Across BC Jurisdictions ({latest_year})")
+    ax.set_xlabel("Violent Offences as % of Total Crime")
+    ax.set_yticks([])
+    ax.legend(loc="upper right", fontsize=9)
+    style_axes(ax)
+    add_subtitle(ax, f"Average violent share: {avg_share:.1f}% — red dots are 10+ pp above average")
+
+    std_share = merged["violent_share"].std()
+    narrative = (
+        f"Across {len(merged)} jurisdictions (with 100+ offences), the violent crime share "
+        f"averages {avg_share:.1f}% with a standard deviation of {std_share:.1f}pp. "
+        f"Red dots indicate jurisdictions with disproportionately high violence (>10pp above average). "
+        f"Source: BC Government Police Resources in British Columbia."
+    )
+
+    add_source(fig, "Source: BC Government, Police Resources in British Columbia")
+
+    if save_path:
+        save_fig(fig, str(save_path))
+    return fig, narrative
+
+
 def run_all() -> dict[str, str]:
     """Generate all Priority 6 charts and return narratives."""
     CHARTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -526,6 +725,9 @@ def run_all() -> dict[str, str]:
         ("q4_jurisdiction_trends", chart_jurisdiction_trends),
         ("q4_total_vs_violent", chart_total_vs_violent),
         ("q4_cma_comparison", chart_cma_comparison),
+        ("q4_cma_trends", chart_cma_trends),
+        ("q4_crime_concentration", chart_crime_concentration),
+        ("q4_violent_share_distribution", chart_violent_share_distribution),
     ]
 
     for name, fn in charts:

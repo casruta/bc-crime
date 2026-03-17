@@ -13,9 +13,16 @@ import numpy as np
 import pandas as pd
 
 from src.analysis.theme import (
+    FIGSIZE_DOUBLE,
+    FIGSIZE_SINGLE,
+    FIGSIZE_SMALL,
+    FIGSIZE_WIDE,
     ORDERED,
     PALETTE,
     PROVINCE_COLOURS,
+    add_source,
+    add_subtitle,
+    annotate_events,
     apply_theme,
     save_fig,
     style_axes,
@@ -101,8 +108,9 @@ def chart_bc_csi_trend(save_path: Path | None = None) -> tuple[plt.Figure, str]:
     """Line chart: BC CSI over time (total, violent, non-violent) with annotations."""
     apply_theme()
     data = _load_csi_bc()
+    data = data[data["year"] >= 2004]
 
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=FIGSIZE_SMALL)
 
     lines = [
         ("Crime severity index", PALETTE["bc_blue"], "Total CSI", 2.5),
@@ -128,12 +136,14 @@ def chart_bc_csi_trend(save_path: Path | None = None) -> tuple[plt.Figure, str]:
                 arrowprops={"arrowstyle": "->", "color": PALETTE["bc_slate"], "lw": 0.8},
             )
 
-    ax.set_title("British Columbia Crime Severity Index (1998–2024)")
+    ax.set_title(f"British Columbia Crime Severity Index ({int(data['year'].min())}–{int(data['year'].max())})")
+    add_subtitle(ax, "BC's crime severity peaked in 2003, fell 46% by 2014, and has since stabilized")
     ax.set_xlabel("Year")
     ax.set_ylabel("Crime Severity Index")
     ax.legend(loc="upper right")
     ax.xaxis.set_major_locator(mticker.MultipleLocator(2))
     style_axes(ax)
+    annotate_events(ax)
 
     # Narrative
     latest_year = int(data["year"].max())
@@ -151,6 +161,8 @@ def chart_bc_csi_trend(save_path: Path | None = None) -> tuple[plt.Figure, str]:
         f"Source: Statistics Canada Table 35-10-0063-01."
     ) if trough_val else f"BC's CSI was {latest_val:.1f} in {latest_year}."
 
+    add_source(fig, "Source: Statistics Canada, Table 35-10-0063-01")
+
     if save_path:
         save_fig(fig, str(save_path))
     return fig, narrative
@@ -160,6 +172,7 @@ def chart_provincial_comparison(save_path: Path | None = None) -> tuple[plt.Figu
     """Small multiples: BC vs Canada vs 3 other provinces, crime rate over time."""
     apply_theme()
     data = _load_national_csi()
+    data = data[data["year"] >= 2004]
 
     provinces = COMPARISON_PROVINCES
     fig, axes = plt.subplots(2, 3, figsize=(16, 9), sharex=True, sharey=True)
@@ -174,6 +187,7 @@ def chart_provincial_comparison(save_path: Path | None = None) -> tuple[plt.Figu
         ax.set_title(prov, fontsize=11, fontweight="bold")
         ax.xaxis.set_major_locator(mticker.MultipleLocator(5))
         style_axes(ax)
+        annotate_events(ax)
 
     fig.suptitle(
         "Criminal Code Offence Rate per 100,000 Population (excl. traffic)",
@@ -199,6 +213,8 @@ def chart_provincial_comparison(save_path: Path | None = None) -> tuple[plt.Figu
         f"Source: Statistics Canada Table 35-10-0177-01."
     )
 
+    add_source(fig, "Source: Statistics Canada, Table 35-10-0177-01")
+
     if save_path:
         save_fig(fig, str(save_path))
     return fig, narrative
@@ -222,7 +238,7 @@ def chart_yoy_change_by_province(save_path: Path | None = None) -> tuple[plt.Fig
 
     df_chg = pd.DataFrame(records).sort_values("yoy_pct_change")
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=FIGSIZE_SMALL)
     colors = [
         PALETTE["bc_blue"] if p == "British Columbia" else PALETTE["light_grey"]
         for p in df_chg["province"]
@@ -230,7 +246,7 @@ def chart_yoy_change_by_province(save_path: Path | None = None) -> tuple[plt.Fig
     bars = ax.barh(df_chg["province"], df_chg["yoy_pct_change"], color=colors, edgecolor="white")
 
     # Add value labels
-    for bar, val in zip(bars, df_chg["yoy_pct_change"]):
+    for bar, val, prov in zip(bars, df_chg["yoy_pct_change"], df_chg["province"]):
         x = bar.get_width()
         ax.text(
             x + (0.3 if x >= 0 else -0.3),
@@ -239,7 +255,7 @@ def chart_yoy_change_by_province(save_path: Path | None = None) -> tuple[plt.Fig
             ha="left" if x >= 0 else "right",
             va="center",
             fontsize=10,
-            fontweight="bold" if bar.get_facecolor()[:3] != (0.835, 0.847, 0.863) else "normal",
+            fontweight="bold" if prov == "British Columbia" else "normal",
         )
 
     latest_yr = df_chg["latest_year"].max()
@@ -252,10 +268,13 @@ def chart_yoy_change_by_province(save_path: Path | None = None) -> tuple[plt.Fig
     # Narrative
     bc_chg = df_chg.loc[df_chg["province"] == "British Columbia", "yoy_pct_change"].values[0]
     direction = "increased" if bc_chg > 0 else "decreased"
+    add_subtitle(ax, f"BC's rate {direction} by {abs(bc_chg):.1f}% — among the {'largest' if abs(bc_chg) > 5 else 'moderate'} changes nationally")
     narrative = (
         f"BC's crime rate {direction} by {abs(bc_chg):.1f}% from {latest_yr - 1} to {latest_yr}. "
         f"Source: Statistics Canada Table 35-10-0177-01."
     )
+
+    add_source(fig, "Source: Statistics Canada, Table 35-10-0177-01")
 
     if save_path:
         save_fig(fig, str(save_path))
@@ -266,9 +285,10 @@ def chart_bc_yoy_trend(save_path: Path | None = None) -> tuple[plt.Figure, str]:
     """Bar chart: BC year-over-year % change in total crime rate, full time series."""
     apply_theme()
     data = _load_bc_yoy()
+    data = data[data["year"] >= 2004]
     data = data.dropna(subset=["yoy_pct_change"])
 
-    fig, ax = plt.subplots(figsize=(12, 5))
+    fig, ax = plt.subplots(figsize=FIGSIZE_SMALL)
     colors = [PALETTE["bc_red"] if v > 0 else PALETTE["bc_teal"] for v in data["yoy_pct_change"]]
     ax.bar(data["year"], data["yoy_pct_change"], color=colors, edgecolor="white", width=0.8)
     ax.axhline(0, color="black", linewidth=0.8)
@@ -277,16 +297,219 @@ def chart_bc_yoy_trend(save_path: Path | None = None) -> tuple[plt.Figure, str]:
     ax.set_ylabel("% Change")
     ax.xaxis.set_major_locator(mticker.MultipleLocator(2))
     style_axes(ax)
+    annotate_events(ax)
 
     # Narrative
     rising_years = len(data[data["yoy_pct_change"] > 0])
     falling_years = len(data[data["yoy_pct_change"] < 0])
+    add_subtitle(ax, f"Rising rates in {rising_years} years, declining in {falling_years} — most sustained decline was 2003-2014")
     latest_chg = data.iloc[-1]["yoy_pct_change"]
     latest_yr = int(data.iloc[-1]["year"])
     narrative = (
         f"Over the full time series, BC experienced rising crime rates in {rising_years} years "
         f"and declining rates in {falling_years} years. In {latest_yr}, the rate changed by "
         f"{latest_chg:+.1f}%. The most sustained decline occurred from 2003–2014. "
+        f"Source: Statistics Canada Table 35-10-0177-01."
+    )
+
+    add_source(fig, "Source: Statistics Canada, Table 35-10-0177-01")
+
+    if save_path:
+        save_fig(fig, str(save_path))
+    return fig, narrative
+
+
+def chart_indexed_provincial_growth(save_path: Path | None = None) -> tuple[plt.Figure, str]:
+    """Indexed line chart: all comparison provinces indexed to 2004 = 100."""
+    apply_theme()
+    data = _load_national_csi()
+    data = data[data["year"] >= 2004]
+
+    fig, ax = plt.subplots(figsize=FIGSIZE_SMALL)
+
+    for prov in COMPARISON_PROVINCES:
+        prov_data = data[data["geo"] == prov].sort_values("year")
+        if prov_data.empty or prov_data["crime_rate"].iloc[0] == 0:
+            continue
+        base_val = prov_data["crime_rate"].iloc[0]
+        indexed = (prov_data["crime_rate"] / base_val) * 100
+        color = PROVINCE_COLOURS.get(prov, PALETTE["bc_slate"])
+        lw = 2.5 if prov == "British Columbia" else 1.5
+        ax.plot(prov_data["year"], indexed, color=color, linewidth=lw, label=prov)
+
+    ax.axhline(100, color=PALETTE["light_grey"], linewidth=1, linestyle=":")
+    ax.set_title(f"Provincial Crime Rate Trajectories (indexed to {int(data['year'].min())} = 100)")
+    add_subtitle(ax, "All provinces declined from 2004, but BC's rebound has been steeper than Ontario's")
+    ax.set_xlabel("Year")
+    ax.set_ylabel("Index (base year = 100)")
+    ax.legend(loc="upper right", fontsize=9)
+    ax.xaxis.set_major_locator(mticker.MultipleLocator(2))
+    style_axes(ax)
+    annotate_events(ax)
+
+    narrative = (
+        "When all provinces are indexed to their 2004 crime rate, BC's decline and partial rebound "
+        "become directly comparable to peers. Saskatchewan shows the shallowest decline, while "
+        "Ontario dropped furthest. BC's trajectory sits between the national average and the "
+        "prairies. Source: Statistics Canada Table 35-10-0177-01."
+    )
+
+    add_source(fig, "Source: Statistics Canada, Table 35-10-0177-01")
+
+    if save_path:
+        save_fig(fig, str(save_path))
+    return fig, narrative
+
+
+def chart_violent_nonviolent_gap(save_path: Path | None = None) -> tuple[plt.Figure, str]:
+    """Ratio chart: violent CSI / non-violent CSI over time, showing compositional shift."""
+    apply_theme()
+    data = _load_csi_bc()
+    data = data[data["year"] >= 2004]
+
+    v_col = "Violent crime severity index"
+    nv_col = "Non-violent crime severity index"
+    if v_col not in data.columns or nv_col not in data.columns:
+        fig, ax = plt.subplots(figsize=(12, 6))
+        ax.text(0.5, 0.5, "Data unavailable", ha="center", va="center", transform=ax.transAxes)
+        return fig, "Violent/non-violent CSI data unavailable."
+
+    data["ratio"] = data[v_col] / data[nv_col]
+
+    fig, ax = plt.subplots(figsize=FIGSIZE_SMALL)
+    ax.fill_between(data["year"], 1, data["ratio"],
+                     where=data["ratio"] >= 1, alpha=0.2, color=PALETTE["bc_red"], interpolate=True)
+    ax.fill_between(data["year"], 1, data["ratio"],
+                     where=data["ratio"] < 1, alpha=0.2, color=PALETTE["bc_teal"], interpolate=True)
+    ax.plot(data["year"], data["ratio"], color=PALETTE["bc_blue"], linewidth=2.5)
+    ax.axhline(1, color=PALETTE["light_grey"], linewidth=1, linestyle=":")
+
+    ax.set_title("Violent vs Non-Violent CSI Ratio — Measuring the Compositional Shift")
+    ax.set_xlabel("Year")
+    ax.set_ylabel("Ratio (Violent CSI / Non-Violent CSI)")
+    ax.xaxis.set_major_locator(mticker.MultipleLocator(2))
+    style_axes(ax)
+    annotate_events(ax)
+
+    latest_ratio = data["ratio"].iloc[-1]
+    add_subtitle(ax, f"Ratio rose from {data['ratio'].iloc[0]:.2f} to {latest_ratio:.2f} — violent severity growing faster")
+    min_ratio = data["ratio"].min()
+    min_yr = int(data.loc[data["ratio"].idxmin(), "year"])
+    narrative = (
+        f"The ratio of violent to non-violent CSI reached a low of {min_ratio:.2f} in {min_yr}, "
+        f"then rose to {latest_ratio:.2f} by {int(data['year'].max())}. A rising ratio means violent "
+        f"crime severity is growing relative to non-violent — confirming the compositional shift "
+        f"toward more serious offences. Source: Statistics Canada Table 35-10-0063-01."
+    )
+
+    add_source(fig, "Source: Statistics Canada, Table 35-10-0063-01")
+
+    if save_path:
+        save_fig(fig, str(save_path))
+    return fig, narrative
+
+
+def chart_bc_canada_gap(save_path: Path | None = None) -> tuple[plt.Figure, str]:
+    """Area chart: gap between BC and Canada crime rates over time."""
+    apply_theme()
+    data = _load_national_csi()
+    data = data[data["year"] >= 2004]
+
+    bc = data[data["geo"] == "British Columbia"].set_index("year")["crime_rate"]
+    ca = data[data["geo"] == "Canada"].set_index("year")["crime_rate"]
+    merged = pd.DataFrame({"bc": bc, "canada": ca}).dropna()
+
+    fig, ax = plt.subplots(figsize=FIGSIZE_SMALL)
+    ax.plot(merged.index, merged["bc"], color=PALETTE["bc_blue"], linewidth=2.5, label="British Columbia")
+    ax.plot(merged.index, merged["canada"], color=PALETTE["canada_grey"], linewidth=2, label="Canada")
+    ax.fill_between(merged.index, merged["canada"], merged["bc"],
+                     where=merged["bc"] >= merged["canada"],
+                     alpha=0.15, color=PALETTE["bc_red"], label="BC excess")
+    ax.fill_between(merged.index, merged["canada"], merged["bc"],
+                     where=merged["bc"] < merged["canada"],
+                     alpha=0.15, color=PALETTE["bc_teal"], label="BC below avg")
+
+    ax.set_title("BC vs Canada Crime Rate — The Excess Crime Gap")
+    ax.set_xlabel("Year")
+    ax.set_ylabel("Rate per 100,000")
+    ax.legend(loc="upper right", fontsize=9)
+    ax.xaxis.set_major_locator(mticker.MultipleLocator(2))
+    style_axes(ax)
+    annotate_events(ax)
+
+    latest_gap_pct = ((merged["bc"].iloc[-1] / merged["canada"].iloc[-1]) - 1) * 100
+    add_subtitle(ax, f"BC has exceeded the national average by {latest_gap_pct:+.0f}% — the gap is persistent")
+    first_gap_pct = ((merged["bc"].iloc[0] / merged["canada"].iloc[0]) - 1) * 100
+    narrative = (
+        f"BC's crime rate has consistently exceeded the national average. In {int(merged.index[0])}, "
+        f"BC was {first_gap_pct:+.0f}% above Canada; by {int(merged.index[-1])}, the gap was "
+        f"{latest_gap_pct:+.0f}%. The shaded area visualizes this persistent excess. "
+        f"Source: Statistics Canada Table 35-10-0177-01."
+    )
+
+    add_source(fig, "Source: Statistics Canada, Table 35-10-0177-01")
+
+    if save_path:
+        save_fig(fig, str(save_path))
+    return fig, narrative
+
+
+def chart_csi_contribution(save_path: Path | None = None) -> tuple[plt.Figure, str]:
+    """Horizontal bar chart: top 12 violations by CSI contribution in BC."""
+    apply_theme()
+    df = pd.read_parquet(PROCESSED_DIR / "crime_incidents_national.parquet")
+
+    mask = (
+        (df["geo"] == "British Columbia")
+        & (df["statistic"] == "Percentage contribution to the Crime Severity Index (CSI)")
+    )
+    contrib = df[mask][["year", "violation", "value"]].copy()
+    contrib = contrib.dropna(subset=["value"])
+
+    if contrib.empty:
+        fig, ax = plt.subplots(figsize=FIGSIZE_SINGLE)
+        ax.text(0.5, 0.5, "Data unavailable", ha="center", va="center", transform=ax.transAxes)
+        return fig, "CSI contribution data unavailable for British Columbia."
+
+    latest_year = int(contrib["year"].max())
+    latest = contrib[contrib["year"] == latest_year].copy()
+
+    # Exclude aggregate/total violations
+    latest = latest[
+        ~latest["violation"].str.startswith("Total")
+        & ~latest["violation"].str.contains("all Criminal Code", case=False, na=False)
+        & ~latest["violation"].str.contains("all violations", case=False, na=False)
+    ]
+
+    # Top 12 by contribution value
+    top12 = latest.nlargest(12, "value").sort_values("value")
+
+    # Strip bracket codes from labels
+    top12["label"] = top12["violation"].str.replace(r"\s*\[\d+\]", "", regex=True)
+
+    total_contribution = top12["value"].sum()
+
+    fig, ax = plt.subplots(figsize=FIGSIZE_SINGLE)
+    ax.barh(top12["label"], top12["value"], color=PALETTE["bc_blue"], edgecolor="white")
+
+    for i, (val, label) in enumerate(zip(top12["value"], top12["label"])):
+        ax.text(
+            val + 0.3, i, f"{val:.1f}%",
+            ha="left", va="center", fontsize=9,
+        )
+
+    ax.set_title(f"Top Violations Contributing to BC's Crime Severity Index ({latest_year})")
+    add_subtitle(ax, f"The top 12 violations account for {total_contribution:.0f}% of BC's Crime Severity Index")
+    ax.set_xlabel("% Contribution to CSI")
+    style_axes(ax)
+    ax.grid(axis="y", visible=False)
+    add_source(fig, "Source: Statistics Canada, Table 35-10-0177-01")
+
+    narrative = (
+        f"In {latest_year}, the top 12 violations accounted for {total_contribution:.0f}% of BC's "
+        f"Crime Severity Index. {top12.iloc[-1]['label']} was the single largest contributor at "
+        f"{top12.iloc[-1]['value']:.1f}%. This concentration means a small number of offence types "
+        f"drive the majority of the CSI score. "
         f"Source: Statistics Canada Table 35-10-0177-01."
     )
 
@@ -309,6 +532,10 @@ def run_all() -> dict[str, str]:
         ("q1_provincial_comparison", chart_provincial_comparison),
         ("q1_yoy_by_province", chart_yoy_change_by_province),
         ("q1_bc_yoy_trend", chart_bc_yoy_trend),
+        ("q1_indexed_provincial_growth", chart_indexed_provincial_growth),
+        ("q1_violent_nonviolent_gap", chart_violent_nonviolent_gap),
+        ("q1_bc_canada_gap", chart_bc_canada_gap),
+        ("q1_csi_contribution", chart_csi_contribution),
     ]
 
     for name, fn in charts:
