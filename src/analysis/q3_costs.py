@@ -450,9 +450,10 @@ def chart_expenditure_breakdown(save_path: Path | None = None) -> tuple[plt.Figu
         label = EXPENDITURE_LABELS.get(cat, cat)
         ax.bar(years, vals, bar_width, bottom=bottom, label=label, color=colors[i], edgecolor="white")
 
-        # Add value labels inside bars if space allows
+        # Add value labels inside bars if segment is tall enough
         for j, (y, v, b) in enumerate(zip(years, vals, bottom)):
-            if v > 0.5:
+            # Only label if the segment is tall enough (> 1.5× fontsize in data units)
+            if v > 0.8:
                 ax.text(
                     y, b + v / 2, f"${v:.1f}B",
                     ha="center", va="center", fontsize=8, color="white", fontweight="bold",
@@ -463,7 +464,7 @@ def chart_expenditure_breakdown(save_path: Path | None = None) -> tuple[plt.Figu
     # Total labels on top
     totals = bottom
     for y, t in zip(years, totals):
-        ax.text(y, t + 0.3, f"${t:.1f}B", ha="center", va="bottom", fontsize=9, fontweight="bold")
+        ax.text(y, t + 0.5, f"${t:.1f}B", ha="center", va="bottom", fontsize=9, fontweight="bold")
 
     ax.set_title(f"Canada Policing Expenditure Breakdown (constant {CPI_BASE_YEAR} dollars)")
     ax.set_xlabel("Year")

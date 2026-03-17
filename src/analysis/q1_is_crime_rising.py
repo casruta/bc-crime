@@ -122,14 +122,16 @@ def chart_bc_csi_trend(save_path: Path | None = None) -> tuple[plt.Figure, str]:
         if col in data.columns:
             ax.plot(data["year"], data[col], color=color, label=label, linewidth=lw)
 
-    # Annotations
+    # Annotations — offset proportional to y-range to avoid overlap with event labels
+    y_range = data["Crime severity index"].max() - data["Crime severity index"].min()
+    ann_offset = max(y_range * 0.12, 8)
     for yr, label in ANNOTATIONS.items():
         if yr in data["year"].values:
             val = data.loc[data["year"] == yr, "Crime severity index"].values[0]
             ax.annotate(
                 label,
                 xy=(yr, val),
-                xytext=(yr, val + 12),
+                xytext=(yr, val + ann_offset),
                 ha="center",
                 fontsize=9,
                 color=PALETTE["bc_slate"],
@@ -143,7 +145,7 @@ def chart_bc_csi_trend(save_path: Path | None = None) -> tuple[plt.Figure, str]:
     ax.legend(loc="upper right")
     ax.xaxis.set_major_locator(mticker.MultipleLocator(2))
     style_axes(ax)
-    annotate_events(ax)
+    annotate_events(ax, ypos=0.92)
 
     # Narrative
     latest_year = int(data["year"].max())

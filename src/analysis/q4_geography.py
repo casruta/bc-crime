@@ -26,6 +26,7 @@ from src.analysis.theme import (
     annotate_events,
     apply_theme,
     save_fig,
+    smart_annotate,
     style_axes,
 )
 
@@ -332,16 +333,13 @@ def chart_total_vs_violent(save_path: Path | None = None) -> tuple[plt.Figure, s
     top_violent_share = merged.nlargest(5, "violent_share")
     to_label = pd.concat([top_total, top_violent_share]).drop_duplicates("policing_jurisdiction")
 
-    for _, row in to_label.iterrows():
-        ax.annotate(
-            row["policing_jurisdiction"].replace(" Mun", "").replace(" Prov", ""),
-            xy=(row["total_count"], row["violent_count"]),
-            xytext=(5, 5),
-            textcoords="offset points",
-            fontsize=8,
-            color=PALETTE["bc_slate"],
-            bbox={"boxstyle": "round,pad=0.2", "facecolor": "white", "alpha": 0.7, "edgecolor": "none"},
-        )
+    smart_annotate(
+        ax,
+        texts=to_label["policing_jurisdiction"].str.replace(" Mun", "").str.replace(" Prov", "").tolist(),
+        x=to_label["total_count"].values,
+        y=to_label["violent_count"].values,
+        fontsize=8,
+    )
 
     # Trend line
     valid = merged[["total_count", "violent_count"]].dropna()
@@ -682,7 +680,8 @@ def chart_region_comparison(save_path: Path | None = None) -> tuple[plt.Figure, 
         ax.plot(r_data["year"], r_data["count"], color=color, linewidth=2, marker="o", markersize=3)
         ax.fill_between(r_data["year"], r_data["count"], alpha=0.1, color=color)
 
-        ax.set_title(region, fontsize=10, fontweight="bold")
+        display_name = region[:25] + "\u2026" if len(region) > 25 else region
+        ax.set_title(display_name, fontsize=9, fontweight="bold")
         ax.xaxis.set_major_locator(mticker.MultipleLocator(2))
         ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{x:,.0f}"))
         ax.tick_params(axis="x", rotation=45, labelsize=8)
@@ -699,7 +698,7 @@ def chart_region_comparison(save_path: Path | None = None) -> tuple[plt.Figure, 
     )
     add_fig_subtitle(fig, "Regions ranked by total Criminal Code Offences in the latest year")
     fig.supylabel("Criminal Code Offences (count)")
-    fig.tight_layout(pad=2.0)
+    fig.tight_layout(pad=2.5)
 
     # Narrative — identify which regions are trending up vs down
     trends = []
@@ -771,15 +770,16 @@ def chart_violent_share_distribution(save_path: Path | None = None) -> tuple[plt
     ax.axvline(avg_share, color=PALETTE["bc_blue"], linewidth=1.5, linestyle="--",
                label=f"Average: {avg_share:.1f}%")
 
-    # Label outliers (top 5 and bottom 5)
-    for idx in list(merged.index[:3]) + list(merged.index[-3:]):
-        row = merged.loc[idx]
-        ax.annotate(
-            row["policing_jurisdiction"].replace(" Mun", "").replace(" Prov", ""),
-            xy=(row["violent_share"], idx),
-            xytext=(5, 0), textcoords="offset points",
-            fontsize=9, color=PALETTE["bc_slate"],
-        )
+    # Label outliers (bottom 3 and top 3)
+    outlier_indices = list(merged.index[:3]) + list(merged.index[-3:])
+    outliers = merged.loc[outlier_indices]
+    smart_annotate(
+        ax,
+        texts=outliers["policing_jurisdiction"].str.replace(" Mun", "").str.replace(" Prov", "").tolist(),
+        x=outliers["violent_share"].values,
+        y=np.array([merged.index.get_loc(i) for i in outlier_indices], dtype=float),
+        fontsize=9,
+    )
 
     ax.set_title(f"Distribution of Violent Crime Share Across BC Jurisdictions ({latest_year})")
     ax.set_xlabel("Violent Offences as % of Total Crime")

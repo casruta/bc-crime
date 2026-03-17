@@ -6,6 +6,7 @@ are preserved; theming, axes styling, and figure export delegate to kds.
 
 import sys
 from pathlib import Path
+import textwrap
 
 import matplotlib.pyplot as plt
 
@@ -20,6 +21,7 @@ from kds.theme import (  # noqa: E402
     FIGSIZE_SINGLE,
     FIGSIZE_SMALL,
     FIGSIZE_WIDE,
+    smart_annotate as _kds_smart_annotate,
 )
 
 # ---------------------------------------------------------------------------
@@ -133,3 +135,104 @@ def annotate_events(
             rotation=90, va="top",
             bbox={"boxstyle": "round,pad=0.15", "facecolor": "white", "alpha": 0.85, "edgecolor": "none"},
         )
+
+
+def smart_annotate(
+    ax: plt.Axes,
+    texts: list[str],
+    x,
+    y,
+    fontsize: int = 8,
+    color: str | None = None,
+    max_labels: int = 30,
+    **kwargs,
+) -> list:
+    """Auto-position scatter/strip labels to avoid overlaps with dotted leader lines.
+
+    Thin wrapper around kds.theme.smart_annotate using the BC palette default.
+    """
+    return _kds_theme.smart_annotate(
+        ax, texts, x, y,
+        fontsize=fontsize,
+        color=color or PALETTE["bc_slate"],
+        max_labels=max_labels,
+        **kwargs,
+    )
+
+
+def wrap_bar_labels(labels: list[str], max_width: int = 20) -> list[str]:
+    """Wrap long jurisdiction/category names for horizontal bar y-tick labels.
+
+    Parameters
+    ----------
+    labels : list[str]
+        The original label strings.
+    max_width : int
+        Maximum characters per line before wrapping.
+
+    Returns
+    -------
+    list[str]
+        Labels with newlines inserted at word boundaries.
+    """
+    return [textwrap.fill(str(lbl), width=max_width) for lbl in labels]
+
+
+def smart_bar_value_labels(
+    ax: plt.Axes,
+    bars,
+    values,
+    fontsize: int = 8,
+    min_gap_px: int = 12,
+    fmt: str = "",
+) -> None:
+    """Add value labels to horizontal bars, staggering or omitting on overlap.
+
+    Checks if consecutive value labels would overlap in pixel space
+    (y-positions closer than min_gap_px) and staggers them by adding
+    horizontal offset, or omits labels that still collide.
+
+    Parameters
+    ----------
+    ax : plt.Axes
+        The axes containing the bars.
+    bars : BarContainer
+        The bar patches from ax.barh().
+    values : array-like
+        The numeric values to display as labels.
+    fontsize : int
+        Font size for labels.
+    min_gap_px : int
+        Minimum vertical pixel gap between consecutive labels.
+    fmt : str
+        Format string for values (e.g., '+.1f' for signed floats).
+        If empty, auto-detects: uses comma-separated integers for
+        values > 100, one decimal otherwise.
+    """
+    fig = ax.get_figure()
+    fig.canvas.draw()
+    transform = ax.transData
+
+    label_positions = []
+    for bar, val in zip(bars, values):
+        cx = bar.get_width()
+        cy = bar.get_y() + bar.get_height() / 2
+        _, py = transform.transform((cx, cy))
+        label_positions.append((cx, cy, py, val))
+
+    label_positions.sort(key=lambda t: t[2])
+
+    last_py = -999
+    for cx, cy, py, val in label_positions:
+        if py - last_py < min_gap_px:
+            continue
+        if fmt:
+            text = f"{val:{fmt}}"
+        elif abs(val) >= 100:
+            text = f"{val:,.0f}"
+        else:
+            text = f"{val:.1f}"
+        offset = 2 if cx >= 0 else -2
+        ha = "left" if cx >= 0 else "right"
+        ax.text(cx + offset, cy, text, ha=ha, va="center", fontsize=fontsize)
+        last_py = py

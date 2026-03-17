@@ -73,6 +73,16 @@ STATCAN_TABLES = [
         name="cpi_annual",
         description="Consumer Price Index, annual averages",
     ),
+    StatCanTable(
+        table_id="35-10-0066-01",
+        name="gss_perception_neighbourhood",
+        description="Perception of crime in neighbourhood, by province (GSS)",
+    ),
+    StatCanTable(
+        table_id="35-10-0068-01",
+        name="gss_confidence_police",
+        description="Confidence in police, by province (GSS)",
+    ),
 ]
 
 BCGOV_FILES = [

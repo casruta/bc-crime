@@ -20,6 +20,8 @@ python -m src.clean
 | 18-10-0005-01 | `statscan/18100005.csv` | Consumer Price Index, annual averages | 1914--2024 | ~13 MB |
 | 35-10-0076-01 | `statscan/35100076.csv` | Police personnel and selected crime statistics | 1986--2023 | ~1.1 MB |
 | 35-10-0059-01 | `statscan/35100059.csv` | Police services expenditures (Canada) | 2018--2023 | ~16 KB |
+| 35-10-0066-01 | `statscan/35100066.csv` | Perception of crime in neighbourhood, by province (GSS) | 2004--2019 | ~500 KB |
+| 35-10-0068-01 | `statscan/35100068.csv` | Confidence in police, by province (GSS) | 2004--2019 | ~500 KB |
 
 Each table has a companion `*_MetaData.csv` file containing variable descriptions, footnotes, and correction notices.
 
@@ -168,6 +170,28 @@ All processed files are written to `data/processed/` in Apache Parquet format.
 | bcgov_name | string | BC Government jurisdiction name | Vancouver Mun |
 | statcan_name | string | Statistics Canada GEO name | Vancouver, City, Municipal |
 
+### gss_perception.parquet
+
+**Source:** 35-10-0066-01
+
+| Column | Type | Description | Example |
+|--------|------|-------------|---------|
+| year | Int64 | GSS survey reference year | 2019 |
+| geo | string | Province or Canada | British Columbia |
+| response | string | Perception response | Increased |
+| value | float64 | Percentage of respondents | 42.0 |
+
+### gss_confidence.parquet
+
+**Source:** 35-10-0068-01
+
+| Column | Type | Description | Example |
+|--------|------|-------------|---------|
+| year | Int64 | GSS survey reference year | 2019 |
+| geo | string | Province | British Columbia |
+| confidence_level | string | Level of confidence in police | Great deal of confidence |
+| value | float64 | Percentage of respondents | 30.0 |
+
 ---
 
 ## Jurisdiction Mapping
@@ -219,7 +243,9 @@ The following 23-entry mapping links BC Government jurisdiction names to their S
 │  ├── 35100177.csv + _MetaData.csv                │
 │  ├── 18100005.csv + _MetaData.csv                │
 │  ├── 35100076.csv + _MetaData.csv                │
-│  └── 35100059.csv + _MetaData.csv                │
+│  ├── 35100059.csv + _MetaData.csv                │
+│  ├── 35100066.csv + _MetaData.csv                │
+│  └── 35100068.csv + _MetaData.csv                │
 └───────────────────────┬──────────────────────────┘
                         │ clean_crime_severity_bc()
                         │ clean_crime_incidents_national()
@@ -233,12 +259,15 @@ The following 23-entry mapping links BC Government jurisdiction names to their S
 │  ├── bc_gov_trends.parquet                       │
 │  ├── bc_gov_jurisdiction_trends.parquet          │
 │  ├── bc_gov_stats_2023.parquet                   │
-│  └── jurisdiction_mapping.parquet                │
+│  ├── jurisdiction_mapping.parquet                │
+│  ├── gss_perception.parquet                      │
+│  └── gss_confidence.parquet                      │
 └───────────────────────┬──────────────────────────┘
                         │ q1_is_crime_rising.run_all()
                         │ q2_what_kinds.run_all()
                         │ q3_justice.run_all()
                         │ q3_costs.run_all()
+                        │ q5_perception.run_all()
                         │ q4_geography.run_all()
                         ▼
 ┌──────────────────────────────────────────────────┐
@@ -247,7 +276,8 @@ The following 23-entry mapping links BC Government jurisdiction names to their S
 │  ├── q2_*.png  (8 charts)                        │
 │  ├── q3_*.png  (11 charts)                       │
 │  ├── q4_*.png  (7 charts)                        │
-│  └── q4_interactive_map.html                     │
+│  ├── q4_interactive_map.html                     │
+│  └── q5_*.png  (3 charts)                        │
 └──────────────────────────────────────────────────┘
 ```
 
@@ -281,3 +311,7 @@ The following 23-entry mapping links BC Government jurisdiction names to their S
 > Cotter, A. (2021). *Criminal victimization in Canada, 2019*. Statistics Canada, *Juristat*, Catalogue no. 85-002-X. https://www150.statcan.gc.ca/n1/pub/85-002-x/2021001/article/00014-eng.htm
 
 This source is used in the underreporting analysis (Figure 23, `q3_justice.py`) for GSS victimization survey context showing that only 29% of criminal victimizations are reported to police.
+
+> Statistics Canada. Table 35-10-0066-01: Perception of neighbourhood crime. https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3510006601
+
+> Statistics Canada. Table 35-10-0068-01: Confidence in the police. https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3510006801

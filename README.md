@@ -13,9 +13,10 @@
 3. [What Kinds of Crime Are Changing? (Figures 9--16)](#2-what-kinds-of-crime-are-changing)
 4. [How Effectively Is Crime Being Addressed? (Figures 17--23)](#3-how-effectively-is-crime-being-addressed)
 5. [Where Is Crime Concentrated? (Figures 24--30)](#4-where-is-crime-concentrated)
-6. [Methodology](#methodology)
-7. [Caveats](#caveats)
-8. [Technical Details](#technical-details)
+6. [Why Does Crime Feel Like It's Rising? (Figures 31--33)](#5-why-does-crime-feel-like-its-rising)
+7. [Methodology](#methodology)
+8. [Caveats](#caveats)
+9. [Technical Details](#technical-details)
 
 ### List of Figures
 
@@ -60,6 +61,9 @@
 | — | BC Gov YoY 2022-2023 | Year-over-year change by crime category (BC Gov data) | 17 categories rising, 14 declining between 2022 and 2023 |
 | — | Region comparison | Small multiples of crime trends by BC region | Strathcona, Central Okanagan fastest-growing; Metro Vancouver declining |
 | -- | Interactive jurisdiction map | Plotly HTML with hover details for 50 jurisdictions | Explore violent, property, and total offence breakdowns interactively |
+| 31 | Perception vs reality | Dual-panel: "crime increased" belief vs actual CSI trend | 42% of BC residents believe crime rose, yet CSI was 40% below peak |
+| 32 | Confidence in police | Confidence levels by province, BC highlighted | 30% of BC residents have great confidence in police — below national average |
+| 33 | Reporting rates | % of incidents reported to police by crime type | Only 6% of sexual assaults and 29% of all crimes are reported to police |
 
 ---
 
@@ -73,6 +77,7 @@
 > 6. **Interior CMAs have roughly double** the per-capita crime rate of coastal metros -- Chilliwack (11,352/100k) and Kamloops (10,546/100k) vs. Vancouver (5,438/100k) and Victoria (5,283/100k).
 > 7. **Crime is extremely concentrated**: just **5% of jurisdictions account for 50%** of all Criminal Code offences; 19% account for 80%.
 > 8. **Total and violent offences correlate at r = 0.99** across jurisdictions -- high-crime areas have proportionally more violent crime, not just more property crime.
+> 9. **42% of BC residents believe crime increased** in their neighbourhood (GSS 2019), yet the Crime Severity Index was ~40% below its peak — a persistent perception-reality gap driven by media salience, visible disorder, and selective recall.
 
 ---
 
@@ -300,6 +305,29 @@ An [interactive version of the jurisdiction data](outputs/charts/q4_interactive_
 
 ---
 
+## 5. Why Does Crime Feel Like It's Rising?
+
+The data in Sections 1--4 demonstrates that BC's crime severity has fallen substantially from its early-2000s peak. Yet public surveys consistently show that a large minority of residents believe crime is getting worse. This section examines that perception-reality gap.
+
+Statistics Canada's General Social Survey on Canadians' Safety (2019) asked respondents whether they believed crime in their neighbourhood had increased, decreased, or stayed the same over the past five years. In BC, 42% said crime had increased — up from 30% in 2014. Nationally, 39% held the same view. These responses track poorly with the actual Crime Severity Index, which in 2019 sat roughly 40% below its 2003 peak.
+
+![Perception vs reality: survey beliefs alongside actual CSI trend](outputs/charts/q5_perception_vs_reality.png)
+*Figure 31. Top: proportion of BC and Canada respondents who said crime "increased" across GSS cycles. Bottom: actual BC Crime Severity Index. The gap between perceived and measured crime trends is substantial and widening. Sources: Statistics Canada, GSS on Canadians' Safety; Table 35-10-0063-01.*
+
+Confidence in local police varies across provinces and may contribute to crime perceptions. In 2019, 30% of BC residents reported a "great deal of confidence" in their local police — below the national average of 32% and below prairie provinces. Lower confidence may amplify perceptions of rising crime, as residents who feel less protected tend to overestimate local crime trends.
+
+![Confidence in police by province](outputs/charts/q5_confidence_by_province.png)
+*Figure 32. Confidence in police by province (GSS 2019). BC's confidence levels are modestly below the national average. Source: Statistics Canada, GSS on Canadians' Safety (2019).*
+
+A critical structural factor underlying the perception-reality gap is under-reporting. Only 29% of all criminal victimization is reported to police. This means the police-reported data in every chart in this analysis captures less than a third of actual crime. Reporting rates vary dramatically by offence type: motor vehicle theft (60%), break and enter (54%), robbery (43%), and assault (31%) have moderate reporting rates, while sexual assault is reported just 6% of the time.
+
+![Reporting rates by crime type](outputs/charts/q5_reporting_rates.png)
+*Figure 33. Police reporting rates by crime type (GSS 2019). The overall victimization reporting rate is just 29%. Source: Cotter (2021), Juristat, Catalogue no. 85-002-X.*
+
+**Assessment.** The perception-reality gap has multiple drivers: (1) media coverage emphasises dramatic incidents over statistical trends; (2) visible disorder (e.g., homelessness, open drug use) creates a sense of rising crime even when severity indices decline; (3) specific crime types that affect daily life (property theft, vehicle break-ins) may have risen locally even as aggregate indices fell; (4) the opioid crisis has concentrated visible harm in urban centres; and (5) social media amplifies anecdotal reports. Understanding this gap matters because public policy driven by perceived rather than measured crime trends may misallocate resources.
+
+---
+
 ## Methodology
 
 ### Data Sources
@@ -368,6 +396,7 @@ python -m src.analysis.q2_what_kinds
 python -m src.analysis.q3_justice
 python -m src.analysis.q3_costs
 python -m src.analysis.q4_geography
+python -m src.analysis.q5_perception
 ```
 
 Charts are saved to `outputs/charts/`. Open `notebooks/bc_crime_report.ipynb` for the full interactive narrative report.
@@ -386,6 +415,7 @@ src/
     q3_justice.py             # Justice system effectiveness (7 charts)
     q3_costs.py               # Policing expenditure and staffing analysis (6 charts)
     q4_geography.py           # Jurisdiction and CMA analysis (8 charts + 1 HTML)
+    q5_perception.py          # Perception vs reality (3 charts)
 data/
   README.md                   # Data dictionary — full citations and schemas
   raw/
@@ -395,7 +425,7 @@ data/
 notebooks/
   bc_crime_report.ipynb       # Full narrative report
 outputs/
-  charts/                     # Generated charts (38 PNG + 1 HTML)
+  charts/                     # Generated charts (41 PNG + 1 HTML)
     README.md                 # Chart index with figure numbers and sources
 tests/
   test_download.py            # Download verification tests
@@ -413,7 +443,8 @@ See [`data/README.md`](data/README.md) for full data source citations, column sc
 | q3_justice.py | 7 | 0 | 17--23 |
 | q3_costs.py | 6 | 0 | S1--S6 (supplementary) |
 | q4_geography.py | 8 | 1 | 24--30 + region + interactive |
-| **Total** | **38** | **1** | **38 + 1** |
+| q5_perception.py | 3 | 0 | 31--33 |
+| **Total** | **41** | **1** | **41 + 1** |
 
 ### Processed Data
 

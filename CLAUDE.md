@@ -18,6 +18,7 @@ python -m src.analysis.q2_what_kinds       # Section 2 charts (9 PNG)
 python -m src.analysis.q3_justice          # Section 3 charts (7 PNG)
 python -m src.analysis.q3_costs            # Policing costs charts (6 PNG)
 python -m src.analysis.q4_geography        # Section 4 charts (8 PNG + 1 HTML)
+python -m src.analysis.q5_perception    # Section 5 charts (3 PNG)
 pytest                                     # Run tests
 ```
 
@@ -38,6 +39,7 @@ BC-CRIME-/
       q3_justice.py
       q3_costs.py
       q4_geography.py
+      q5_perception.py        # Perception vs reality
   data/
     README.md              # Comprehensive data dictionary with citations
     raw/
@@ -98,4 +100,4 @@ All gates must pass before committing:
 
 1. `pytest` passes with zero failures
 2. No lint errors
-3. All charts regenerate without error (`python -m src.analysis.q1_is_crime_rising` through `q4`)
+3. All charts regenerate without error (`python -m src.analysis.q1_is_crime_rising` through `q5`)

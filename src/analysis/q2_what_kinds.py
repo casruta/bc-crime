@@ -26,7 +26,9 @@ from src.analysis.theme import (
     annotate_events,
     apply_theme,
     save_fig,
+    smart_bar_value_labels,
     style_axes,
+    wrap_bar_labels,
 )
 
 from src.paths import CHARTS_DIR, PROCESSED_DIR
@@ -254,17 +256,8 @@ def chart_top_changes(save_path: Path | None = None) -> tuple[plt.Figure, str]:
 
     fig, ax = plt.subplots(figsize=FIGSIZE_SINGLE)
     colors = [PALETTE["bc_red"] if v > 0 else PALETTE["bc_teal"] for v in df_top["abs_change"]]
-    ax.barh(df_top["label"], df_top["abs_change"], color=colors, edgecolor="white")
-
-    for i, (val, label) in enumerate(zip(df_top["abs_change"], df_top["label"])):
-        ax.text(
-            val + (2 if val >= 0 else -2),
-            i,
-            f"{val:+.0f}",
-            ha="left" if val >= 0 else "right",
-            va="center",
-            fontsize=9,
-        )
+    bars = ax.barh(df_top["label"], df_top["abs_change"], color=colors, edgecolor="white")
+    smart_bar_value_labels(ax, bars, df_top["abs_change"].values, fontsize=9, fmt="+.0f")
 
     ax.axvline(0, color="black", linewidth=0.8)
     ax.set_title(f"Top 10 Violations by Absolute Rate Change ({start}–{latest})")
@@ -310,6 +303,30 @@ def chart_slope(save_path: Path | None = None) -> tuple[plt.Figure, str]:
     fig, ax = plt.subplots(figsize=(8, 6))
 
     categories = list(CATEGORIES.keys())
+
+    # Collect positions for stagger calculation
+    left_positions = []
+    right_positions = []
+    for i, cat in enumerate(categories):
+        if cat in start_rank.index and cat in end_rank.index:
+            left_positions.append((start_rank[cat], cat, i))
+            right_positions.append((end_rank[cat], cat, i))
+
+    def _stagger(positions):
+        """Offset labels that are within 0.3 rank units of each other."""
+        positions.sort(key=lambda t: t[0])
+        offsets = {}
+        for j, (pos, cat, idx) in enumerate(positions):
+            offset = 0.0
+            for k in range(j):
+                if abs(positions[k][0] - pos) < 0.3:
+                    offset = 0.15 if (j - k) % 2 == 1 else -0.15
+            offsets[cat] = offset
+        return offsets
+
+    left_offsets = _stagger(left_positions)
+    right_offsets = _stagger(right_positions)
+
     for i, cat in enumerate(categories):
         if cat in start_rank.index and cat in end_rank.index:
             color = ORDERED[i % len(ORDERED)]
@@ -321,8 +338,10 @@ def chart_slope(save_path: Path | None = None) -> tuple[plt.Figure, str]:
                 marker="o",
                 markersize=8,
             )
-            ax.text(-0.05, start_rank[cat], cat, ha="right", va="center", fontsize=10, color=color)
-            ax.text(1.05, end_rank[cat], cat, ha="left", va="center", fontsize=10, color=color)
+            ax.text(-0.05, start_rank[cat] + left_offsets.get(cat, 0),
+                    cat, ha="right", va="center", fontsize=10, color=color)
+            ax.text(1.05, end_rank[cat] + right_offsets.get(cat, 0),
+                    cat, ha="left", va="center", fontsize=10, color=color)
 
     ax.set_xlim(-0.5, 1.5)
     ax.set_ylim(len(categories) + 0.5, 0.5)
@@ -649,19 +668,11 @@ def chart_bcgov_yoy_2022_2023(save_path: Path | None = None) -> tuple[plt.Figure
     # Clean labels: strip trailing footnote numbers (e.g., "Homicide 1,2" -> "Homicide")
     df["label"] = df["crime_category"].str.replace(r"\s*\d[\d,]*$", "", regex=True).str.strip()
 
-    fig, ax = plt.subplots(figsize=FIGSIZE_SINGLE)
+    fig, ax = plt.subplots(figsize=(14, 10))
     colors = [PALETTE["bc_red"] if v > 0 else PALETTE["bc_teal"] for v in df["pct_change"]]
-    ax.barh(df["label"], df["pct_change"], color=colors, edgecolor="white")
-
-    for i, (val, label) in enumerate(zip(df["pct_change"], df["label"])):
-        ax.text(
-            val + (1.5 if val >= 0 else -1.5),
-            i,
-            f"{val:+.1f}%",
-            ha="left" if val >= 0 else "right",
-            va="center",
-            fontsize=8,
-        )
+    bars = ax.barh(df["label"], df["pct_change"], color=colors, edgecolor="white")
+    ax.set_yticklabels(wrap_bar_labels(df["label"].tolist(), max_width=25))
+    smart_bar_value_labels(ax, bars, df["pct_change"].values, fontsize=8, fmt="+.1f")
 
     ax.axvline(0, color="black", linewidth=0.8)
     ax.set_title("BC Crime Year-over-Year Change by Category (2022–2023)")

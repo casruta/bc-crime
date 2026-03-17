@@ -111,6 +111,103 @@ def clean_cpi() -> pd.DataFrame:
     return df
 
 
+def clean_gss_perception() -> pd.DataFrame:
+    """Clean 35100066 — Perception of crime in neighbourhood, by province (GSS).
+
+    Extracts the 'increased/decreased/about the same' responses for
+    BC and Canada from the General Social Survey data.
+    Output columns: year, geo, response, value.
+    """
+    path = RAW_STATSCAN_DIR / "35100066.csv"
+    if not path.exists():
+        logger.warning("GSS perception file not found: %s", path)
+        return pd.DataFrame(columns=["year", "geo", "response", "value"])
+    logger.info("Cleaning %s ...", path.name)
+    df = pd.read_csv(path, dtype=str, encoding="utf-8-sig")
+    logger.info("  Raw columns: %s", list(df.columns))
+    df = _clean_statcan_columns(df)
+    df = _parse_ref_date(df)
+
+    # Keep BC and Canada
+    geos = {"British Columbia", "Canada"}
+    if "geo" in df.columns:
+        df = df[df["geo"].isin(geos)].copy()
+
+    # Identify the response/perception column
+    # StatCan GSS tables use various column names for the perception dimension
+    response_col = None
+    for candidate in ("perceptions", "perception_of_crime_in_the_neighbourhood",
+                       "perception", "indicators"):
+        if candidate in df.columns:
+            response_col = candidate
+            break
+
+    if response_col is None:
+        # Fall back: use any column that contains perception-like values
+        for col in df.columns:
+            sample = df[col].dropna().head(20).str.lower()
+            if sample.str.contains("increased|decreased|about the same", regex=True).any():
+                response_col = col
+                break
+
+    if response_col is None:
+        logger.warning("Could not identify perception/response column in GSS data")
+        return pd.DataFrame(columns=["year", "geo", "response", "value"])
+
+    # Filter to key responses
+    response_keywords = ["increased", "decreased", "about the same"]
+    mask = df[response_col].str.lower().str.contains("|".join(response_keywords), na=False, regex=True)
+    df = df[mask].copy()
+
+    df = df.rename(columns={response_col: "response"})
+    result = df[["year", "geo", "response", "value"]].copy()
+    result = result.dropna(subset=["value"]).reset_index(drop=True)
+    logger.info("  %d rows after filtering", len(result))
+    return result
+
+
+def clean_gss_confidence() -> pd.DataFrame:
+    """Clean 35100068 — Confidence in police, by province (GSS).
+
+    Extracts confidence levels for all provinces from the General Social Survey.
+    Output columns: year, geo, confidence_level, value.
+    """
+    path = RAW_STATSCAN_DIR / "35100068.csv"
+    if not path.exists():
+        logger.warning("GSS confidence file not found: %s", path)
+        return pd.DataFrame(columns=["year", "geo", "confidence_level", "value"])
+    logger.info("Cleaning %s ...", path.name)
+    df = pd.read_csv(path, dtype=str, encoding="utf-8-sig")
+    logger.info("  Raw columns: %s", list(df.columns))
+    df = _clean_statcan_columns(df)
+    df = _parse_ref_date(df)
+
+    # Identify the confidence level column
+    confidence_col = None
+    for candidate in ("confidence_in_police", "confidence", "level_of_confidence",
+                       "indicators", "responses"):
+        if candidate in df.columns:
+            confidence_col = candidate
+            break
+
+    if confidence_col is None:
+        for col in df.columns:
+            sample = df[col].dropna().head(20).str.lower()
+            if sample.str.contains("great deal|some confidence|not very much", regex=True).any():
+                confidence_col = col
+                break
+
+    if confidence_col is None:
+        logger.warning("Could not identify confidence column in GSS data")
+        return pd.DataFrame(columns=["year", "geo", "confidence_level", "value"])
+
+    df = df.rename(columns={confidence_col: "confidence_level"})
+    result = df[["year", "geo", "confidence_level", "value"]].copy()
+    result = result.dropna(subset=["value"]).reset_index(drop=True)
+    logger.info("  %d rows after filtering", len(result))
+    return result
+
+
 # ---------------------------------------------------------------------------
 # BC Gov XLSX cleaners
 # ---------------------------------------------------------------------------
@@ -347,6 +444,8 @@ def clean_all() -> dict[str, pd.DataFrame]:
         "crime_severity_bc": (clean_crime_severity_bc, "crime_severity_bc.parquet"),
         "crime_incidents_national": (clean_crime_incidents_national, "crime_incidents_national.parquet"),
         "cpi": (clean_cpi, "cpi.parquet"),
+        "gss_perception": (clean_gss_perception, "gss_perception.parquet"),
+        "gss_confidence": (clean_gss_confidence, "gss_confidence.parquet"),
     }
 
     for name, (fn, filename) in cleaners.items():
