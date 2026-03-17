@@ -89,7 +89,7 @@ def add_source(fig: plt.Figure, text: str, fontsize: int = 8) -> None:
 def add_subtitle(ax: plt.Axes, text: str, fontsize: int = 10) -> None:
     """Add an interpretive subtitle below the title."""
     ax.text(
-        0, 1.02, text,
+        0, 1.06, text,
         transform=ax.transAxes,
         fontsize=fontsize,
         color=PALETTE["bc_slate"],
@@ -105,16 +105,31 @@ KEY_EVENTS = {
 }
 
 
+def add_fig_subtitle(fig: plt.Figure, text: str, fontsize: int = 10) -> None:
+    """Add a figure-level subtitle for small multiples (below fig.suptitle)."""
+    fig.text(
+        0.5, 0.96, text,
+        ha="center",
+        fontsize=fontsize,
+        color=PALETTE["bc_slate"],
+        style="italic",
+    )
+
+
 def annotate_events(
     ax: plt.Axes,
     events: dict[int, str] | None = None,
-    ypos: float = 0.95,
+    ypos: float = 0.85,
 ) -> None:
     """Add vertical dashed lines and labels for key events on temporal charts."""
-    for yr, label in (events or KEY_EVENTS).items():
+    items = list((events or KEY_EVENTS).items())
+    for idx, (yr, label) in enumerate(items):
         ax.axvline(yr, color=PALETTE["light_grey"], linewidth=0.8, linestyle="--", zorder=0)
+        # Stagger alternating labels to prevent overlap
+        stagger = 0.0 if idx % 2 == 0 else -0.10
         ax.text(
-            yr, ax.get_ylim()[1] * ypos, f" {label}",
+            yr, ax.get_ylim()[1] * (ypos + stagger), f" {label}",
             fontsize=7, color=PALETTE["bc_slate"],
             rotation=90, va="top",
+            bbox={"boxstyle": "round,pad=0.15", "facecolor": "white", "alpha": 0.85, "edgecolor": "none"},
         )

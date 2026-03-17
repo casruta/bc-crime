@@ -20,6 +20,7 @@ from src.analysis.theme import (
     ORDERED,
     PALETTE,
     PROVINCE_COLOURS,
+    add_fig_subtitle,
     add_source,
     add_subtitle,
     annotate_events,
@@ -191,11 +192,11 @@ def chart_provincial_comparison(save_path: Path | None = None) -> tuple[plt.Figu
 
     fig.suptitle(
         "Criminal Code Offence Rate per 100,000 Population (excl. traffic)",
-        fontsize=14, fontweight="bold", y=1.02,
+        fontsize=14, fontweight="bold", y=1.04,
     )
     fig.supxlabel("Year")
     fig.supylabel("Rate per 100,000")
-    fig.tight_layout()
+    fig.tight_layout(pad=2.0)
 
     # Narrative
     latest = data[data["year"] == data["year"].max()]
@@ -503,6 +504,7 @@ def chart_csi_contribution(save_path: Path | None = None) -> tuple[plt.Figure, s
     ax.set_xlabel("% Contribution to CSI")
     style_axes(ax)
     ax.grid(axis="y", visible=False)
+    fig.subplots_adjust(left=0.25)
     add_source(fig, "Source: Statistics Canada, Table 35-10-0177-01")
 
     narrative = (

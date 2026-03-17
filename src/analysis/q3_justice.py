@@ -14,8 +14,10 @@ import pandas as pd
 
 from src.analysis.theme import (
     FIGSIZE_SINGLE,
+    FIGSIZE_WIDE,
     ORDERED,
     PALETTE,
+    add_fig_subtitle,
     add_source,
     add_subtitle,
     annotate_events,
@@ -235,6 +237,7 @@ def chart_clearance_by_violation(
     ax.set_xlabel("Clearance Rate (%)")
     style_axes(ax)
     ax.grid(axis="y", visible=False)
+    fig.subplots_adjust(left=0.30)
     add_source(fig, "Source: Statistics Canada, Table 35-10-0177-01")
 
     # Narrative
@@ -474,6 +477,7 @@ def chart_covid_impact(
     ax.legend(loc="lower right", fontsize=10)
     style_axes(ax)
     ax.grid(axis="y", visible=False)
+    fig.subplots_adjust(left=0.22)
 
     # Data-driven subtitle
     prop_2019 = df.loc[
@@ -581,6 +585,202 @@ def chart_unfounded_rates(
 
 
 # ---------------------------------------------------------------------------
+# Underreporting hypothesis
+# ---------------------------------------------------------------------------
+
+# Specific violations to track in underreporting proxy analysis
+_PROXY_VIOLATIONS = {
+    "Sexual assault": "Sexual assault, level 1 [1330]",
+    "Assault": "Assault, level 1 [1430]",
+    "Theft under $5k": "Total theft under $5,000 (non-motor vehicle) [240]",
+    "Breaking & entering": "Total breaking and entering [210]",
+    "Mischief": "Total mischief [250]",
+}
+
+
+def chart_underreporting_proxies(
+    save_path: Path | None = None,
+) -> tuple[plt.Figure, str]:
+    """2x2 dashboard exploring whether underreporting explains crime declines.
+
+    Panels:
+    1. Unfounded rates for specific violations over time
+    2. Clearance method shift (charge vs otherwise) over time
+    3. Property vs violent rate trajectories indexed to 2004=100
+    4. Text panel with GSS victimization context
+    """
+    apply_theme()
+    bc = _load_national_bc()
+    bc = bc[bc["year"] >= 2004]
+
+    fig, axes = plt.subplots(2, 2, figsize=FIGSIZE_WIDE)
+
+    # --- Panel 1: Unfounded rates for specific violations ---
+    ax1 = axes[0, 0]
+    for i, (label, violation) in enumerate(_PROXY_VIOLATIONS.items()):
+        unfounded = bc[
+            (bc["violation"] == violation)
+            & (bc["statistic"] == "Percent unfounded")
+        ][["year", "value"]].sort_values("year")
+        if not unfounded.empty:
+            ax1.plot(
+                unfounded["year"], unfounded["value"],
+                color=ORDERED[i], linewidth=1.8, label=label,
+            )
+
+    ax1.set_title("Unfounded Rates by Violation Type", fontsize=11, fontweight="bold")
+    ax1.set_xlabel("Year")
+    ax1.set_ylabel("Percent Unfounded (%)")
+    ax1.legend(fontsize=7, loc="upper right")
+    ax1.xaxis.set_major_locator(mticker.MultipleLocator(4))
+    style_axes(ax1)
+
+    # --- Panel 2: Clearance method shift ---
+    ax2 = axes[0, 1]
+    total_violation = "Total, all Criminal Code violations (excluding traffic) [50]"
+    charged = bc[
+        (bc["violation"] == total_violation)
+        & (bc["statistic"] == "Cleared by charge")
+    ][["year", "value"]].rename(columns={"value": "by_charge"}).sort_values("year")
+    otherwise = bc[
+        (bc["violation"] == total_violation)
+        & (bc["statistic"] == "Cleared otherwise")
+    ][["year", "value"]].rename(columns={"value": "otherwise"}).sort_values("year")
+
+    if not charged.empty and not otherwise.empty:
+        merged = charged.merge(otherwise, on="year", how="inner")
+        merged["total_cleared"] = merged["by_charge"] + merged["otherwise"]
+        merged["charge_share"] = np.where(
+            merged["total_cleared"] > 0,
+            merged["by_charge"] / merged["total_cleared"] * 100,
+            np.nan,
+        )
+        merged["otherwise_share"] = np.where(
+            merged["total_cleared"] > 0,
+            merged["otherwise"] / merged["total_cleared"] * 100,
+            np.nan,
+        )
+        ax2.stackplot(
+            merged["year"],
+            [merged["charge_share"].values, merged["otherwise_share"].values],
+            labels=["Cleared by charge", "Cleared otherwise"],
+            colors=[PALETTE["bc_blue"], PALETTE["bc_amber"]],
+            alpha=0.8,
+        )
+        ax2.set_ylim(0, 100)
+        ax2.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{x:.0f}%"))
+
+    ax2.set_title("Clearance Method: Charge vs Otherwise", fontsize=11, fontweight="bold")
+    ax2.set_xlabel("Year")
+    ax2.set_ylabel("Share of Cleared Cases (%)")
+    ax2.legend(fontsize=8, loc="lower right")
+    ax2.xaxis.set_major_locator(mticker.MultipleLocator(4))
+    style_axes(ax2)
+
+    # --- Panel 3: Property vs violent indexed to 2004 = 100 ---
+    ax3 = axes[1, 0]
+    cat_violations = {
+        "Property crime": "Total property crime violations [200]",
+        "Violent crime": "Total violent Criminal Code violations [100]",
+    }
+    cat_colors = {
+        "Property crime": PALETTE["bc_teal"],
+        "Violent crime": PALETTE["bc_red"],
+    }
+    for label, violation in cat_violations.items():
+        rates = bc[
+            (bc["violation"] == violation)
+            & (bc["statistic"] == "Rate per 100,000 population")
+        ][["year", "value"]].sort_values("year")
+        if not rates.empty:
+            base_val = rates["value"].iloc[0]
+            if base_val > 0:
+                indexed = rates["value"] / base_val * 100
+                ax3.plot(
+                    rates["year"], indexed,
+                    color=cat_colors[label], linewidth=2, label=label,
+                )
+
+    ax3.axhline(100, color=PALETTE["light_grey"], linewidth=1, linestyle=":")
+    ax3.set_title("Property vs Violent Rate (indexed 2004 = 100)", fontsize=11, fontweight="bold")
+    ax3.set_xlabel("Year")
+    ax3.set_ylabel("Index (2004 = 100)")
+    ax3.legend(fontsize=9, loc="upper right")
+    ax3.xaxis.set_major_locator(mticker.MultipleLocator(4))
+    style_axes(ax3)
+    ax3.annotate(
+        "Real decline\nor reporting\ndecline?",
+        xy=(2018, 60), fontsize=9, color=PALETTE["bc_slate"],
+        style="italic", ha="center",
+        bbox={"boxstyle": "round,pad=0.4", "facecolor": "#f9f9f9", "edgecolor": PALETTE["bc_slate"], "alpha": 0.9},
+    )
+
+    # --- Panel 4: GSS context text ---
+    ax4 = axes[1, 1]
+    ax4.axis("off")
+
+    gss_text = (
+        "The Reporting Gap\n"
+        "━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+        "Statistics Canada's General Social\n"
+        "Survey on Victimization (2019) found:\n\n"
+        "  Overall:  only 29% of criminal\n"
+        "            victimizations reported\n\n"
+        "  Property crime:      ~35%\n"
+        "  Violent crime:       ~24%\n"
+        "  Sexual assault:       ~6%\n\n"
+        "If reporting rates are declining,\n"
+        "police-reported crime falls even\n"
+        "when actual crime is stable.\n\n"
+        "Source: Statistics Canada, GSS on\n"
+        "Canadians' Safety, 2019 (Catalogue\n"
+        "no. 85-002-X)"
+    )
+
+    ax4.text(
+        0.08, 0.95, gss_text,
+        transform=ax4.transAxes,
+        fontsize=9, fontfamily="monospace",
+        color=PALETTE["bc_blue"],
+        va="top", ha="left",
+        bbox={"boxstyle": "round,pad=0.6", "facecolor": "#f0f4f8", "edgecolor": PALETTE["bc_blue"], "alpha": 0.3},
+    )
+
+    fig.suptitle(
+        "Could Underreporting Explain the Crime Decline?",
+        fontsize=14, fontweight="bold", y=1.04,
+    )
+    add_fig_subtitle(
+        fig,
+        "Proxy indicators from police data, alongside victimization survey context",
+    )
+    fig.tight_layout(pad=2.0)
+    add_source(fig, "Source: Statistics Canada, Tables 35-10-0177-01 and 35-10-0063-01; GSS 2019")
+
+    # Narrative
+    narrative = (
+        "This dashboard explores whether declining crime rates may partly reflect "
+        "changes in reporting behaviour rather than genuine crime reduction. "
+        "Panel 1 shows unfounded rates for specific violations — if police are "
+        "dismissing more reports, it inflates the apparent decline. "
+        "Panel 2 tracks whether cases are increasingly 'cleared otherwise' "
+        "(e.g., victim declines to proceed) rather than cleared by charge. "
+        "Panel 3 contrasts property and violent crime trajectories — property "
+        "crime (higher reporting sensitivity) has declined more steeply. "
+        "The GSS context (Panel 4) reveals that only 29% of victimizations are "
+        "reported to police, with sexual assault at just 6%. These proxy indicators "
+        "suggest underreporting likely explains some of the property crime decline "
+        "but cannot account for violent crime trends, which are less sensitive to "
+        "reporting behaviour. "
+        "Source: Statistics Canada Tables 35-10-0177-01, 35-10-0063-01; GSS 2019."
+    )
+
+    if save_path:
+        save_fig(fig, str(save_path))
+    return fig, narrative
+
+
+# ---------------------------------------------------------------------------
 # Run all
 # ---------------------------------------------------------------------------
 
@@ -596,6 +796,7 @@ def run_all() -> dict[str, str]:
         ("q3_rcmp_vs_municipal", chart_rcmp_vs_municipal),
         ("q3_covid_impact", chart_covid_impact),
         ("q3_unfounded_rates", chart_unfounded_rates),
+        ("q3_underreporting_proxies", chart_underreporting_proxies),
     ]
 
     for name, fn in charts:

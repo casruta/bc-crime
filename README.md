@@ -11,46 +11,47 @@
 1. [Key Findings at a Glance](#key-findings-at-a-glance)
 2. [Is Crime Rising? (Figures 1--8)](#1-is-crime-rising)
 3. [What Kinds of Crime Are Changing? (Figures 9--16)](#2-what-kinds-of-crime-are-changing)
-4. [How Effectively Is Crime Being Addressed? (Figures 17--22)](#3-how-effectively-is-crime-being-addressed)
-5. [Where Is Crime Concentrated? (Figures 23--29)](#4-where-is-crime-concentrated)
+4. [How Effectively Is Crime Being Addressed? (Figures 17--23)](#3-how-effectively-is-crime-being-addressed)
+5. [Where Is Crime Concentrated? (Figures 24--30)](#4-where-is-crime-concentrated)
 6. [Methodology](#methodology)
 7. [Caveats](#caveats)
 8. [Technical Details](#technical-details)
 
 ### List of Figures
 
-| # | Figure | Section |
-|---|--------|---------|
-| 1 | BC CSI trend | Is Crime Rising? |
-| 2 | Violent vs non-violent ratio | Is Crime Rising? |
-| 3 | BC YoY changes | Is Crime Rising? |
-| 4 | Provincial small multiples | Is Crime Rising? |
-| 5 | Indexed provincial trajectories | Is Crime Rising? |
-| 6 | BC vs Canada gap | Is Crime Rising? |
-| 7 | Provincial YoY comparison | Is Crime Rising? |
-| 8 | CSI contribution breakdown | Is Crime Rising? |
-| 9 | Stacked area composition | What Kinds? |
-| 10 | 100% stacked shares | What Kinds? |
-| 11 | Rate heatmap | What Kinds? |
-| 12 | Top changes bar chart | What Kinds? |
-| 13 | Category ranking slope | What Kinds? |
-| 14 | CAGR lollipop | What Kinds? |
-| 15 | Violation trend small multiples | What Kinds? |
-| 16 | Rising violations overlay | What Kinds? |
-| 17 | Clearance rate trends | Justice Effectiveness |
-| 18 | Clearance by violation type | Justice Effectiveness |
-| 19 | Youth vs adult CSI | Justice Effectiveness |
-| 20 | RCMP vs municipal policing | Justice Effectiveness |
-| 21 | COVID impact analysis | Justice Effectiveness |
-| 22 | Unfounded rates | Justice Effectiveness |
-| 23 | Top 20 jurisdictions | Geographic Concentration |
-| 24 | 8 largest jurisdiction trends | Geographic Concentration |
-| 25 | CMA rate comparison | Geographic Concentration |
-| 26 | CMA trends | Geographic Concentration |
-| 27 | Total vs violent scatter | Geographic Concentration |
-| 28 | Pareto concentration curve | Geographic Concentration |
-| 29 | Violent share distribution | Geographic Concentration |
-| -- | Interactive jurisdiction map | Geographic Concentration |
+| # | Figure | What It Shows | Key Insight |
+|---|--------|---------------|-------------|
+| 1 | BC CSI trend | Total, violent, and non-violent Crime Severity Index over time | CSI fell 46% from peak to 2014 trough; violent CSI rising relative to non-violent since 2014 |
+| 2 | Violent vs non-violent ratio | Ratio of violent CSI to non-violent CSI | Ratio rose from 0.73 to ~1.0 — violent and non-violent severity now roughly equal |
+| 3 | BC YoY changes | Year-over-year percentage change in BC crime rate | 2004--2014 shows near-continuous decline; post-2019 trend is again downward |
+| 4 | Provincial small multiples | Crime rate panels for 6 provinces | All provinces share the same broad arc; Saskatchewan consistently highest |
+| 5 | Indexed provincial trajectories | Provinces indexed to 2004 = 100 | BC declined the steepest (-42% by 2014), then partially rebounded |
+| 6 | BC vs Canada gap | BC and Canada crime rates with shaded gap | BC persistently ~20% above the national average |
+| 7 | Provincial YoY comparison | Latest year-over-year change by province | BC's recent decline is among the steepest nationally |
+| 8 | CSI contribution breakdown | Top 12 violations by CSI contribution | A small number of offence types drive the majority of BC's CSI score |
+| 9 | Stacked area composition | Crime rate by category, stacked over time | Property crime dominates but declining; violent crime holds steady |
+| 10 | 100% stacked shares | Category shares as percentage of total | Property share fell 64% to 51%; violent grew 12% to 20% |
+| 11 | Rate heatmap | Year-by-year intensity by category | Administration of justice violations warming notably over time |
+| 12 | Top changes bar chart | Top 10 violations by absolute rate change | Theft from motor vehicles fell -772/100k; child exploitation rose +82/100k |
+| 13 | Category ranking slope | Category rankings, 2014 vs latest year | Property crime remains #1; drug offences fell in rank |
+| 14 | CAGR lollipop | 5-year compound annual growth rate by category | Drug offences declining fastest (-8.3%); violent crime slowest (-0.8%) |
+| 15 | Violation trend small multiples | 2x4 panels for 8 highest-rate violations | Diverse trajectories beneath the aggregate — some declining, others surging |
+| 16 | Rising violations overlay | 5 fastest-growing violations overlaid | Emerging pressure points not visible in aggregate statistics |
+| 17 | Clearance rate trends | Clearance rate by category over time | Property crime clearance far lower than violent crime clearance |
+| 18 | Clearance by violation type | Clearance rate for top 10 violations by volume | Wide range from <20% (theft) to >70% (assault) |
+| 19 | Youth vs adult CSI | Youth and overall CSI compared | Youth CSI declining even as overall CSI rises — divergent trajectories |
+| 20 | RCMP vs municipal policing | Crime counts by policing type | Municipal police forces handle the largest share of offences |
+| 21 | COVID impact analysis | Pre-COVID vs pandemic vs post-pandemic rates | Property crime dropped mid-pandemic; some categories largely unaffected |
+| 22 | Unfounded rates | Percent unfounded by category | Property crime has the highest unfounded rate; violent crime the lowest |
+| 23 | Underreporting proxies | 2x2 dashboard: unfounded rates, clearance methods, indexed rates, GSS context | Only 29% of victimizations are reported; property crime decline may partly reflect reporting changes |
+| 24 | Top 20 jurisdictions | Jurisdictions ranked by total crime count | Municipal police forces in Metro Vancouver dominate the rankings |
+| 25 | 8 largest jurisdiction trends | Small multiples for top 8 jurisdictions | Divergent trajectories — local factors matter as much as provincial trends |
+| 26 | CMA rate comparison | Per-capita crime rates across BC CMAs | Interior CMAs report ~2x higher per-capita crime than coastal metros |
+| 27 | CMA trends | CMA crime rate trends over time | Abbotsford-Mission halved from peak; Kelowna relatively flat |
+| 28 | Total vs violent scatter | Total vs violent offences by jurisdiction | r = 0.99 — high-crime areas have proportionally more violence |
+| 29 | Pareto concentration curve | Cumulative share of crime by jurisdiction | 5% of jurisdictions account for 50% of all crime |
+| 30 | Violent share distribution | Distribution of violent crime share across jurisdictions | Average violent share ~26%, but wide variance (15%--50%+) |
+| -- | Interactive jurisdiction map | Plotly HTML with hover details for 50 jurisdictions | Explore violent, property, and total offence breakdowns interactively |
 
 ---
 
@@ -191,6 +192,25 @@ Not all reported incidents result in founded criminal cases. The unfounded rate 
 ![Unfounded rates by offence type](outputs/charts/q3_unfounded_rates.png)
 *Figure 22. Unfounded rates across offence categories. Higher unfounded rates may reflect investigative complexity, reporting patterns, or systemic factors in how certain offence types are assessed. Source: Statistics Canada, Table 35-10-0063-01.*
 
+### The Reporting Gap: Could Underreporting Explain the Decline?
+
+A natural question arises from the data in Sections 1--2: could the apparent decline in crime rates reflect less crime being *reported* rather than less crime actually occurring? This is not a hypothetical concern. Statistics Canada's [General Social Survey on Canadians' Safety (2019)](https://www150.statcan.gc.ca/n1/pub/85-002-x/2021001/article/00014-eng.htm) found that only **29% of criminal victimizations** were reported to police. Reporting rates vary dramatically by offence type: property crime sits at roughly 35%, violent crime at 24%, and sexual assault at just 6%.
+
+This means the police-reported data underlying every chart in this analysis captures less than a third of actual criminal victimization. If reporting rates are declining over time, then falling police-reported rates could coexist with stable or even rising actual crime.
+
+To investigate, we can examine proxy indicators available in the police data itself:
+
+1. **Unfounded rates** -- If police are classifying more reports as "unfounded" (i.e., determining they did not occur), this artificially suppresses crime counts. Panel 1 of Figure 23 tracks unfounded rates for specific violations over time.
+
+2. **Clearance method shifts** -- A growing share of cases "cleared otherwise" (rather than by charge) may indicate victims declining to proceed with complaints, consistent with reporting fatigue. Panel 2 tracks this ratio.
+
+3. **Differential decline rates** -- If underreporting is the primary driver, we would expect the steepest declines in offence categories with the lowest reporting rates. Panel 3 compares property crime (higher reporting rate, ~35%) and violent crime (lower reporting rate, ~24%) trajectories.
+
+![Underreporting proxy dashboard](outputs/charts/q3_underreporting_proxies.png)
+*Figure 23. Underreporting proxy dashboard. Top-left: unfounded rates for specific violations. Top-right: share of cleared cases resolved by charge vs otherwise. Bottom-left: property vs violent crime indexed to 2004. Bottom-right: GSS victimization survey context. Sources: Statistics Canada Tables 35-10-0177-01 and 35-10-0063-01; GSS on Canadians' Safety, 2019.*
+
+**Assessment.** The proxy data provides partial support for the underreporting hypothesis. Property crime -- which has a higher reporting rate and is therefore less sensitive to reporting changes -- has declined more steeply than violent crime. This is the *opposite* of what we would expect if declining reporting rates were the sole driver. However, the GSS data confirms that the vast majority of crime goes unreported, making it impossible to fully distinguish genuine crime reduction from reporting changes using police data alone. The most defensible conclusion is that underreporting likely contributes to some of the property crime decline (particularly for low-value theft) but cannot explain the violent crime trends, which are driven by distinct factors including the opioid crisis and changing enforcement priorities.
+
 ---
 
 ## 4. Where Is Crime Concentrated?
@@ -200,37 +220,37 @@ Aggregate provincial statistics mask enormous variation at the local level. This
 Raw offence counts are dominated by population -- Vancouver and Surrey account for the largest volumes simply because they are the most populous. The chart below ranks the top 20 policing jurisdictions by total Criminal Code offences, distinguishing municipal police forces from RCMP detachments.
 
 ![Top 20 jurisdictions by total crime count](outputs/charts/q4_top_jurisdictions.png)
-*Figure 23. Top 20 BC policing jurisdictions by total Criminal Code offence count (latest year). Source: BC Government, Police Resources in British Columbia.*
+*Figure 24. Top 20 BC policing jurisdictions by total Criminal Code offence count (latest year). Source: BC Government, Police Resources in British Columbia.*
 
 The small multiples below show how crime counts have evolved over time in BC's eight largest policing jurisdictions. The trajectories diverge: some show clear declines, others have plateaued, and a few show modest increases -- suggesting that local factors matter as much as provincial trends.
 
 ![Crime trends for the 8 largest BC jurisdictions](outputs/charts/q4_jurisdiction_trends.png)
-*Figure 24. Crime trends in BC's 8 largest policing jurisdictions. Divergent trajectories indicate that local conditions drive outcomes as much as province-wide forces. Source: BC Government, Police Resources in British Columbia.*
+*Figure 25. Crime trends in BC's 8 largest policing jurisdictions. Divergent trajectories indicate that local conditions drive outcomes as much as province-wide forces. Source: BC Government, Police Resources in British Columbia.*
 
 Among BC's Census Metropolitan Areas, Chilliwack leads at 11,352 offences per 100,000 population, followed by Kamloops (10,546), Nanaimo (9,365), and Kelowna (8,922). The large coastal metros -- Vancouver (5,438) and Victoria (5,283) -- sit at the bottom. Interior CMAs consistently record per-capita crime rates roughly double those of the major urban centres.
 
 ![Per-capita crime rates across BC CMAs](outputs/charts/q4_cma_comparison.png)
-*Figure 25. Criminal Code offence rate per 100,000 across BC Census Metropolitan Areas (latest year). Interior CMAs significantly outpace coastal metros. Source: Statistics Canada, Table 35-10-0177-01.*
+*Figure 26. Criminal Code offence rate per 100,000 across BC Census Metropolitan Areas (latest year). Interior CMAs significantly outpace coastal metros. Source: Statistics Canada, Table 35-10-0177-01.*
 
 The CMA trend charts add temporal context. Abbotsford-Mission's rate roughly halved from its 2004 peak, while Kelowna's rate has been relatively flat. Chilliwack and Kamloops have data from more recent years, showing elevated but declining rates. These divergent trajectories caution against treating "BC" as a single story (see Caveat 3 on CMA boundary changes).
 
 ![CMA crime rate trends over time](outputs/charts/q4_cma_trends.png)
-*Figure 26. Crime rate trends across BC CMAs, 2004--2024. Trajectories diverge -- Abbotsford-Mission declined sharply while Kelowna held steady. Source: Statistics Canada, Table 35-10-0177-01.*
+*Figure 27. Crime rate trends across BC CMAs, 2004--2024. Trajectories diverge -- Abbotsford-Mission declined sharply while Kelowna held steady. Source: Statistics Canada, Table 35-10-0177-01.*
 
 A scatter plot of total offences against violent offences reveals a near-perfect linear relationship (r = 0.99). Jurisdictions with more crime overall have proportionally more violent crime -- not just more property crime. This undermines the narrative that high-crime areas are driven solely by property offences.
 
 ![Scatter plot of total vs violent offences by jurisdiction](outputs/charts/q4_total_vs_violent.png)
-*Figure 27. Total vs. violent Criminal Code offences by jurisdiction (r = 0.99). The near-perfect correlation means high-crime areas face proportionally elevated violence, not just property crime. Source: BC Government, Police Resources in British Columbia.*
+*Figure 28. Total vs. violent Criminal Code offences by jurisdiction (r = 0.99). The near-perfect correlation means high-crime areas face proportionally elevated violence, not just property crime. Source: BC Government, Police Resources in British Columbia.*
 
 Crime in BC is highly concentrated. The Pareto curve shows that just 5% of jurisdictions account for 50% of all Criminal Code offences, and 19% account for 80%. This extreme concentration means provincial crime statistics are largely driven by a handful of high-volume jurisdictions -- a fact with direct implications for where resources will have the greatest impact.
 
 ![Crime concentration Pareto curve](outputs/charts/q4_crime_concentration.png)
-*Figure 28. Pareto curve of crime concentration across BC jurisdictions. The steep initial rise shows that a small number of jurisdictions dominate total crime volume. Source: BC Government, Police Resources in British Columbia.*
+*Figure 29. Pareto curve of crime concentration across BC jurisdictions. The steep initial rise shows that a small number of jurisdictions dominate total crime volume. Source: BC Government, Police Resources in British Columbia.*
 
 The distribution of violent crime share across jurisdictions reveals wide variance. The average is roughly 26%, but some jurisdictions have violent shares exceeding 50% while others are below 15%. Jurisdictions with disproportionately high violent shares may require different policing strategies than those dominated by property crime.
 
 ![Distribution of violent crime share across jurisdictions](outputs/charts/q4_violent_share_distribution.png)
-*Figure 29. Distribution of violent crime share (%) across BC jurisdictions. The dashed line shows the average; red dots mark jurisdictions with disproportionately high violence (>10 pp above average). Source: BC Government, Police Resources in British Columbia.*
+*Figure 30. Distribution of violent crime share (%) across BC jurisdictions. The dashed line shows the average; red dots mark jurisdictions with disproportionately high violence (>10 pp above average). Source: BC Government, Police Resources in British Columbia.*
 
 An [interactive version of the jurisdiction data](outputs/charts/q4_interactive_map.html) is available for exploring all 50 top jurisdictions with hover details for violent, property, and total offence breakdowns.
 
@@ -249,11 +269,11 @@ An [interactive version of the jurisdiction data](outputs/charts/q4_interactive_
 ### Key Metric Definitions
 
 - **Crime Severity Index (CSI)**: A Statistics Canada composite measure that weights each offence type by its average sentence length (derived from five years of sentencing data), then divides by population. More serious crimes carry higher weight. Base year: 2006 = 100. Unlike simple crime rates, the CSI accounts for both the volume and severity of crime. See Figures 1--2, 8, 19.
-- **Per-capita rate**: Criminal Code offences per 100,000 population, excluding traffic violations. This normalizes for population size, enabling fair comparisons across jurisdictions of different sizes. See Figures 4--7, 25--26.
+- **Per-capita rate**: Criminal Code offences per 100,000 population, excluding traffic violations. This normalizes for population size, enabling fair comparisons across jurisdictions of different sizes. See Figures 4--7, 26--27.
 - **Compound Annual Growth Rate (CAGR)**: The constant annual rate that would produce the observed cumulative change over a given period. Calculated as (end value / start value)^(1/n) - 1, where n is the number of years. CAGR smooths out year-to-year volatility, making it useful for comparing categories with different time spans. See Figure 14.
 - **Indexed growth (base = 100)**: Each province's crime rate is divided by its 2004 value and multiplied by 100, so all series start at the same point. Changes are then expressed in percentage-point terms relative to 2004, enabling trajectory comparisons across provinces with very different absolute levels. See Figure 5.
 - **Clearance rate**: The share of police-reported incidents that are "cleared" -- either by charge (a suspect is identified and charged) or by other means (e.g., the suspect dies, the victim declines to proceed). Clearance rates vary by offence type and are not equivalent to conviction rates. See Figures 17--18.
-- **Unfounded rate**: The share of reported incidents that police determine did not occur or did not constitute a criminal offence. A high unfounded rate does not necessarily mean false reporting -- it may reflect evidentiary thresholds or investigative practices. See Figure 22.
+- **Unfounded rate**: The share of reported incidents that police determine did not occur or did not constitute a criminal offence. A high unfounded rate does not necessarily mean false reporting -- it may reflect evidentiary thresholds or investigative practices. See Figures 22--23.
 
 ### Limitations
 
@@ -267,15 +287,15 @@ An [interactive version of the jurisdiction data](outputs/charts/q4_interactive_
 
 These limitations are material to interpreting the analysis. They are referenced in specific figure captions where most relevant.
 
-1. **Police-reported data only** -- These statistics reflect crimes reported to and recorded by police. They do not capture unreported crime, which varies significantly by offence type (e.g., sexual assault is heavily underreported). This affects all sections but is most consequential for Figures 9--16 (compositional analysis), where offences with low reporting rates may be systematically underrepresented.
+1. **Police-reported data only** -- These statistics reflect crimes reported to and recorded by police. They do not capture unreported crime, which varies significantly by offence type (e.g., sexual assault is heavily underreported). This affects all sections but is most consequential for Figures 9--16 (compositional analysis), where offences with low reporting rates may be systematically underrepresented. Figure 23 explores proxy indicators for underreporting using police data and GSS victimization survey context.
 
 2. **COVID-19 disruption** -- The 2020--2021 period shows anomalous patterns due to lockdowns, reduced mobility, and changes in reporting behaviour. Trends spanning this period should be interpreted with caution. Figure 21 isolates the pandemic's impact; Figures 3 and 5 are also affected. Any year-over-year comparison involving 2020 or 2021 data should be treated as potentially distorted.
 
-3. **CMA boundary changes** -- Census Metropolitan Area definitions shift between census cycles, which can affect per-capita rate comparisons over long periods. This is most relevant to Figures 25--26 (CMA comparisons). Chilliwack and Kamloops, which became CMAs more recently, have shorter time series.
+3. **CMA boundary changes** -- Census Metropolitan Area definitions shift between census cycles, which can affect per-capita rate comparisons over long periods. This is most relevant to Figures 26--27 (CMA comparisons). Chilliwack and Kamloops, which became CMAs more recently, have shorter time series.
 
 4. **Most-serious-offence counting rule** -- Statistics Canada counts only the most serious offence when multiple offences occur in a single incident. This systematically undercounts less serious offences and inflates the apparent severity share. Figures 9--14 (compositional analysis) are affected.
 
-5. **Jurisdiction coverage** -- BC Government appendix data covers the largest municipal police services and RCMP detachments but may not include all smaller jurisdictions. Figures 23--24 and 27--29 should be interpreted as covering the majority -- but not the entirety -- of BC policing jurisdictions.
+5. **Jurisdiction coverage** -- BC Government appendix data covers the largest municipal police services and RCMP detachments but may not include all smaller jurisdictions. Figures 24--25 and 28--30 should be interpreted as covering the majority -- but not the entirety -- of BC policing jurisdictions.
 
 6. **Clearance rates are not conviction rates** -- A "cleared" case means police have identified a suspect, not that a conviction was obtained. Figures 17--18 reflect police investigative outcomes, not judicial outcomes.
 
@@ -317,7 +337,7 @@ src/
     theme.py                  # Shared chart theme and palette (kds wrapper)
     q1_is_crime_rising.py     # CSI trends, provincial comparison (8 charts)
     q2_what_kinds.py          # Crime type breakdown (8 charts)
-    q3_justice.py             # Justice system effectiveness (6 charts)
+    q3_justice.py             # Justice system effectiveness (7 charts)
     q4_geography.py           # Jurisdiction and CMA analysis (7 charts + 1 HTML)
 data/
   raw/                        # Downloaded files (gitignored)
@@ -325,7 +345,7 @@ data/
 notebooks/
   bc_crime_report.ipynb       # Full narrative report
 outputs/
-  charts/                     # Generated charts (29 PNG + 1 HTML)
+  charts/                     # Generated charts (30 PNG + 1 HTML)
 tests/
   test_download.py            # Download verification tests
   test_clean.py               # Data quality tests
@@ -337,18 +357,20 @@ tests/
 |--------|-----|------|---------|
 | q1_is_crime_rising.py | 8 | 0 | 1--8 |
 | q2_what_kinds.py | 8 | 0 | 9--16 |
-| q3_justice.py | 6 | 0 | 17--22 |
-| q4_geography.py | 7 | 1 | 23--29 + interactive |
-| **Total** | **29** | **1** | **29 + 1** |
+| q3_justice.py | 7 | 0 | 17--23 |
+| q4_geography.py | 7 | 1 | 24--30 + interactive |
+| **Total** | **30** | **1** | **30 + 1** |
 
-### R Markdown Report (legacy)
+### Processed Data
 
-An earlier R-based analysis covering 2018--2023 is available in `BC Crime Data/Data Sets/BC CRIME.Rmd`. Open in RStudio and click **Knit** to generate the HTML report.
+Cleaned parquet files are stored in `data/processed/` (gitignored). Regenerate them with `python -m src.clean` after downloading raw data. The processed files include:
+- `crime_severity_bc.parquet` -- BC Crime Severity Index by component
+- `crime_incidents_national.parquet` -- incident-based crime statistics by province and CMA
+- `bc_gov_jurisdiction_trends.parquet` -- jurisdiction-level counts from BC Government appendices
 
 ### Requirements
 
-- **Python track:** Python 3.12+, see `requirements.txt`
-- **R track (legacy):** R >= 4.0, ggplot2, dplyr, tidyr, scales, knitr, rmarkdown, glue
+- Python 3.12+, see `requirements.txt`
 
 </details>
 

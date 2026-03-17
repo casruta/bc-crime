@@ -20,6 +20,7 @@ from src.analysis.theme import (
     FIGSIZE_WIDE,
     ORDERED,
     PALETTE,
+    add_fig_subtitle,
     add_source,
     add_subtitle,
     annotate_events,
@@ -184,6 +185,7 @@ def chart_top_jurisdictions(save_path: Path | None = None) -> tuple[plt.Figure, 
     ax.xaxis.set_major_formatter(mticker.FuncFormatter(lambda x, _: f"{x:,.0f}"))
     style_axes(ax)
     ax.grid(axis="y", visible=False)
+    fig.subplots_adjust(left=0.18)
 
     # Legend
     from matplotlib.patches import Patch
@@ -244,11 +246,11 @@ def chart_jurisdiction_trends(save_path: Path | None = None) -> tuple[plt.Figure
     max_yr = int(jur["year"].max())
     fig.suptitle(
         f"Crime Trends in BC's 8 Largest Policing Jurisdictions ({min_yr}–{max_yr})",
-        fontsize=14, fontweight="bold", y=1.02,
+        fontsize=14, fontweight="bold", y=1.04,
     )
-    fig.text(0.5, 0.99, "Tracking the 8 highest-volume jurisdictions over a decade", ha="center", fontsize=10, color=PALETTE["bc_slate"], style="italic")
+    add_fig_subtitle(fig, "Tracking the 8 highest-volume jurisdictions over a decade")
     fig.supylabel("Criminal Code Offences (count)")
-    fig.tight_layout()
+    fig.tight_layout(pad=2.0)
 
     # Narrative — identify which jurisdictions are trending up vs down
     trends = []
@@ -570,10 +572,10 @@ def chart_cma_trends(save_path: Path | None = None) -> tuple[plt.Figure, str]:
         axes[j].set_visible(False)
 
     fig.suptitle("Crime Rate Trends Across BC Census Metropolitan Areas",
-                 fontsize=14, fontweight="bold", y=1.02)
-    fig.text(0.5, 0.99, "Interior CMAs have consistently higher rates than coastal metros", ha="center", fontsize=10, color=PALETTE["bc_slate"], style="italic")
+                 fontsize=14, fontweight="bold", y=1.04)
+    add_fig_subtitle(fig, "Interior CMAs have consistently higher rates than coastal metros")
     fig.supylabel("Rate per 100,000")
-    fig.tight_layout()
+    fig.tight_layout(pad=2.0)
 
     narrative = (
         "The CMA trend charts reveal whether high-crime metro areas have always been high "

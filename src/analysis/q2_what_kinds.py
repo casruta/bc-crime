@@ -20,6 +20,7 @@ from src.analysis.theme import (
     FIGSIZE_WIDE,
     ORDERED,
     PALETTE,
+    add_fig_subtitle,
     add_source,
     add_subtitle,
     annotate_events,
@@ -272,6 +273,7 @@ def chart_top_changes(save_path: Path | None = None) -> tuple[plt.Figure, str]:
     ax.set_xlabel("Change in Rate per 100,000")
     style_axes(ax)
     ax.grid(axis="y", visible=False)
+    fig.subplots_adjust(left=0.30)
 
     # Narrative
     biggest_rise = df_top.iloc[-1]
@@ -513,15 +515,12 @@ def chart_specific_violation_trends(save_path: Path | None = None) -> tuple[plt.
 
     fig.suptitle(
         f"Top 8 Specific Violations by Rate — Trend Over Time (2004–{latest_year})",
-        fontsize=14, fontweight="bold", y=1.02,
+        fontsize=14, fontweight="bold", y=1.04,
     )
-    fig.text(
-        0.5, 0.99, "Deep-dive into the 8 highest-rate specific violations",
-        ha="center", fontsize=10, color=PALETTE["bc_slate"], style="italic",
-    )
+    add_fig_subtitle(fig, "Deep-dive into the 8 highest-rate specific violations")
     fig.supxlabel("Year")
     fig.supylabel("Rate per 100,000")
-    fig.tight_layout()
+    fig.tight_layout(pad=2.0)
     add_source(fig, "Source: Statistics Canada, Table 35-10-0177-01")
 
     top_names = [v.split(" [")[0] for v in top_violations[:3]]
