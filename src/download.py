@@ -83,6 +83,16 @@ STATCAN_TABLES = [
         name="gss_confidence_police",
         description="Confidence in police, by province (GSS)",
     ),
+    StatCanTable(
+        table_id="35-10-0076-01",
+        name="police_personnel",
+        description="Police personnel and selected crime statistics",
+    ),
+    StatCanTable(
+        table_id="35-10-0059-01",
+        name="police_expenditure",
+        description="Police services expenditures, municipal, provincial/territorial",
+    ),
 ]
 
 BCGOV_FILES = [
