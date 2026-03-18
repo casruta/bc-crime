@@ -201,10 +201,10 @@ def parse_readme(lines):
             continue
 
         if skip_toc:
-            # TOC ends at the next ## or ### List of Figures
-            if stripped.startswith("### List of Figures"):
+            # TOC ends at the next --- or ## heading
+            if stripped == "---":
                 skip_toc = False
-                # fall through to handle this heading
+                # fall through to handle the horizontal rule
             elif stripped.startswith("## "):
                 skip_toc = False
                 # fall through to handle this heading
