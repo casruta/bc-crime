@@ -1540,6 +1540,34 @@ cat(glue::glue("
 "))
 ```
 
+## Crime Type Momentum
+
+```{r type-momentum}
+# Compare latest year to prior year for each crime type
+type_momentum <- crime_data %>%
+  filter(YEAR %in% c(LATEST_YEAR - 1, LATEST_YEAR)) %>%
+  count(YEAR, TYPE) %>%
+  pivot_wider(names_from = YEAR, values_from = n, values_fill = 0)
+
+yr_prev <- as.character(LATEST_YEAR - 1)
+yr_curr <- as.character(LATEST_YEAR)
+
+type_momentum <- type_momentum %>%
+  mutate(
+    change_pct = safe_pct_change(.data[[yr_curr]], .data[[yr_prev]]),
+    trend = ifelse(change_pct > 5, "\u2191 Rising",
+              ifelse(change_pct < -5, "\u2193 Falling", "\u2194 Stable"))
+  ) %>%
+  arrange(desc(change_pct))
+
+kable(
+  type_momentum %>%
+    rename(`Crime Type` = TYPE, `Change (%)` = change_pct, Trend = trend),
+  caption = glue::glue("Most recent momentum: {LATEST_YEAR - 1} to {LATEST_YEAR} change by crime type"),
+  format.args = list(big.mark = ",")
+)
+```
+
 ## What to Watch
 
 ```{r forward-looking, results='asis'}
