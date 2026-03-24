@@ -1546,14 +1546,76 @@ continued monitoring:
 
 ## Methodology Notes
 
-- **Data source:** BC municipal crime statistics (publicly available CSV).
-- **Exclusions:** The Central Business District is excluded from neighbourhood
-  comparisons to prevent its high volume from compressing the scale.
-- **Severity weights:** The crime severity index uses illustrative weights and
-  should be calibrated against official severity scales for policy use.
-- **Limitations:** This analysis uses reported crime counts, which may not reflect
-  actual crime rates due to under-reporting. Population normalization is not applied
-  as neighbourhood-level population data was not available in the dataset.
+### Data Source and Provenance
+
+The analysis draws on publicly available municipal crime statistics from
+British Columbia, Canada. Each record in the dataset represents one reported
+criminal incident classified by year, offence type, and neighbourhood.
+
+### Temporal Coverage
+
+- **Period:** `r EARLIEST_YEAR` to `r LATEST_YEAR` (`r LATEST_YEAR - EARLIEST_YEAR + 1` years)
+- **Granularity:** Annual aggregation for most analyses; monthly where MONTH
+  column is available
+- **Notable period:** 2020 captures COVID-19 pandemic-related disruptions
+
+### Variable Definitions
+
+| Variable | Definition |
+|----------|------------|
+| YEAR | Calendar year of the reported crime |
+| TYPE | Offence category as classified by police reporting standards |
+| NEIGHBOURHOOD | Geographic area (police reporting boundary) |
+| MONTH | Calendar month (1--12), when available |
+
+### Analytical Methods
+
+| Method | Application | Section |
+|--------|-------------|---------|
+| Linear regression | Overall trend direction + significance | Part 1 |
+| Chi-squared test | Crime type distribution change | Part 2 |
+| Lorenz curve | Geographic concentration analysis | Part 3 |
+| Hierarchical clustering (Ward's D2) | Neighbourhood crime profile grouping | Part 3 |
+| Pearson correlation | Crime type co-movement | Part 2 |
+| Severity-weighted index | Qualitative crime weighting | Part 5 |
+| Linear extrapolation | Trend projection with prediction intervals | Part 6 |
+
+### Exclusions and Assumptions
+
+- `r paste(EXCLUDE_HOODS, collapse = " and ")` is excluded from neighbourhood
+  comparisons due to disproportionate volume that compresses visual scales.
+- Severity weights are **illustrative** and should be calibrated against
+  official severity indices (e.g., Statistics Canada's Crime Severity Index)
+  before policy application.
+- All crime types not explicitly assigned a severity weight default to 2.
+
+### Limitations
+
+1. **Reported vs. actual crime:** This analysis uses *reported* crime counts.
+   Under-reporting varies by crime type (e.g., sexual assault is historically
+   under-reported) and can change over time due to policy or cultural shifts.
+2. **No population normalization:** Neighbourhood-level population data was
+   not available. Rising crime in a growing neighbourhood may reflect population
+   growth rather than worsening safety.
+3. **No causal claims:** This report identifies patterns and associations but
+   does not establish causal relationships between interventions and outcomes.
+4. **Temporal granularity:** Annual aggregation may mask within-year patterns;
+   monthly analysis is provided where data permits.
+
+### Reproducibility
+
+```{r session-info, echo=FALSE, results='asis'}
+cat(glue::glue(
+  "- **R version:** {getRversion()}\n",
+  "- **Platform:** {R.version$platform}\n",
+  "- **Key packages:** ggplot2 {packageVersion('ggplot2')}, ",
+  "dplyr {packageVersion('dplyr')}, ",
+  "tidyr {packageVersion('tidyr')}, ",
+  "scales {packageVersion('scales')}, ",
+  "knitr {packageVersion('knitr')}\n",
+  "- **Report generated:** {Sys.time()}\n"
+))
+```
 
 ---
 
