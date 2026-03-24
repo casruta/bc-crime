@@ -1796,6 +1796,42 @@ continued monitoring:
 "))
 ```
 
+## Recommended Actions
+
+```{r action-items, results='asis', echo=FALSE}
+# Auto-generate action items based on data patterns
+actions <- list()
+
+# Action 1: Fastest-growing type
+actions[[1]] <- glue::glue(
+  "**Investigate {fastest_growing$TYPE}:** This category grew {fastest_growing$change}% ",
+  "over the study period. Commission a root-cause analysis to determine whether this ",
+  "reflects genuine increase, reclassification, or improved reporting.")
+
+# Action 2: High-crime concentration
+actions[[2]] <- glue::glue(
+  "**Target high-concentration areas:** {hoods_for_80}% of neighbourhoods drive 80% ",
+  "of crime. Pilot focused interventions (e.g., CPTED, community outreach) in the ",
+  "top 3 highest-composite-score areas and measure 6-month outcomes.")
+
+# Action 3: Data improvement
+actions[[3]] <- glue::glue(
+  "**Improve data granularity:** Add neighbourhood-level population data to enable ",
+  "per-capita analysis. Add incident-level timestamps for time-of-day analysis. ",
+  "Add clearance/resolution status to measure enforcement effectiveness.")
+
+# Action 4: Monitoring
+actions[[4]] <- glue::glue(
+  "**Establish quarterly monitoring:** Use this report's parameterized framework to ",
+  "generate quarterly updates. Set alert thresholds for any crime type exceeding ",
+  "+15% quarter-over-quarter change.")
+
+cat("Based on the analysis findings, the following actions are recommended:\n\n")
+for (i in seq_along(actions)) {
+  cat(glue::glue("{i}. {actions[[i]]}\n\n"))
+}
+```
+
 ---
 
 ## Methodology Notes
