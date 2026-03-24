@@ -1,7 +1,7 @@
 ---
 title: "Exploring the Crime Landscape in British Columbia, Canada"
 author: "Casper Kacper Ruta"
-date: "2024-02-25"
+date: "`r Sys.Date()`"
 output:
   html_document:
     toc: true
@@ -173,6 +173,24 @@ plot_hood_bar <- function(data, title, subtitle = NULL, show_labels = TRUE) {
   p
 }
 
+# Auto-incrementing figure counter for cross-referencing
+fig_counter <- local({
+  count <- 0
+  function(caption) {
+    count <<- count + 1
+    glue::glue("Figure {count}: {caption}")
+  }
+})
+
+# Auto-incrementing table counter
+tbl_counter <- local({
+  count <- 0
+  function(caption) {
+    count <<- count + 1
+    glue::glue("Table {count}: {caption}")
+  }
+})
+
 # Helper: get top N values from a column, returns a character vector
 get_top_n <- function(data, col, n = 10) {
   data %>%
@@ -254,13 +272,14 @@ cat(glue::glue('
 
 This report examines crime trends across British Columbia, Canada, using publicly
 available municipal crime data. The analysis spans **`r exec_years[1]`** to
-**`r exec_years[2]`** and is organized into five parts:
+**`r exec_years[2]`** and is organized into six parts:
 
 1. **Overall Trends** --- aggregate crime volume and year-over-year momentum
 2. **Crime Type Analysis** --- compositional breakdown by offence category
-3. **Neighbourhood Analysis** --- geographic variation and hotspot identification
+3. **Neighbourhood Analysis** --- geographic variation, clustering, and hotspot identification
 4. **Seasonal & Monthly Patterns** --- temporal rhythms within each year
 5. **Crime Severity Index** --- a weighted view beyond raw counts
+6. **Trend Projections** --- forward-looking estimates with uncertainty bounds
 
 The overarching question: *How has crime in British Columbia evolved in the years
 surrounding the COVID-19 pandemic, and which communities and crime types are driving
