@@ -1258,6 +1258,89 @@ kable(
 
 ---
 
+# Part 6: Trend Projections
+
+Crime trends are not destiny, but understanding where current trajectories lead
+can help inform resource planning. This section uses simple statistical models to
+project crime volumes forward, with appropriate uncertainty bounds.
+
+> **Important caveat:** These projections assume existing trends continue unchanged.
+> Policy interventions, economic shifts, or demographic changes can alter trajectories
+> substantially. Treat these as *baseline expectations*, not predictions.
+
+```{r forecast-overall, fig.height=7}
+# Simple exponential smoothing forecast using Holt's method (linear trend)
+forecast_years <- 2
+future_years <- seq(LATEST_YEAR + 1, LATEST_YEAR + forecast_years)
+
+# Fit Holt's linear trend model manually (no forecast package dependency)
+annual_n <- crime_by_year$n
+n_obs <- length(annual_n)
+
+# Use linear regression as a robust baseline forecast
+forecast_model <- lm(n ~ YEAR, data = crime_by_year)
+forecast_vals <- predict(forecast_model,
+                         newdata = data.frame(YEAR = future_years),
+                         interval = "prediction", level = 0.80)
+
+forecast_df <- data.frame(
+  YEAR = future_years,
+  n = forecast_vals[, "fit"],
+  lower = forecast_vals[, "lwr"],
+  upper = forecast_vals[, "upr"],
+  type = "Projected"
+)
+
+# Naive forecast (carry forward last value)
+naive_val <- tail(crime_by_year$n, 1)
+
+# Combine historical + forecast
+historical_df <- crime_by_year %>%
+  select(YEAR, n) %>%
+  mutate(lower = n, upper = n, type = "Historical")
+
+combined_df <- bind_rows(historical_df, forecast_df)
+
+ggplot(combined_df, aes(x = YEAR, y = n)) +
+  geom_ribbon(data = forecast_df, aes(ymin = lower, ymax = upper),
+              fill = bc_accent, alpha = 0.15) +
+  geom_line(data = historical_df, color = bc_accent, linewidth = 1.2) +
+  geom_point(data = historical_df, color = bc_accent, size = 3, shape = 21,
+             fill = "white", stroke = 1.3) +
+  geom_line(data = forecast_df, color = bc_accent, linewidth = 1.2, linetype = "dashed") +
+  geom_point(data = forecast_df, color = bc_red, size = 3.5, shape = 17) +
+  geom_hline(yintercept = naive_val, linetype = "dotted", color = "grey50") +
+  annotate("text", x = LATEST_YEAR + forecast_years, y = naive_val,
+           label = glue::glue("Naive baseline ({comma(naive_val)})"),
+           hjust = 1, vjust = -0.8, size = 3, color = "grey50") +
+  scale_y_continuous(labels = comma, expand = expansion(mult = c(0.05, 0.12))) +
+  scale_x_continuous(breaks = c(crime_by_year$YEAR, future_years)) +
+  labs(
+    title = glue::glue("Crime Volume Projection: {LATEST_YEAR + 1}\u2013{LATEST_YEAR + forecast_years}"),
+    subtitle = "Linear trend extrapolation with 80% prediction interval (shaded); dotted = naive baseline",
+    x = NULL, y = "Projected Crimes",
+    caption = "Projection: linear regression on historical data. Source: BC municipal crime data"
+  ) +
+  theme_bc_crime()
+```
+
+```{r forecast-interpretation, results='asis'}
+proj_latest <- round(forecast_vals[nrow(forecast_vals), "fit"], 0)
+proj_lower  <- round(forecast_vals[nrow(forecast_vals), "lwr"], 0)
+proj_upper  <- round(forecast_vals[nrow(forecast_vals), "upr"], 0)
+proj_change <- safe_pct_change(proj_latest, naive_val)
+
+cat(glue::glue(
+  "> **Projection summary:** If the linear trend continues, {LATEST_YEAR + forecast_years} ",
+  "crime volume is projected at approximately **{comma(proj_latest)}** incidents ",
+  "(80% interval: {comma(proj_lower)}\u2013{comma(proj_upper)}). ",
+  "This represents a **{format_change(proj_change)}** change relative to the ",
+  "naive baseline of {comma(naive_val)} ({LATEST_YEAR} actuals carried forward).\n\n"
+))
+```
+
+---
+
 # Summary and Key Findings
 
 ```{r summary-stats, results='asis'}
