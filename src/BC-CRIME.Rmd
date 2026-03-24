@@ -568,6 +568,47 @@ Not all crimes are equal in severity or frequency. This section decomposes the
 aggregate trend by offence type to understand *what kinds* of crime are rising or
 falling. Use the tabs below to explore different angles.
 
+## At a Glance
+
+```{r type-glance}
+# Compact summary: one row per crime type with key metrics
+type_glance <- crime_data %>%
+  count(YEAR, TYPE) %>%
+  group_by(TYPE) %>%
+  summarise(
+    total = sum(n),
+    avg_per_year = round(mean(n), 0),
+    latest = n[YEAR == max(YEAR)],
+    earliest = n[YEAR == min(YEAR)],
+    change_pct = round((latest / earliest - 1) * 100, 1),
+    peak_year = YEAR[which.max(n)],
+    .groups = "drop"
+  ) %>%
+  mutate(
+    share = round(total / sum(total) * 100, 1),
+    trend = ifelse(change_pct > 10, "\u2191",
+              ifelse(change_pct < -10, "\u2193", "\u2194"))
+  ) %>%
+  arrange(desc(total))
+
+kable(
+  type_glance %>%
+    select(TYPE, total, avg_per_year, latest, change_pct, trend, share, peak_year) %>%
+    rename(
+      `Crime Type` = TYPE,
+      `Total` = total,
+      `Avg/Year` = avg_per_year,
+      `Latest Year` = latest,
+      `Change (%)` = change_pct,
+      `Trend` = trend,
+      `Share (%)` = share,
+      `Peak Year` = peak_year
+    ),
+  caption = glue::glue("Crime types at a glance ({EARLIEST_YEAR}\u2013{LATEST_YEAR})"),
+  format.args = list(big.mark = ",")
+)
+```
+
 ## By Count
 
 ```{r crime-type-table}
