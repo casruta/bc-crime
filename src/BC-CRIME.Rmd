@@ -462,6 +462,65 @@ cat(glue::glue(
 ))
 ```
 
+## Per-Capita Context
+
+Crime counts alone can be misleading in a growing population. While this dataset
+does not include population figures, we can overlay BC Stats population estimates
+to provide context on whether crime is keeping pace with population growth.
+
+```{r per-capita-context, fig.height=6}
+# BC population estimates (source: BC Stats, approximate mid-year values)
+# These are province-wide estimates; neighbourhood-level not available
+bc_pop <- data.frame(
+  YEAR = 2018:2023,
+  population = c(5000879, 5071336, 5147712, 5214805, 5399117, 5519913)
+)
+
+# Only include years that exist in both datasets
+pop_context <- crime_by_year %>%
+  inner_join(bc_pop, by = "YEAR") %>%
+  mutate(
+    rate_per_1000 = round(n / population * 1000, 1),
+    pop_index = round(population / first(population) * 100, 1),
+    crime_index = round(n / first(n) * 100, 1)
+  )
+
+if (nrow(pop_context) >= 2) {
+  ggplot(pop_context, aes(x = YEAR)) +
+    geom_line(aes(y = crime_index, color = "Crime volume"), linewidth = 1.2) +
+    geom_point(aes(y = crime_index, color = "Crime volume"), size = 3) +
+    geom_line(aes(y = pop_index, color = "Population"), linewidth = 1.2, linetype = "dashed") +
+    geom_point(aes(y = pop_index, color = "Population"), size = 3, shape = 17) +
+    geom_hline(yintercept = 100, linetype = "dotted", color = "grey60") +
+    scale_color_manual(values = c("Crime volume" = bc_accent, "Population" = bc_green),
+                       name = NULL) +
+    scale_x_continuous(breaks = pop_context$YEAR) +
+    scale_y_continuous(labels = function(x) paste0(x)) +
+    labs(
+      title = glue::glue("Crime vs Population Growth (Indexed to {min(pop_context$YEAR)} = 100)"),
+      subtitle = "If crime line is below population line, per-capita crime is declining",
+      x = NULL, y = glue::glue("Index ({min(pop_context$YEAR)} = 100)"),
+      caption = "Population: BC Stats estimates. Crime: municipal reporting data"
+    ) +
+    theme_bc_crime() +
+    theme(legend.position = "bottom")
+}
+```
+
+```{r per-capita-note, results='asis'}
+if (nrow(pop_context) >= 2) {
+  latest_rate <- tail(pop_context$rate_per_1000, 1)
+  first_rate <- head(pop_context$rate_per_1000, 1)
+  rate_change <- safe_pct_change(latest_rate, first_rate)
+  cat(glue::glue(
+    "> **Per-capita context:** The crime rate was approximately **{latest_rate} per 1,000 residents** ",
+    "in {LATEST_YEAR}, compared to {first_rate} per 1,000 in {EARLIEST_YEAR} ",
+    "({format_change(rate_change)}). Population-adjusted crime provides a more ",
+    "meaningful measure than raw counts alone.\n\n"
+  ))
+}
+```
+
 ## Year-over-Year Momentum
 
 The bar chart below isolates the *direction and magnitude* of change each year.
