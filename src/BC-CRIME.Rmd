@@ -150,6 +150,38 @@ plot_hood_bar <- function(data, title, subtitle = NULL, show_labels = TRUE) {
   }
   p
 }
+
+# Helper: get top N values from a column, returns a character vector
+get_top_n <- function(data, col, n = 10) {
+  data %>%
+    count({{ col }}, sort = TRUE) %>%
+    head(n) %>%
+    pull({{ col }})
+}
+
+# Helper: add COVID-19 annotation band to a ggplot
+add_covid_band <- function(plot, y_max = NULL) {
+  plot +
+    annotate("rect", xmin = COVID_START, xmax = COVID_END,
+             ymin = -Inf, ymax = Inf, fill = bc_red, alpha = 0.06) +
+    annotate("text", x = mean(c(COVID_START, COVID_END)),
+             y = if (!is.null(y_max)) y_max * 1.08 else Inf,
+             label = "COVID-19\nonset", color = bc_red, size = 3,
+             fontface = "italic", vjust = if (is.null(y_max)) 1.2 else 0)
+}
+
+# Helper: format percentage change with directional arrow
+format_change <- function(value) {
+  ifelse(is.na(value), "N/A",
+    ifelse(value > 0, paste0("\u2191 +", value, "%"),
+      ifelse(value < 0, paste0("\u2193 ", value, "%"),
+        "0%")))
+}
+
+# Helper: create a summary stat for inline reporting
+stat_inline <- function(x, fmt = comma) {
+  fmt(x)
+}
 ```
 
 # Executive Summary
