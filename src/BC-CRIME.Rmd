@@ -2,6 +2,12 @@
 title: "Exploring the Crime Landscape in British Columbia, Canada"
 author: "Casper Kacper Ruta"
 date: "`r Sys.Date()`"
+params:
+  data_file: "../data/bc_crime.csv"
+  exclude_neighbourhoods: "Central Business District"
+  top_n_types: 8
+  top_n_hoods: 10
+  forecast_years: 2
 output:
   html_document:
     toc: true
@@ -78,7 +84,7 @@ library(knitr)
 ```
 
 ```{r load-data}
-csv_path <- "../data/bc_crime.csv"
+csv_path <- params$data_file
 if (!file.exists(csv_path)) {
   stop(paste0(
     "Data file not found: ", csv_path, "\n",
@@ -105,14 +111,15 @@ cat(glue::glue("Loaded {comma(nrow(crime_data))} records with {ncol(crime_data)}
 ```{r config}
 # ------------------------------------------------------------------
 # Report Configuration
-# Change these values to adapt the report to different datasets
+# Values sourced from YAML params; override via rmarkdown::render()
+# Example: rmarkdown::render("BC-CRIME.Rmd", params = list(top_n_hoods = 15))
 # ------------------------------------------------------------------
 LATEST_YEAR     <- max(crime_data$YEAR)
 EARLIEST_YEAR   <- min(crime_data$YEAR)
 COMPARE_YEARS   <- c(EARLIEST_YEAR, EARLIEST_YEAR + 1, LATEST_YEAR)
-EXCLUDE_HOODS   <- c("Central Business District")
-TOP_N_TYPES     <- 8
-TOP_N_HOODS     <- 10
+EXCLUDE_HOODS   <- strsplit(params$exclude_neighbourhoods, ",\\s*")[[1]]
+TOP_N_TYPES     <- params$top_n_types
+TOP_N_HOODS     <- params$top_n_hoods
 TOP_N_HOODS_PROFILE <- 8
 TOP_N_TYPES_PROFILE <- 6
 TOP_N_DUMBBELL  <- 12
@@ -1410,7 +1417,7 @@ project crime volumes forward, with appropriate uncertainty bounds.
 
 ```{r forecast-overall, fig.height=7, fig.alt="Fan chart showing crime volume projection with 80 percent prediction interval"}
 # Simple exponential smoothing forecast using Holt's method (linear trend)
-forecast_years <- 2
+forecast_years <- params$forecast_years
 future_years <- seq(LATEST_YEAR + 1, LATEST_YEAR + forecast_years)
 
 # Fit Holt's linear trend model manually (no forecast package dependency)
