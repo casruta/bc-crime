@@ -80,6 +80,25 @@ if (length(missing_cols) > 0) {
 cat(glue::glue("Loaded {comma(nrow(crime_data))} records with {ncol(crime_data)} columns."), "\n")
 ```
 
+```{r config}
+# ------------------------------------------------------------------
+# Report Configuration
+# Change these values to adapt the report to different datasets
+# ------------------------------------------------------------------
+LATEST_YEAR     <- max(crime_data$YEAR)
+EARLIEST_YEAR   <- min(crime_data$YEAR)
+COMPARE_YEARS   <- c(EARLIEST_YEAR, EARLIEST_YEAR + 1, LATEST_YEAR)
+EXCLUDE_HOODS   <- c("Central Business District")
+TOP_N_TYPES     <- 8
+TOP_N_HOODS     <- 10
+TOP_N_HOODS_PROFILE <- 8
+TOP_N_TYPES_PROFILE <- 6
+TOP_N_DUMBBELL  <- 12
+COVID_START     <- 2019.5
+COVID_END       <- 2020.5
+has_month       <- "MONTH" %in% names(crime_data)
+```
+
 ```{r custom-theme}
 # ------------------------------------------------------------------
 # Unified visual identity for all charts
@@ -287,7 +306,7 @@ crime_by_year <- crime_data %>%
   )
 
 ggplot(crime_by_year, aes(x = YEAR, y = n)) +
-  annotate("rect", xmin = 2019.5, xmax = 2020.5,
+  annotate("rect", xmin = COVID_START, xmax = COVID_END,
            ymin = -Inf, ymax = Inf, fill = bc_red, alpha = 0.06) +
   annotate("text", x = 2020, y = max(crime_by_year$n) * 1.08,
            label = "COVID-19\nonset", color = bc_red, size = 3, fontface = "italic") +
@@ -700,16 +719,16 @@ scale for other areas.
 
 Click the tabs below to explore different neighbourhood perspectives.
 
-## Top 10 (2023)
+## Top 10 (`r LATEST_YEAR`)
 
-```{r top-neighbourhoods-2023}
-top_hoods_2023 <- crime_data %>%
-  filter(YEAR == 2023, NEIGHBOURHOOD != "Central Business District") %>%
+```{r top-neighbourhoods-latest}
+top_hoods_latest <- crime_data %>%
+  filter(YEAR == LATEST_YEAR, !NEIGHBOURHOOD %in% EXCLUDE_HOODS) %>%
   count(NEIGHBOURHOOD, sort = TRUE) %>%
-  head(10) %>%
+  head(TOP_N_HOODS) %>%
   mutate(share = round(n / sum(n) * 100, 1))
 
-ggplot(top_hoods_2023,
+ggplot(top_hoods_latest,
        aes(x = reorder(NEIGHBOURHOOD, n), y = n, fill = n)) +
   geom_col(show.legend = FALSE) +
   geom_text(aes(label = paste0(comma(n), " (", share, "%)")),
@@ -718,8 +737,8 @@ ggplot(top_hoods_2023,
   scale_fill_viridis_c(option = "D", direction = -1) +
   scale_y_continuous(labels = comma, expand = expansion(mult = c(0, 0.2))) +
   labs(
-    title = "Top 10 Neighbourhoods by Crime Volume (2023)",
-    subtitle = "Central Business District excluded; labels show count and share of top 10",
+    title = glue::glue("Top {TOP_N_HOODS} Neighbourhoods by Crime Volume ({LATEST_YEAR})"),
+    subtitle = glue::glue("{paste(EXCLUDE_HOODS, collapse = ', ')} excluded; labels show count and share of top {TOP_N_HOODS}"),
     x = NULL, y = "Total Reported Crimes",
     caption = "Source: BC municipal crime data"
   ) +
@@ -730,8 +749,8 @@ ggplot(top_hoods_2023,
 
 ```{r neighbourhood-facet, fig.height=10, fig.width=12}
 neighbourhood_data <- crime_data %>%
-  filter(YEAR %in% c(2018, 2019, 2023),
-         NEIGHBOURHOOD != "Central Business District") %>%
+  filter(YEAR %in% COMPARE_YEARS,
+         !NEIGHBOURHOOD %in% EXCLUDE_HOODS) %>%
   count(YEAR, NEIGHBOURHOOD)
 
 ggplot(neighbourhood_data,
@@ -743,7 +762,7 @@ ggplot(neighbourhood_data,
   scale_y_continuous(labels = comma) +
   labs(
     title = "Total Crimes by Neighbourhood",
-    subtitle = "Side-by-side comparison: 2018, 2019, and 2023 (CBD excluded)",
+    subtitle = glue::glue("Side-by-side comparison: {paste(COMPARE_YEARS, collapse = ', ')} ({paste(EXCLUDE_HOODS, collapse = ', ')} excluded)"),
     x = NULL, y = "Total Reported Crimes",
     caption = "Source: BC municipal crime data"
   ) +
@@ -759,7 +778,7 @@ indicates that a small number of neighbourhoods account for a large share of cri
 
 ```{r crime-concentration, fig.height=6}
 hood_concentration <- crime_data %>%
-  filter(YEAR == 2023) %>%
+  filter(YEAR == LATEST_YEAR) %>%
   count(NEIGHBOURHOOD, sort = TRUE) %>%
   arrange(n) %>%
   mutate(
@@ -784,7 +803,7 @@ ggplot(hood_concentration, aes(x = hood_pct, y = cumulative_pct)) +
   scale_x_continuous(labels = function(x) paste0(x, "%")) +
   scale_y_continuous(labels = function(x) paste0(x, "%")) +
   labs(
-    title = "Crime Concentration Curve (2023)",
+    title = glue::glue("Crime Concentration Curve ({LATEST_YEAR})"),
     subtitle = "Cumulative % of crime vs cumulative % of neighbourhoods (Lorenz-style)",
     x = "Cumulative % of Neighbourhoods (low to high crime)",
     y = "Cumulative % of Total Crime",
@@ -794,21 +813,24 @@ ggplot(hood_concentration, aes(x = hood_pct, y = cumulative_pct)) +
   theme(panel.grid.major.x = element_line(color = "grey92"))
 ```
 
-## Change 2018-2023
+## Change `r EARLIEST_YEAR`--`r LATEST_YEAR`
 
 The overall crime trend (Part 1) showed the aggregate direction of change. But
 this masks variation: some neighbourhoods may have improved even as others worsened.
 The diverging bar chart below reveals which neighbourhoods drove the aggregate trend.
 
 ```{r neighbourhood-change, fig.height=8}
+yr_early <- as.character(EARLIEST_YEAR)
+yr_late  <- as.character(LATEST_YEAR)
+
 hood_change <- crime_data %>%
-  filter(YEAR %in% c(2018, 2023),
-         NEIGHBOURHOOD != "Central Business District") %>%
+  filter(YEAR %in% c(EARLIEST_YEAR, LATEST_YEAR),
+         !NEIGHBOURHOOD %in% EXCLUDE_HOODS) %>%
   count(YEAR, NEIGHBOURHOOD) %>%
   pivot_wider(names_from = YEAR, values_from = n, values_fill = 0) %>%
   mutate(
-    change_pct = safe_pct_change(`2023`, `2018`),
-    abs_change = `2023` - `2018`,
+    change_pct = safe_pct_change(.data[[yr_late]], .data[[yr_early]]),
+    abs_change = .data[[yr_late]] - .data[[yr_early]],
     direction  = ifelse(change_pct > 0, "Increase", "Decrease")
   ) %>%
   filter(!is.na(change_pct)) %>%
@@ -828,7 +850,7 @@ ggplot(hood_change,
   scale_y_continuous(labels = function(x) paste0(x, "%"),
                      expand = expansion(mult = 0.15)) +
   labs(
-    title = "Crime Change by Neighbourhood: 2018 vs 2023",
+    title = glue::glue("Crime Change by Neighbourhood: {EARLIEST_YEAR} vs {LATEST_YEAR}"),
     subtitle = "Percentage change in total reported crimes; red = increase, green = decrease",
     x = NULL, y = "Change (%)",
     caption = "Source: BC municipal crime data"
@@ -839,7 +861,7 @@ ggplot(hood_change,
 ```{r neighbourhood-change-table}
 kable(
   hood_change %>%
-    select(NEIGHBOURHOOD, `2018`, `2023`, abs_change, change_pct, direction) %>%
+    select(NEIGHBOURHOOD, all_of(c(yr_early, yr_late)), abs_change, change_pct, direction) %>%
     rename(
       Neighbourhood = NEIGHBOURHOOD,
       `Abs. Change` = abs_change,
@@ -847,34 +869,35 @@ kable(
       Trend = direction
     ) %>%
     arrange(desc(`Change (%)`)),
-  caption = "Table 6: Crime volume change by neighbourhood, 2018 to 2023",
+  caption = glue::glue("Table 6: Crime volume change by neighbourhood, {EARLIEST_YEAR} to {LATEST_YEAR}"),
   format.args = list(big.mark = ",")
 )
 ```
 
 ## Before & After
 
-A dumbbell chart shows the absolute crime count in both 2018 and 2023 for each
-neighbourhood, making it easy to see both the *level* and the *direction* of change.
+A dumbbell chart shows the absolute crime count in both `r EARLIEST_YEAR` and
+`r LATEST_YEAR` for each neighbourhood, making it easy to see both the *level*
+and the *direction* of change.
 
 ```{r dumbbell, fig.height=8}
 dumbbell_data <- hood_change %>%
-  arrange(desc(`2023`)) %>%
-  head(12)
+  arrange(desc(.data[[yr_late]])) %>%
+  head(TOP_N_DUMBBELL)
 
 ggplot(dumbbell_data) +
-  geom_segment(aes(x = `2018`, xend = `2023`,
-                   y = reorder(NEIGHBOURHOOD, `2023`),
-                   yend = reorder(NEIGHBOURHOOD, `2023`)),
+  geom_segment(aes(x = .data[[yr_early]], xend = .data[[yr_late]],
+                   y = reorder(NEIGHBOURHOOD, .data[[yr_late]]),
+                   yend = reorder(NEIGHBOURHOOD, .data[[yr_late]])),
                color = "grey70", linewidth = 0.8) +
-  geom_point(aes(x = `2018`, y = reorder(NEIGHBOURHOOD, `2023`)),
+  geom_point(aes(x = .data[[yr_early]], y = reorder(NEIGHBOURHOOD, .data[[yr_late]])),
              color = bc_accent, size = 3) +
-  geom_point(aes(x = `2023`, y = reorder(NEIGHBOURHOOD, `2023`)),
+  geom_point(aes(x = .data[[yr_late]], y = reorder(NEIGHBOURHOOD, .data[[yr_late]])),
              color = bc_red, size = 3) +
   scale_x_continuous(labels = comma) +
   labs(
-    title = "Neighbourhood Crime: 2018 (blue) vs 2023 (red)",
-    subtitle = "Top 12 neighbourhoods by 2023 volume; segment shows change",
+    title = glue::glue("Neighbourhood Crime: {EARLIEST_YEAR} (blue) vs {LATEST_YEAR} (red)"),
+    subtitle = glue::glue("Top {TOP_N_DUMBBELL} neighbourhoods by {LATEST_YEAR} volume; segment shows change"),
     x = "Total Reported Crimes", y = NULL,
     caption = "Source: BC municipal crime data"
   ) +
@@ -889,21 +912,20 @@ volumes. This heatmap shows what fraction of each neighbourhood's crime falls in
 each category, revealing distinct neighbourhood "profiles."
 
 ```{r hood-profiles, fig.height=10, fig.width=12}
-# Use top 8 neighbourhoods and top 6 crime types for readability
-top8_hoods <- crime_data %>%
-  filter(YEAR == 2023, NEIGHBOURHOOD != "Central Business District") %>%
+top_profile_hoods <- crime_data %>%
+  filter(YEAR == LATEST_YEAR, !NEIGHBOURHOOD %in% EXCLUDE_HOODS) %>%
   count(NEIGHBOURHOOD, sort = TRUE) %>%
-  head(8) %>%
+  head(TOP_N_HOODS_PROFILE) %>%
   pull(NEIGHBOURHOOD)
 
-top6_types <- crime_data %>%
-  filter(YEAR == 2023) %>%
+top_profile_types <- crime_data %>%
+  filter(YEAR == LATEST_YEAR) %>%
   count(TYPE, sort = TRUE) %>%
-  head(6) %>%
+  head(TOP_N_TYPES_PROFILE) %>%
   pull(TYPE)
 
 hood_profile <- crime_data %>%
-  filter(YEAR == 2023, NEIGHBOURHOOD %in% top8_hoods, TYPE %in% top6_types) %>%
+  filter(YEAR == LATEST_YEAR, NEIGHBOURHOOD %in% top_profile_hoods, TYPE %in% top_profile_types) %>%
   count(NEIGHBOURHOOD, TYPE) %>%
   group_by(NEIGHBOURHOOD) %>%
   mutate(pct = round(n / sum(n) * 100, 1)) %>%
@@ -917,10 +939,10 @@ ggplot(hood_profile, aes(x = TYPE, y = NEIGHBOURHOOD, fill = pct)) +
   scale_color_manual(values = c("TRUE" = "white", "FALSE" = "grey20")) +
   scale_fill_viridis_c(option = "D", name = "Share (%)") +
   labs(
-    title = "Neighbourhood Crime Profiles (2023)",
+    title = glue::glue("Neighbourhood Crime Profiles ({LATEST_YEAR})"),
     subtitle = "What % of each neighbourhood's crime falls into each type?",
     x = NULL, y = NULL,
-    caption = "Top 8 neighbourhoods x top 6 crime types. Source: BC municipal crime data"
+    caption = glue::glue("Top {TOP_N_HOODS_PROFILE} neighbourhoods x top {TOP_N_TYPES_PROFILE} crime types. Source: BC municipal crime data")
   ) +
   theme_bc_crime() +
   theme(
@@ -964,14 +986,14 @@ ggplot(be_data, aes(x = YEAR, y = n, color = TYPE, group = TYPE)) +
 
 ```{r be-by-neighbourhood, fig.height=7}
 top_be_hoods <- crime_data %>%
-  filter(TYPE %in% be_types, YEAR == max(YEAR),
-         NEIGHBOURHOOD != "Central Business District") %>%
+  filter(TYPE %in% be_types, YEAR == LATEST_YEAR,
+         !NEIGHBOURHOOD %in% EXCLUDE_HOODS) %>%
   count(NEIGHBOURHOOD, sort = TRUE) %>%
-  head(10) %>%
+  head(TOP_N_HOODS) %>%
   pull(NEIGHBOURHOOD)
 
 be_by_hood <- crime_data %>%
-  filter(TYPE %in% be_types, YEAR == max(YEAR),
+  filter(TYPE %in% be_types, YEAR == LATEST_YEAR,
          NEIGHBOURHOOD %in% top_be_hoods) %>%
   count(NEIGHBOURHOOD, TYPE) %>%
   group_by(NEIGHBOURHOOD) %>%
@@ -1004,7 +1026,7 @@ Crime is not uniformly distributed throughout the year. Understanding monthly
 patterns can inform resource allocation and public safety planning.
 
 ```{r monthly-check, include=FALSE}
-has_month <- "MONTH" %in% names(crime_data)
+# has_month is defined in the config chunk above
 ```
 
 ```{r monthly-analysis, eval=has_month, fig.height=7}
