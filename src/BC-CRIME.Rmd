@@ -278,10 +278,53 @@ checks$balance <- glue::glue(
   "**INFO** --- Year with fewest records: {min_year$YEAR[1]} ({comma(min_year$n[1])}). ",
   "Year with most: {max_year$YEAR[1]} ({comma(max_year$n[1])}). Ratio: {ratio}x.")
 
+# Check 4: Duplicate records
+n_dupes <- sum(duplicated(crime_data))
+checks$duplicates <- ifelse(n_dupes == 0,
+  "**PASS** --- No exact duplicate rows detected.",
+  glue::glue("**WARNING** --- {comma(n_dupes)} duplicate rows found ({round(n_dupes/nrow(crime_data)*100, 2)}% of data)."))
+
+# Check 5: Crime type consistency across years
+type_by_year <- crime_data %>% group_by(YEAR) %>% summarise(n_types = n_distinct(TYPE))
+type_range <- range(type_by_year$n_types)
+checks$type_consistency <- ifelse(type_range[1] == type_range[2],
+  glue::glue("**PASS** --- All years have exactly {type_range[1]} crime types."),
+  glue::glue("**INFO** --- Crime types per year range from {type_range[1]} to {type_range[2]}. ",
+             "New types may have been added or removed over time."))
+
+# Check 6: Neighbourhood consistency
+hood_by_year <- crime_data %>% group_by(YEAR) %>% summarise(n_hoods = n_distinct(NEIGHBOURHOOD))
+hood_range <- range(hood_by_year$n_hoods)
+checks$hood_consistency <- ifelse(hood_range[1] == hood_range[2],
+  glue::glue("**PASS** --- All years have exactly {hood_range[1]} neighbourhoods."),
+  glue::glue("**INFO** --- Neighbourhoods per year range from {hood_range[1]} to {hood_range[2]}."))
+
+# Check 7: Outlier detection (years with unusual volume using IQR)
+q1 <- quantile(year_counts$n, 0.25)
+q3 <- quantile(year_counts$n, 0.75)
+iqr_val <- q3 - q1
+outlier_years <- year_counts %>% filter(n < q1 - 1.5 * iqr_val | n > q3 + 1.5 * iqr_val)
+checks$outliers <- ifelse(nrow(outlier_years) == 0,
+  "**PASS** --- No outlier years detected (IQR method).",
+  glue::glue("**INFO** --- Potential outlier year(s): {paste(outlier_years$YEAR, collapse = ', ')} ",
+             "(volume outside 1.5x IQR)."))
+
+# Check 8: Column completeness per column
+col_completeness <- sapply(crime_data, function(x) round(sum(!is.na(x)) / length(x) * 100, 1))
+low_cols <- names(col_completeness[col_completeness < 100])
+checks$completeness <- ifelse(length(low_cols) == 0,
+  "**PASS** --- All columns 100% complete.",
+  glue::glue("**WARNING** --- Columns with missing data: {paste(low_cols, collapse = ', ')}."))
+
 cat("| Check | Result |\n|:------|:-------|\n")
 cat(glue::glue("| Missing values | {checks$missing} |\n"))
 cat(glue::glue("| Year continuity | {checks$year_gaps} |\n"))
 cat(glue::glue("| Record balance | {checks$balance} |\n"))
+cat(glue::glue("| Duplicate rows | {checks$duplicates} |\n"))
+cat(glue::glue("| Crime type consistency | {checks$type_consistency} |\n"))
+cat(glue::glue("| Neighbourhood consistency | {checks$hood_consistency} |\n"))
+cat(glue::glue("| Volume outliers | {checks$outliers} |\n"))
+cat(glue::glue("| Column completeness | {checks$completeness} |\n"))
 ```
 
 ---
