@@ -143,59 +143,6 @@ safe_pct_change <- function(new, old) {
   ifelse(old == 0, NA_real_, round((new / old - 1) * 100, 1))
 }
 
-# Reusable horizontal bar chart for neighbourhood data
-plot_hood_bar <- function(data, title, subtitle = NULL, show_labels = TRUE) {
-  p <- ggplot(data, aes(x = reorder(NEIGHBOURHOOD, n), y = n, fill = n)) +
-    geom_col(show.legend = FALSE) +
-    coord_flip() +
-    scale_fill_viridis_c(option = "D", direction = -1) +
-    scale_y_continuous(labels = comma, expand = expansion(mult = c(0, 0.15))) +
-    labs(title = title, subtitle = subtitle, x = NULL, y = "Total Reported Crimes",
-         caption = "Source: BC municipal crime data") +
-    theme_bc_crime()
-  if (show_labels) {
-    p <- p + geom_text(aes(label = comma(n)), hjust = -0.05, size = 3.2, fontface = "bold")
-  }
-  p
-}
-
-# Auto-incrementing figure counter for cross-referencing
-fig_counter <- local({
-  count <- 0
-  function(caption) {
-    count <<- count + 1
-    glue::glue("Figure {count}: {caption}")
-  }
-})
-
-# Auto-incrementing table counter
-tbl_counter <- local({
-  count <- 0
-  function(caption) {
-    count <<- count + 1
-    glue::glue("Table {count}: {caption}")
-  }
-})
-
-# Helper: get top N values from a column, returns a character vector
-get_top_n <- function(data, col, n = 10) {
-  data %>%
-    count({{ col }}, sort = TRUE) %>%
-    head(n) %>%
-    pull({{ col }})
-}
-
-# Helper: add COVID-19 annotation band to a ggplot
-add_covid_band <- function(plot, y_max = NULL) {
-  plot +
-    annotate("rect", xmin = COVID_START, xmax = COVID_END,
-             ymin = -Inf, ymax = Inf, fill = bc_red, alpha = 0.06) +
-    annotate("text", x = mean(c(COVID_START, COVID_END)),
-             y = if (!is.null(y_max)) y_max * 1.08 else Inf,
-             label = "COVID-19\nonset", color = bc_red, size = 3,
-             fontface = "italic", vjust = if (is.null(y_max)) 1.2 else 0)
-}
-
 # Helper: format percentage change with directional arrow
 format_change <- function(value) {
   ifelse(is.na(value), "N/A",
@@ -204,10 +151,6 @@ format_change <- function(value) {
         "0%")))
 }
 
-# Helper: create a summary stat for inline reporting
-stat_inline <- function(x, fmt = comma) {
-  fmt(x)
-}
 ```
 
 # Abstract {-}
@@ -388,6 +331,13 @@ checks$completeness <- ifelse(length(low_cols) == 0,
   "**PASS** --- All columns 100% complete.",
   glue::glue("**WARNING** --- Columns with missing data: {paste(low_cols, collapse = ', ')}."))
 
+# Check 9: Excluded neighbourhoods exist in data
+missing_excludes <- setdiff(EXCLUDE_HOODS, unique(crime_data$NEIGHBOURHOOD))
+checks$excludes <- ifelse(length(missing_excludes) == 0,
+  glue::glue("**PASS** --- All excluded neighbourhoods ({paste(EXCLUDE_HOODS, collapse = ', ')}) found in data."),
+  glue::glue("**WARNING** --- Excluded neighbourhood(s) not found in data: {paste(missing_excludes, collapse = ', ')}. ",
+             "Check spelling in params$exclude_neighbourhoods."))
+
 cat("| Check | Result |\n|:------|:-------|\n")
 cat(glue::glue("| Missing values | {checks$missing} |\n"))
 cat(glue::glue("| Year continuity | {checks$year_gaps} |\n"))
@@ -397,6 +347,7 @@ cat(glue::glue("| Crime type consistency | {checks$type_consistency} |\n"))
 cat(glue::glue("| Neighbourhood consistency | {checks$hood_consistency} |\n"))
 cat(glue::glue("| Volume outliers | {checks$outliers} |\n"))
 cat(glue::glue("| Column completeness | {checks$completeness} |\n"))
+cat(glue::glue("| Excluded areas | {checks$excludes} |\n"))
 ```
 
 ---
@@ -1219,9 +1170,12 @@ As a worked example of how to drill deeper into a specific crime category, this
 section examines break-and-enter offences (both commercial and residential) in
 more detail. This pattern can be replicated for any crime type of interest.
 
-```{r be-spotlight, fig.height=6}
+```{r be-check, include=FALSE}
 be_types <- c("Break and Enter Commercial", "Break and Enter Residential/Other")
+has_be <- all(be_types %in% unique(crime_data$TYPE))
+```
 
+```{r be-spotlight, fig.height=6, eval=has_be}
 be_data <- crime_data %>%
   filter(TYPE %in% be_types) %>%
   count(YEAR, TYPE)
@@ -1245,7 +1199,7 @@ ggplot(be_data, aes(x = YEAR, y = n, color = TYPE, group = TYPE)) +
   theme(legend.position = "bottom")
 ```
 
-```{r be-by-neighbourhood, fig.height=7}
+```{r be-by-neighbourhood, fig.height=7, eval=has_be}
 top_be_hoods <- crime_data %>%
   filter(TYPE %in% be_types, YEAR == LATEST_YEAR,
          !NEIGHBOURHOOD %in% EXCLUDE_HOODS) %>%
@@ -1277,6 +1231,12 @@ ggplot(be_by_hood,
   ) +
   theme_bc_crime() +
   theme(legend.position = "bottom")
+```
+
+```{r be-missing-note, eval=!has_be, results='asis'}
+cat("*Break-and-enter analysis is not available because the expected crime types ",
+    "('Break and Enter Commercial', 'Break and Enter Residential/Other') were not ",
+    "found in this dataset. Adjust the be_types variable if your data uses different names.*\n\n")
 ```
 
 ---
