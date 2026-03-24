@@ -1619,6 +1619,68 @@ cat(glue::glue(
 
 ---
 
+# Appendix {.tabset}
+
+## Glossary
+
+| Term | Definition |
+|------|------------|
+| **Crime Severity Index (CSI)** | A Statistics Canada measure weighting crimes by their seriousness, based on average sentences |
+| **Lorenz curve** | A graphical representation of inequality, showing the cumulative share of a quantity vs. cumulative share of the population |
+| **Hierarchical clustering** | An unsupervised learning method that builds nested clusters by progressively merging or splitting groups |
+| **Ward's method** | A clustering linkage criterion that minimizes total within-cluster variance at each merge step |
+| **YoY (Year-over-Year)** | Comparison of a metric in one year to the same metric in the previous year |
+| **Indexed comparison** | Expressing values relative to a base period (set to 100) to compare trends across different magnitudes |
+| **IQR (Interquartile Range)** | The range between the 25th and 75th percentiles; used for outlier detection |
+| **Chi-squared test** | A statistical test assessing whether the distribution of categorical data differs from expectation |
+| **R-squared (R\u00b2)** | The proportion of variance in the outcome variable explained by the model |
+| **Prediction interval** | A range within which a future observation is expected to fall with a given probability |
+
+## Full Data Summary
+
+```{r appendix-full-table}
+full_summary <- crime_data %>%
+  count(YEAR, TYPE) %>%
+  pivot_wider(names_from = YEAR, values_from = n, values_fill = 0) %>%
+  arrange(TYPE)
+
+kable(
+  full_summary,
+  caption = "Appendix A: Complete crime counts by type and year",
+  format.args = list(big.mark = ",")
+)
+```
+
+```{r appendix-hood-table}
+hood_summary <- crime_data %>%
+  count(YEAR, NEIGHBOURHOOD) %>%
+  pivot_wider(names_from = YEAR, values_from = n, values_fill = 0) %>%
+  arrange(NEIGHBOURHOOD)
+
+kable(
+  hood_summary,
+  caption = "Appendix B: Complete crime counts by neighbourhood and year",
+  format.args = list(big.mark = ",")
+)
+```
+
+## References
+
+1. Statistics Canada. *Police-reported crime statistics in Canada*. Annual release.
+   [https://www150.statcan.gc.ca/n1/daily-quotidien/230727/dq230727b-eng.htm](https://www150.statcan.gc.ca/n1/daily-quotidien/230727/dq230727b-eng.htm)
+
+2. BC Stats. *Population Estimates*. Government of British Columbia.
+   [https://www2.gov.bc.ca/gov/content/data/statistics/people-population-community/population](https://www2.gov.bc.ca/gov/content/data/statistics/people-population-community/population)
+
+3. Wickham, H. (2016). *ggplot2: Elegant Graphics for Data Analysis*. Springer-Verlag.
+   [https://ggplot2.tidyverse.org](https://ggplot2.tidyverse.org)
+
+4. R Core Team (`r R.version.string`). *R: A Language and Environment for Statistical Computing*.
+   R Foundation for Statistical Computing, Vienna, Austria.
+   [https://www.R-project.org/](https://www.R-project.org/)
+
+---
+
 ```{r report-footer, echo=FALSE, results='asis'}
 cat(glue::glue(
   "*Report generated on {Sys.Date()} using R {getRversion()}. ",
