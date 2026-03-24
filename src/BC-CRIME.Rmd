@@ -819,6 +819,56 @@ cat(glue::glue(
 ))
 ```
 
+## Pre/Post COVID Shift
+
+How did the *relationship* between crime types change around the pandemic? This
+chart compares the year-over-year change profile of the top crime types before
+and after COVID-19, revealing structural shifts in crime patterns.
+
+```{r covid-shift, fig.height=7, fig.width=10}
+# Compare average annual counts pre-COVID vs post-COVID
+covid_pivot <- 2020
+
+type_shift <- crime_data %>%
+  filter(TYPE %in% (crime_data %>% count(TYPE, sort = TRUE) %>% head(TOP_N_TYPES) %>% pull(TYPE))) %>%
+  mutate(period = ifelse(YEAR < covid_pivot, "Pre-COVID", "Post-COVID")) %>%
+  count(period, TYPE) %>%
+  group_by(period) %>%
+  mutate(
+    total = sum(n),
+    share = round(n / total * 100, 1)
+  ) %>%
+  ungroup()
+
+# Calculate shift
+pre <- type_shift %>% filter(period == "Pre-COVID") %>% select(TYPE, pre_share = share)
+post <- type_shift %>% filter(period == "Post-COVID") %>% select(TYPE, post_share = share)
+shift_data <- inner_join(pre, post, by = "TYPE") %>%
+  mutate(
+    shift = post_share - pre_share,
+    direction = ifelse(shift > 0, "Grew", "Shrank")
+  ) %>%
+  arrange(shift)
+
+ggplot(shift_data, aes(x = reorder(TYPE, shift), y = shift, fill = direction)) +
+  geom_col(width = 0.6, show.legend = FALSE) +
+  geom_hline(yintercept = 0, linewidth = 0.6, color = "grey40") +
+  geom_text(aes(label = paste0(ifelse(shift > 0, "+", ""), round(shift, 1), "pp")),
+            hjust = ifelse(shift_data$shift > 0, -0.1, 1.1),
+            size = 3, fontface = "bold") +
+  coord_flip() +
+  scale_fill_manual(values = c("Grew" = bc_red, "Shrank" = bc_green)) +
+  scale_y_continuous(labels = function(x) paste0(x, "pp"),
+                     expand = expansion(mult = 0.2)) +
+  labs(
+    title = "Crime Type Share Shift: Pre-COVID vs Post-COVID",
+    subtitle = glue::glue("Change in percentage-point share of total crime ({EARLIEST_YEAR}\u2013{covid_pivot - 1} vs {covid_pivot}\u2013{LATEST_YEAR})"),
+    x = NULL, y = "Share Change (percentage points)",
+    caption = "Positive = type grew as proportion of all crime. Source: BC municipal crime data"
+  ) +
+  theme_bc_crime()
+```
+
 ## Indexed Comparison
 
 Comparing crime types of very different magnitudes (e.g., thousands of thefts vs
