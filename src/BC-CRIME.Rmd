@@ -411,17 +411,31 @@ kable(
 ```
 
 ```{r trend-interpretation, results='asis'}
-# Simple linear trend test
+# Linear trend with statistical significance
 trend_model <- lm(n ~ YEAR, data = crime_by_year)
+trend_summary <- summary(trend_model)
 slope <- coef(trend_model)[["YEAR"]]
 slope_dir <- ifelse(slope > 0, "increasing", "decreasing")
 slope_per_year <- round(abs(slope), 0)
+p_value <- trend_summary$coefficients["YEAR", "Pr(>|t|)"]
+r_squared <- round(trend_summary$r.squared, 3)
+sig_label <- ifelse(p_value < 0.01, "highly significant (p < 0.01)",
+              ifelse(p_value < 0.05, "statistically significant (p < 0.05)",
+                ifelse(p_value < 0.10, "marginally significant (p < 0.10)",
+                  "not statistically significant (p \u2265 0.10)")))
+
+# Confidence interval on slope
+ci <- confint(trend_model, "YEAR", level = 0.95)
+ci_low <- round(abs(ci[1]), 0)
+ci_high <- round(abs(ci[2]), 0)
 
 cat(glue::glue(
-  "> **Trend summary:** A simple linear fit suggests reported crimes are ",
+  "> **Trend summary:** A linear regression finds reported crimes are ",
   "**{slope_dir}** by approximately **{comma(slope_per_year)} incidents per year** ",
-  "over the {min(crime_by_year$YEAR)}\u2013{max(crime_by_year$YEAR)} period. ",
-  "Note that this linear approximation does not capture non-linear pandemic effects.\n\n"
+  "(95% CI: {comma(min(ci_low, ci_high))} to {comma(max(ci_low, ci_high))}). ",
+  "This trend is **{sig_label}** with R\u00b2 = {r_squared}, explaining ",
+  "{round(r_squared * 100, 1)}% of the year-to-year variance. ",
+  "Note: the linear approximation does not capture non-linear pandemic effects.\n\n"
 ))
 ```
 
@@ -477,6 +491,31 @@ kable(
   caption = glue::glue("Table 4: Crime counts by type and year ({yr_range[1]}\u2013{yr_range[2]})"),
   format.args = list(big.mark = ",")
 )
+```
+
+```{r chi-squared-test, results='asis'}
+# Chi-squared test: Has the distribution of crime types changed significantly?
+contingency <- crime_data %>%
+  filter(YEAR %in% c(EARLIEST_YEAR, LATEST_YEAR)) %>%
+  count(YEAR, TYPE) %>%
+  pivot_wider(names_from = YEAR, values_from = n, values_fill = 0)
+
+chi_mat <- as.matrix(contingency[, -1])
+rownames(chi_mat) <- contingency$TYPE
+chi_test <- chisq.test(chi_mat)
+chi_p <- chi_test$p.value
+chi_sig <- ifelse(chi_p < 0.001, "highly significant (p < 0.001)",
+            ifelse(chi_p < 0.05, paste0("significant (p = ", round(chi_p, 4), ")"),
+              paste0("not significant (p = ", round(chi_p, 3), ")")))
+
+cat(glue::glue(
+  "> **Distribution test:** A chi-squared test comparing crime type distributions ",
+  "between {EARLIEST_YEAR} and {LATEST_YEAR} is **{chi_sig}** ",
+  "(\u03c7\u00b2 = {round(chi_test$statistic, 1)}, df = {chi_test$parameter}), ",
+  "indicating that the *mix* of crime types has ",
+  "{ifelse(chi_p < 0.05, 'shifted meaningfully', 'remained largely stable')} ",
+  "over this period.\n\n"
+))
 ```
 
 ## Distribution
