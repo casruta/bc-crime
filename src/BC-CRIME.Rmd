@@ -56,7 +56,28 @@ library(knitr)
 ```
 
 ```{r load-data}
-crime_data <- read.csv("../data/bc_crime.csv")
+csv_path <- "../data/bc_crime.csv"
+if (!file.exists(csv_path)) {
+  stop(paste0(
+    "Data file not found: ", csv_path, "\n",
+    "Please place bc_crime.csv in the data/ directory.\n",
+    "Expected columns: YEAR, TYPE, NEIGHBOURHOOD (MONTH optional)."
+  ))
+}
+
+crime_data <- tryCatch(
+  read.csv(csv_path, stringsAsFactors = FALSE),
+  error = function(e) stop(paste("Failed to read CSV:", e$message))
+)
+
+# Validate required columns
+required_cols <- c("YEAR", "TYPE", "NEIGHBOURHOOD")
+missing_cols <- setdiff(required_cols, names(crime_data))
+if (length(missing_cols) > 0) {
+  stop(paste("Missing required columns:", paste(missing_cols, collapse = ", ")))
+}
+
+cat(glue::glue("Loaded {comma(nrow(crime_data))} records with {ncol(crime_data)} columns."), "\n")
 ```
 
 ```{r custom-theme}
