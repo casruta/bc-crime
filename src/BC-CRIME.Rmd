@@ -1791,6 +1791,36 @@ if (has_DT && knitr::is_html_output()) {
 }
 ```
 
+## Derived Data Export
+
+```{r data-export, eval=knitr::is_html_output(), results='asis'}
+# Write derived datasets to output/ for further analysis
+output_dir <- "../output"
+if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
+
+# Crime by year summary
+write.csv(crime_by_year %>% select(YEAR, n, pct_change),
+          file.path(output_dir, "crime_by_year.csv"), row.names = FALSE)
+
+# Crime type by year pivot
+write.csv(full_summary,
+          file.path(output_dir, "crime_by_type_year.csv"), row.names = FALSE)
+
+# Neighbourhood change summary
+if (exists("hood_change")) {
+  write.csv(hood_change,
+            file.path(output_dir, "neighbourhood_change.csv"), row.names = FALSE)
+}
+
+cat(glue::glue(
+  "**Exported files** (saved to `{output_dir}/`):\n\n",
+  "- `crime_by_year.csv` --- Annual totals with YoY change\n",
+  "- `crime_by_type_year.csv` --- Full crime type x year pivot table\n",
+  "- `neighbourhood_change.csv` --- Neighbourhood-level change analysis\n\n",
+  "*These CSV files can be imported into Excel, Tableau, or other tools for further analysis.*\n"
+))
+```
+
 ## References
 
 1. Statistics Canada. *Police-reported crime statistics in Canada*. Annual release.
