@@ -1602,6 +1602,32 @@ kable(
 )
 ```
 
+```{r variance-decomposition, results='asis', echo=FALSE}
+# What drives variation in crime counts: year, type, or neighbourhood?
+crime_agg <- crime_data %>%
+  count(YEAR, TYPE, NEIGHBOURHOOD)
+
+var_model <- tryCatch({
+  anova_result <- aov(n ~ factor(YEAR) + TYPE + NEIGHBOURHOOD, data = crime_agg)
+  ss <- summary(anova_result)[[1]]
+  total_ss <- sum(ss$`Sum Sq`)
+  data.frame(
+    Factor = c("Year", "Crime Type", "Neighbourhood", "Residual"),
+    `Variance Explained` = paste0(round(ss$`Sum Sq` / total_ss * 100, 1), "%")
+  )
+}, error = function(e) NULL)
+
+if (!is.null(var_model)) {
+  cat("\n\n> **Variance decomposition:** An ANOVA on crime counts reveals how much ",
+      "variation is driven by each factor:\n\n")
+  for (i in seq_len(nrow(var_model))) {
+    cat(glue::glue("> - **{var_model$Factor[i]}**: {var_model$Variance.Explained[i]}\n"))
+  }
+  cat("\n> This indicates which dimension (time, type, or location) matters most ",
+      "for understanding crime patterns.\n\n")
+}
+```
+
 ---
 
 # Part 6: Trend Projections
