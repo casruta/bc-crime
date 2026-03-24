@@ -593,7 +593,7 @@ The top 8 categories are shown individually; less common types are grouped.
 ```{r crime-type-area, fig.height=7}
 top_types <- crime_data %>%
   count(TYPE, sort = TRUE) %>%
-  head(8) %>%
+  head(TOP_N_TYPES) %>%
   pull(TYPE)
 
 crime_type_trend <- crime_data %>%
@@ -608,7 +608,7 @@ ggplot(crime_type_trend, aes(x = YEAR, y = n, fill = TYPE)) +
   scale_x_continuous(breaks = unique(crime_type_trend$YEAR)) +
   labs(
     title = "Crime Composition Over Time",
-    subtitle = "Top 8 crime types shown individually; remaining grouped as 'Other'",
+    subtitle = glue::glue("Top {TOP_N_TYPES} crime types shown individually; remaining grouped as 'Other'"),
     x = NULL, y = "Number of Crimes",
     caption = "Source: BC municipal crime data"
   ) +
@@ -718,7 +718,7 @@ ggplot(type_ranks, aes(x = YEAR, y = rank, color = TYPE, group = TYPE)) +
   scale_color_brewer(palette = "Set2", name = "Crime Type") +
   labs(
     title = "Crime Type Rankings Over Time",
-    subtitle = "Top 8 crime types by volume; rank 1 = most common that year",
+    subtitle = glue::glue("Top {TOP_N_TYPES} crime types by volume; rank 1 = most common that year"),
     x = NULL, y = "Rank (1 = most common)",
     caption = "Source: BC municipal crime data"
   ) +
@@ -899,7 +899,7 @@ ggplot(indexed_trends, aes(x = YEAR, y = index, color = TYPE, group = TYPE)) +
     title = glue::glue("Indexed Crime Trends (Base Year {base_year} = 100)"),
     subtitle = "Values above 100 = growth vs base year; below 100 = decline",
     x = NULL, y = glue::glue("Index ({base_year} = 100)"),
-    caption = "Top 8 crime types. Source: BC municipal crime data"
+    caption = glue::glue("Top {TOP_N_TYPES} crime types. Source: BC municipal crime data")
   ) +
   theme_bc_crime() +
   theme(legend.position = "right", panel.grid.major.x = element_line(color = "grey92"))
