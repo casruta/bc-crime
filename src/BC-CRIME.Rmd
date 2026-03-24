@@ -36,7 +36,29 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Setup and Data Loading
+# Abstract {-}
+
+```{r abstract, echo=FALSE, results='asis'}
+cat(paste0(
+  "This report analyses ", comma(nrow(crime_data)), " crime records across British Columbia, ",
+  "Canada, spanning ", min(crime_data$YEAR), " to ", max(crime_data$YEAR), ". ",
+  "The analysis examines trends in total crime volume, compositional shifts across ",
+  length(unique(crime_data$TYPE)), " offence categories, geographic concentration ",
+  "patterns across ", length(unique(crime_data$NEIGHBOURHOOD)), " neighbourhoods, ",
+  "and seasonal variation. Key findings include: (1) the overall trend direction ",
+  "and its statistical significance, (2) which crime types are driving aggregate changes, ",
+  "(3) how crime is geographically concentrated and which areas are improving or worsening, ",
+  "and (4) forward-looking projections based on current trajectories. ",
+  "Methods include descriptive statistics, chi-squared distributional tests, ",
+  "hierarchical clustering of neighbourhood crime profiles, ",
+  "linear trend regression with confidence intervals, and severity-weighted indexing. ",
+  "All analyses are fully reproducible from the source R Markdown file."
+))
+```
+
+---
+
+# Setup and Data Loading {-}
 
 ```{r load-packages}
 packages <- c("here", "readr", "stringr", "clock", "dplyr", "ggplot2",
@@ -491,6 +513,16 @@ ggplot(yoy_data, aes(x = factor(YEAR), y = pct_change, fill = pct_change > 0)) +
   theme_bc_crime()
 ```
 
+```{r part1-takeaway, results='asis', echo=FALSE}
+latest_change <- tail(crime_by_year$pct_change, 1)
+cat(glue::glue(
+  "\n> **Part 1 takeaway:** The aggregate trend is **{slope_dir}** at ~{comma(slope_per_year)} ",
+  "incidents/year. The most recent year-over-year change was **{format_change(latest_change)}**. ",
+  "But aggregate trends can mask divergent patterns across crime types and areas---the next ",
+  "sections unpack this.\n\n"
+))
+```
+
 ---
 
 # Part 2: Crime Type Analysis {.tabset .tabset-fade}
@@ -845,14 +877,19 @@ ggplot(indexed_trends, aes(x = YEAR, y = index, color = TYPE, group = TYPE)) +
   theme(legend.position = "right", panel.grid.major.x = element_line(color = "grey92"))
 ```
 
+> **Part 2 takeaway:** Crime types are not changing uniformly. The chi-squared test
+> above confirms whether the overall *mix* has shifted. Examining types individually
+> reveals which categories drive the aggregate trend. The next section maps these
+> patterns geographically.
+
 ---
 
 # Part 3: Neighbourhood Analysis {.tabset .tabset-fade}
 
 Geographic analysis reveals *where* crime concentrates and how neighbourhood-level
-patterns differ from the aggregate trend. The Central Business District is excluded
-from these comparisons because its disproportionate volume compresses the visual
-scale for other areas.
+patterns differ from the aggregate trend. `r paste(EXCLUDE_HOODS, collapse = " and ")`
+is excluded from these comparisons because its disproportionate volume compresses
+the visual scale for other areas.
 
 Click the tabs below to explore different neighbourhood perspectives.
 
