@@ -1259,6 +1259,49 @@ ggplot(hood_profile, aes(x = TYPE, y = NEIGHBOURHOOD, fill = pct)) +
   )
 ```
 
+## Composite Ranking
+
+A single ranking that considers both *volume* and *trend direction* provides a
+more useful summary than either metric alone. This composite score combines the
+latest-year crime volume (standardized) with the period-over-period change rate,
+identifying areas that are both high-crime *and* worsening.
+
+```{r composite-ranking}
+if (exists("hood_change") && nrow(hood_change) > 0) {
+  composite <- crime_data %>%
+    filter(YEAR == LATEST_YEAR, !NEIGHBOURHOOD %in% EXCLUDE_HOODS) %>%
+    count(NEIGHBOURHOOD) %>%
+    left_join(
+      hood_change %>% select(NEIGHBOURHOOD, change_pct),
+      by = "NEIGHBOURHOOD"
+    ) %>%
+    filter(!is.na(change_pct)) %>%
+    mutate(
+      vol_z = scale(n)[, 1],
+      chg_z = scale(change_pct)[, 1],
+      composite = round(vol_z * 0.6 + chg_z * 0.4, 2),
+      concern = ifelse(composite > 0.5, "High",
+                  ifelse(composite > -0.5, "Moderate", "Lower"))
+    ) %>%
+    arrange(desc(composite))
+
+  kable(
+    composite %>%
+      head(15) %>%
+      select(NEIGHBOURHOOD, n, change_pct, composite, concern) %>%
+      rename(
+        Neighbourhood = NEIGHBOURHOOD,
+        `Latest Volume` = n,
+        `Change (%)` = change_pct,
+        `Composite Score` = composite,
+        `Concern Level` = concern
+      ),
+    caption = glue::glue("Composite neighbourhood ranking: volume ({LATEST_YEAR}) + trend ({EARLIEST_YEAR}\u2013{LATEST_YEAR})"),
+    format.args = list(big.mark = ",")
+  )
+}
+```
+
 ## Neighbourhood Clusters
 
 Which neighbourhoods have similar crime profiles? Hierarchical clustering groups
