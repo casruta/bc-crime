@@ -63,7 +63,7 @@ cat(paste0(
 ```{r load-packages}
 packages <- c("here", "readr", "stringr", "clock", "dplyr", "ggplot2",
               "rmarkdown", "knitr", "magrittr", "glue", "xfun", "fs",
-              "tidyr", "scales")
+              "tidyr", "scales", "DT")
 
 installed_packages <- packages %in% rownames(installed.packages())
 if (any(installed_packages == FALSE)) {
@@ -119,6 +119,7 @@ TOP_N_DUMBBELL  <- 12
 COVID_START     <- 2019.5
 COVID_END       <- 2020.5
 has_month       <- "MONTH" %in% names(crime_data)
+has_DT          <- requireNamespace("DT", quietly = TRUE)
 ```
 
 ```{r custom-theme}
@@ -1663,11 +1664,19 @@ full_summary <- crime_data %>%
   pivot_wider(names_from = YEAR, values_from = n, values_fill = 0) %>%
   arrange(TYPE)
 
-kable(
-  full_summary,
-  caption = "Appendix A: Complete crime counts by type and year",
-  format.args = list(big.mark = ",")
-)
+if (has_DT && knitr::is_html_output()) {
+  DT::datatable(
+    full_summary,
+    caption = "Appendix A: Complete crime counts by type and year",
+    options = list(pageLength = 15, scrollX = TRUE),
+    rownames = FALSE,
+    filter = "top"
+  ) %>% DT::formatCurrency(names(full_summary)[-1], currency = "", digits = 0)
+} else {
+  kable(full_summary,
+        caption = "Appendix A: Complete crime counts by type and year",
+        format.args = list(big.mark = ","))
+}
 ```
 
 ```{r appendix-hood-table}
@@ -1676,11 +1685,19 @@ hood_summary <- crime_data %>%
   pivot_wider(names_from = YEAR, values_from = n, values_fill = 0) %>%
   arrange(NEIGHBOURHOOD)
 
-kable(
-  hood_summary,
-  caption = "Appendix B: Complete crime counts by neighbourhood and year",
-  format.args = list(big.mark = ",")
-)
+if (has_DT && knitr::is_html_output()) {
+  DT::datatable(
+    hood_summary,
+    caption = "Appendix B: Complete crime counts by neighbourhood and year",
+    options = list(pageLength = 15, scrollX = TRUE),
+    rownames = FALSE,
+    filter = "top"
+  ) %>% DT::formatCurrency(names(hood_summary)[-1], currency = "", digits = 0)
+} else {
+  kable(hood_summary,
+        caption = "Appendix B: Complete crime counts by neighbourhood and year",
+        format.args = list(big.mark = ","))
+}
 ```
 
 ## References
