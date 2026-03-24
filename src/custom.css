@@ -1,6 +1,19 @@
 /* Custom styles for BC Crime Report */
+/* ================================== */
 
-/* Executive summary table styling */
+/* ---- Page header / branding ---- */
+.title {
+  color: #08519c;
+  border-bottom: 3px solid #08519c;
+  padding-bottom: 0.3em;
+}
+
+.author, .date {
+  color: #6c757d;
+  font-size: 0.95em;
+}
+
+/* ---- Executive summary table ---- */
 .level1:first-of-type table {
   max-width: 500px;
   margin: 0 auto 1.5rem auto;
@@ -13,7 +26,7 @@
   border-bottom: 1px solid #e0e0e0;
 }
 
-/* Highlight boxes for key findings */
+/* ---- Key findings callout boxes ---- */
 blockquote {
   border-left: 4px solid #08519c;
   background: #f0f4f8;
@@ -22,9 +35,14 @@ blockquote {
   border-radius: 0 4px 4px 0;
 }
 
-/* Better table styling */
+blockquote strong:first-child {
+  color: #08519c;
+}
+
+/* ---- Table styling ---- */
 .table {
   font-size: 0.92em;
+  width: 100%;
 }
 
 .table thead th {
@@ -32,13 +50,22 @@ blockquote {
   color: white;
   font-weight: 600;
   border-bottom: 2px solid #063b73;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .table-striped > tbody > tr:nth-of-type(odd) {
   background-color: #f8f9fa;
 }
 
-/* Figure captions */
+/* Hover effect for table rows */
+.table tbody tr:hover {
+  background-color: #e8f0fe;
+  transition: background-color 0.15s ease;
+}
+
+/* ---- Figure captions ---- */
 .figure p.caption,
 p.caption {
   font-style: italic;
@@ -48,19 +75,25 @@ p.caption {
   margin-top: 4px;
 }
 
-/* Section dividers */
+/* ---- Section dividers ---- */
 hr {
   border: none;
   border-top: 2px solid #e9ecef;
   margin: 2rem 0;
 }
 
-/* TOC styling tweaks */
+/* ---- TOC styling ---- */
 .tocify-header .tocify-subheader {
   font-size: 0.9em;
 }
 
-/* Methodology section subtle background */
+.tocify .active {
+  background-color: #08519c;
+  color: white;
+  border-radius: 3px;
+}
+
+/* ---- Methodology section background ---- */
 #methodology-notes {
   background-color: #fafafa;
   padding: 1rem 1.5rem;
@@ -68,12 +101,84 @@ hr {
   border: 1px solid #e9ecef;
 }
 
-/* Print-friendly: hide code toggle buttons */
+/* ---- Tabset panel styling ---- */
+.nav-tabs > li > a {
+  color: #08519c;
+  font-weight: 500;
+}
+
+.nav-tabs > li.active > a {
+  border-bottom: 3px solid #08519c;
+  font-weight: 600;
+}
+
+/* ---- Code blocks ---- */
+pre {
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+}
+
+/* ---- Responsive design ---- */
+@media (max-width: 768px) {
+  .table {
+    font-size: 0.8em;
+  }
+
+  .tocify {
+    display: none;
+  }
+
+  h1 { font-size: 1.5em; }
+  h2 { font-size: 1.25em; }
+
+  blockquote {
+    padding: 8px 12px;
+    margin: 0.5rem 0;
+  }
+}
+
+/* ---- Accessibility: focus indicators ---- */
+a:focus,
+button:focus,
+.nav-tabs > li > a:focus {
+  outline: 2px solid #08519c;
+  outline-offset: 2px;
+}
+
+/* ---- High contrast for data labels ---- */
+.table td:first-child {
+  font-weight: 500;
+}
+
+/* ---- Glossary table ---- */
+#appendix .table td:first-child {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* ---- Print-friendly rules ---- */
 @media print {
   .btn-default[data-toggle="collapse"] {
     display: none !important;
   }
   .tocify {
     display: none !important;
+  }
+  blockquote {
+    border-left: 2px solid #333;
+    background: none;
+  }
+  .table thead th {
+    background-color: #333 !important;
+    color: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  h1, h2, h3 {
+    page-break-after: avoid;
+  }
+  .figure, table {
+    page-break-inside: avoid;
   }
 }

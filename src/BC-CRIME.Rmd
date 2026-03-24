@@ -435,7 +435,7 @@ is essential before drilling into specific crime types or neighbourhoods.
 
 ## Annual Crime Volume
 
-```{r annual-crime-trend}
+```{r annual-crime-trend, fig.alt="Line chart showing total reported crimes by year with COVID-19 annotation band"}
 crime_by_year <- crime_data %>%
   count(YEAR) %>%
   mutate(
@@ -509,7 +509,7 @@ The bar chart below isolates the *direction and magnitude* of change each year.
 Green bars indicate a year where crime fell relative to the prior year; red bars
 indicate an increase.
 
-```{r yoy-bar}
+```{r yoy-bar, fig.alt="Bar chart showing year-over-year percentage change in crime, red for increases, green for decreases"}
 yoy_data <- crime_by_year %>% filter(!is.na(pct_change))
 
 ggplot(yoy_data, aes(x = factor(YEAR), y = pct_change, fill = pct_change > 0)) +
@@ -663,7 +663,7 @@ This heatmap normalizes each year's data to show the *percentage share* of each
 crime type, making it easy to spot shifts in crime composition independent of
 overall volume changes.
 
-```{r crime-heatmap, fig.height=9, fig.width=10}
+```{r crime-heatmap, fig.height=9, fig.width=10, fig.alt="Heatmap of crime type proportions by year"}
 crime_type_year <- crime_data %>%
   count(YEAR, TYPE) %>%
   group_by(YEAR) %>%
@@ -1407,7 +1407,7 @@ project crime volumes forward, with appropriate uncertainty bounds.
 > Policy interventions, economic shifts, or demographic changes can alter trajectories
 > substantially. Treat these as *baseline expectations*, not predictions.
 
-```{r forecast-overall, fig.height=7}
+```{r forecast-overall, fig.height=7, fig.alt="Fan chart showing crime volume projection with 80 percent prediction interval"}
 # Simple exponential smoothing forecast using Holt's method (linear trend)
 forecast_years <- 2
 future_years <- seq(LATEST_YEAR + 1, LATEST_YEAR + forecast_years)
