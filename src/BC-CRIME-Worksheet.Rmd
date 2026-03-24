@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
 
 # Purpose
 
-This worksheet is a companion to the main analysis report (`BC CRIME.Rmd`). It
+This worksheet is a companion to the main analysis report (`BC-CRIME.Rmd`). It
 provides a quick-start template for ad-hoc exploration of the BC crime dataset.
 Use the code blocks below as building blocks for your own analyses.
 
@@ -47,7 +47,7 @@ library(knitr)
 ```
 
 ```{r load-data}
-crime_data <- read.csv("bc_crime.csv")
+crime_data <- read.csv("../data/bc_crime.csv")
 ```
 
 # Quick Summary

@@ -56,7 +56,7 @@ library(knitr)
 ```
 
 ```{r load-data}
-crime_data <- read.csv("bc_crime.csv")
+crime_data <- read.csv("../data/bc_crime.csv")
 ```
 
 ```{r custom-theme}
