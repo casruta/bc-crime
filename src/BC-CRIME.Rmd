@@ -244,6 +244,29 @@ The overarching question: *How has crime in British Columbia evolved in the year
 surrounding the COVID-19 pandemic, and which communities and crime types are driving
 those changes?*
 
+## Broader Context
+
+Understanding local crime data requires broader context. Key reference points:
+
+- **Population growth:** British Columbia's population grew by approximately 7.6%
+  between 2018 and 2023 (from ~5.0M to ~5.4M), meaning *per-capita* crime rates
+  declined even if absolute counts remained flat. Population-normalized analysis
+  would require neighbourhood-level population estimates not available in this dataset.
+- **National trends:** Statistics Canada's Crime Severity Index (CSI) for BC has
+  historically tracked above the national average but followed similar pandemic-era
+  patterns: a dip in 2020 followed by a partial rebound.
+- **COVID-19 impacts:** The pandemic fundamentally altered crime patterns across Canada.
+  Property crime fell (fewer targets available during lockdowns), while some personal
+  offences (domestic violence) increased. These national patterns provide a baseline
+  for interpreting local BC data.
+- **Policy context:** BC has implemented several policing reforms during this period,
+  including increased emphasis on restorative justice and community policing models,
+  which may influence both crime rates and reporting behaviour.
+
+> **Analytical limitation:** This report analyses *reported* crime counts. Changes
+> in reporting rates, police staffing, or recording practices can affect observed
+> trends independently of actual crime levels.
+
 ---
 
 # Data Quality Check
