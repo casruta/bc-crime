@@ -206,13 +206,63 @@ bug fixes, and basic chart variety. Everything after that was incremental.
 | 18   | 98    | 0     | Auto-generated correlation interpretation |
 | 19   | 98    | 0     | Dynamic report footer |
 
+## Phase 2: Beyond the 100-Point Ceiling (Iterations 20-37)
+
+After hitting 98/100, a new 150-point rubric was created adding: Project Organization,
+Robustness, Contextual Depth, and Reproducibility dimensions.
+
+### What Worked in Phase 2
+
+**1. Folder restructuring was the single biggest Phase 2 win (+12 points).**
+Moving from `BC Crime Data/Data Sets/` to `src/data/output/docs/` with a proper
+`.gitignore` added instant professionalism and made the project navigable.
+
+**2. Parameterization compounds (+5 points).**
+Creating a config chunk with YAML params meant every subsequent change
+was automatically flexible. One change propagated to 15+ locations.
+
+**3. Statistical tests add credibility cheaply (+5 points).**
+Adding p-values, confidence intervals, and a chi-squared test took ~20 lines
+each but transformed the report from descriptive to analytical.
+
+**4. Neighbourhood clustering was novel and high-impact (+3 points).**
+Ward's hierarchical clustering on crime proportions revealed patterns
+not visible in any single chart---genuine new insight from ~40 lines of code.
+
+**5. Context sections turned analysis into intelligence (+3 points).**
+Adding BC population context, national comparisons, and policy references
+made the report useful for decision-makers, not just analysts.
+
+**6. Comprehensive methodology equals reproducibility (+3 points).**
+Expanding from 8 lines to a full section with variable definitions, methods table,
+limitations, and session info made the report citable.
+
+### Phase 2 Score Trajectory
+
+| Iter | Score | Delta | What I Did |
+|------|-------|-------|------------|
+| 20   | 110   | +12   | Project restructure: src/data/output/docs layout |
+| 21   | 112   | +2    | .gitignore for outputs, data, R session files |
+| 22   | 116   | +4    | Robust data loading with file/column validation |
+| 23   | 121   | +5    | Parameterize ~15 hardcoded values via config chunk |
+| 24   | 124   | +3    | Reusable helpers (get_top_n, add_covid_band, format_change) |
+| 25   | 128   | +4    | Expand data validation from 3 to 8 checks |
+| 26   | 133   | +5    | Statistical tests (p-values, CI, chi-squared) |
+| 27   | 137   | +4    | Trend projection (Part 6) with fan chart |
+| 28   | 140   | +3    | Neighbourhood clustering (Ward's D2 hierarchical) |
+| 29   | 143   | +3    | Broader context section |
+| 30   | 145   | +2    | Abstract, inter-section transition callouts |
+| 31   | 148   | +3    | Expanded methodology with methods table |
+| 32   | 150   | +2    | Glossary, appendix tables, references |
+| 33-37| 150   | 0     | Polish: CSS, accessibility, DT tables, YAML params, docs |
+
 ## Files Changed
 
 | File | What Changed |
 |------|-------------|
-| `BC CRIME.Rmd` | 156 lines -> 1200 lines. Complete rewrite with 15+ visualizations, 8 tables, 5 analysis sections, executive summary, data validation, methodology notes |
-| `BC CRIME Worksheet.Rmd` | Upgraded from buggy copy-paste to structured exploration template with reusable code blocks |
-| `custom.css` | New. Professional table styling, blockquotes, print rules |
-| `README.md` | 4 lines -> full project documentation with requirements and instructions |
-| `BC CRIME.md` | Updated to redirect to the main Rmd file |
-| `improvement_log.md` | New. Full iteration history with scoring rubric |
+| `src/BC-CRIME.Rmd` | 156 → ~1700 lines. 6 analysis parts, 18+ chart types, statistical tests, clustering, projections, interactive tables, parameterized |
+| `src/BC-CRIME-Worksheet.Rmd` | Exploration template with reusable code blocks |
+| `src/custom.css` | Responsive, accessible, print-friendly styling |
+| `README.md` | Full documentation with parameterized report instructions |
+| `docs/improvement_log.md` | 37-iteration history across two rubrics |
+| `.gitignore` | Excludes outputs, data, R session files |

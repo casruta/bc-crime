@@ -42,28 +42,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Abstract {-}
-
-```{r abstract, echo=FALSE, results='asis'}
-cat(paste0(
-  "This report analyses ", comma(nrow(crime_data)), " crime records across British Columbia, ",
-  "Canada, spanning ", min(crime_data$YEAR), " to ", max(crime_data$YEAR), ". ",
-  "The analysis examines trends in total crime volume, compositional shifts across ",
-  length(unique(crime_data$TYPE)), " offence categories, geographic concentration ",
-  "patterns across ", length(unique(crime_data$NEIGHBOURHOOD)), " neighbourhoods, ",
-  "and seasonal variation. Key findings include: (1) the overall trend direction ",
-  "and its statistical significance, (2) which crime types are driving aggregate changes, ",
-  "(3) how crime is geographically concentrated and which areas are improving or worsening, ",
-  "and (4) forward-looking projections based on current trajectories. ",
-  "Methods include descriptive statistics, chi-squared distributional tests, ",
-  "hierarchical clustering of neighbourhood crime profiles, ",
-  "linear trend regression with confidence intervals, and severity-weighted indexing. ",
-  "All analyses are fully reproducible from the source R Markdown file."
-))
-```
-
----
-
 # Setup and Data Loading {-}
 
 ```{r load-packages}
@@ -231,6 +209,28 @@ stat_inline <- function(x, fmt = comma) {
   fmt(x)
 }
 ```
+
+# Abstract {-}
+
+```{r abstract, echo=FALSE, results='asis'}
+cat(paste0(
+  "This report analyses ", comma(nrow(crime_data)), " crime records across British Columbia, ",
+  "Canada, spanning ", min(crime_data$YEAR), " to ", max(crime_data$YEAR), ". ",
+  "The analysis examines trends in total crime volume, compositional shifts across ",
+  length(unique(crime_data$TYPE)), " offence categories, geographic concentration ",
+  "patterns across ", length(unique(crime_data$NEIGHBOURHOOD)), " neighbourhoods, ",
+  "and seasonal variation. Key findings include: (1) the overall trend direction ",
+  "and its statistical significance, (2) which crime types are driving aggregate changes, ",
+  "(3) how crime is geographically concentrated and which areas are improving or worsening, ",
+  "and (4) forward-looking projections based on current trajectories. ",
+  "Methods include descriptive statistics, chi-squared distributional tests, ",
+  "hierarchical clustering of neighbourhood crime profiles, ",
+  "linear trend regression with confidence intervals, and severity-weighted indexing. ",
+  "All analyses are fully reproducible from the source R Markdown file."
+))
+```
+
+---
 
 # Executive Summary
 

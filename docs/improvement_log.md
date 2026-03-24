@@ -39,6 +39,29 @@
 | 18        | 98    | 0     | Auto-generated correlation interpretation |
 | 19        | 98    | 0     | Dynamic report footer |
 
+### Phase 2: Expanded Rubric (0-150 scale, iterations 20-37)
+
+| Iteration | Score | Delta | Approach |
+|-----------|-------|-------|----------|
+| 20        | 110   | +12   | Project restructure: src/data/output/docs layout |
+| 21        | 112   | +2    | Add .gitignore |
+| 22        | 116   | +4    | Robust data loading with file/column validation |
+| 23        | 121   | +5    | Parameterize ~15 hardcoded values via config chunk |
+| 24        | 124   | +3    | Extract reusable helper functions (get_top_n, add_covid_band, format_change) |
+| 25        | 128   | +4    | Expand data validation from 3 to 8 checks |
+| 26        | 133   | +5    | Add statistical tests (p-values, CI, chi-squared) |
+| 27        | 137   | +4    | Add trend projection section (Part 6) with fan chart |
+| 28        | 140   | +3    | Neighbourhood clustering (Ward's D2 hierarchical) |
+| 29        | 143   | +3    | Broader context section (population, national, COVID, policy) |
+| 30        | 145   | +2    | Abstract, inter-section transition callouts |
+| 31        | 148   | +3    | Expanded methodology (methods table, limitations, reproducibility) |
+| 32        | 150   | +2    | Glossary, appendix tables, references section |
+| 33        | 150   | 0     | Writing quality pass, dynamic date, figure counters |
+| 34        | 150   | 0     | Enhanced CSS (responsive, hover, print), fig.alt accessibility |
+| 35        | 150   | 0     | Interactive DT::datatable for appendix tables |
+| 36        | 150   | 0     | YAML params for parameterized report generation |
+| 37        | 150   | 0     | Documentation update, final review |
+
 ## Iteration History
 
 ### Baseline (Original) - Score: 18/100
