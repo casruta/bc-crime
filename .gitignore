@@ -1,0 +1,25 @@
+# Generated reports
+output/*.html
+output/*.pdf
+output/*.docx
+
+# Data files (user must supply their own)
+data/*.csv
+data/*.xlsx
+data/*.xls
+
+# R session files
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj
+
+# R Markdown intermediates
+*_cache/
+*_files/
+*.knit.md
+*.utf8.md
+
+# OS files
+.DS_Store
+Thumbs.db
