@@ -1066,6 +1066,66 @@ ggplot(hood_profile, aes(x = TYPE, y = NEIGHBOURHOOD, fill = pct)) +
   )
 ```
 
+## Neighbourhood Clusters
+
+Which neighbourhoods have similar crime profiles? Hierarchical clustering groups
+areas by the *composition* of their crime (not total volume), revealing natural
+groupings that may correspond to urban planning zones or socioeconomic patterns.
+
+```{r neighbourhood-clustering, fig.height=8, fig.width=10}
+# Build a crime type proportion matrix per neighbourhood
+cluster_data <- crime_data %>%
+  filter(YEAR == LATEST_YEAR, !NEIGHBOURHOOD %in% EXCLUDE_HOODS) %>%
+  count(NEIGHBOURHOOD, TYPE) %>%
+  group_by(NEIGHBOURHOOD) %>%
+  mutate(pct = n / sum(n)) %>%
+  ungroup() %>%
+  select(NEIGHBOURHOOD, TYPE, pct) %>%
+  pivot_wider(names_from = TYPE, values_from = pct, values_fill = 0)
+
+# Need at least 3 neighbourhoods to cluster meaningfully
+if (nrow(cluster_data) >= 3) {
+  cluster_mat <- as.matrix(cluster_data[, -1])
+  rownames(cluster_mat) <- cluster_data$NEIGHBOURHOOD
+
+  # Hierarchical clustering with Ward's method
+  dist_mat <- dist(cluster_mat, method = "euclidean")
+  hc <- hclust(dist_mat, method = "ward.D2")
+
+  # Cut into groups (use 3-5 clusters depending on data)
+  n_clusters <- min(5, nrow(cluster_data) - 1)
+  clusters <- cutree(hc, k = n_clusters)
+
+  # Plot dendrogram
+  plot(hc, hang = -1, cex = 0.7,
+       main = glue::glue("Neighbourhood Crime Profile Clusters ({LATEST_YEAR})"),
+       sub = "Ward's method on crime type proportions",
+       xlab = "", ylab = "Distance")
+  rect.hclust(hc, k = n_clusters, border = bc_palette[1:n_clusters])
+}
+```
+
+```{r cluster-summary, results='asis'}
+if (exists("clusters") && length(clusters) > 0) {
+  cluster_df <- data.frame(
+    NEIGHBOURHOOD = names(clusters),
+    Cluster = clusters,
+    stringsAsFactors = FALSE
+  ) %>% arrange(Cluster, NEIGHBOURHOOD)
+
+  cat("\n**Cluster memberships:**\n\n")
+  for (cl in sort(unique(cluster_df$Cluster))) {
+    members <- cluster_df %>% filter(Cluster == cl) %>% pull(NEIGHBOURHOOD)
+    cat(glue::glue("- **Group {cl}** ({length(members)} areas): {paste(members, collapse = ', ')}\n"))
+  }
+  cat("\n")
+  cat("> These clusters reflect similarity in crime *composition* (what proportion of each crime type), ")
+  cat("not total volume. Two neighbourhoods in the same cluster have similar crime profiles.\n\n")
+}
+```
+
+---
+
 # Spotlight: Break-and-Enter Analysis
 
 As a worked example of how to drill deeper into a specific crime category, this
