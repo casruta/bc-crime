@@ -52,7 +52,7 @@ A breakdown of which offences contribute most to BC's overall CSI (Figure 8) rev
 
 BC Government data confirms the pattern at the most recent granularity (Figure below).
 
-![BC Government year-over-year comparison, 2022-2023](outputs/charts/q1_bcgov_yoy_2022_2023.png)
+![BC Government year-over-year comparison, 2022-2023](outputs/charts/q2_bcgov_yoy_2022_2023.png)
 
 **What the data can't tell us:** Whether the violent-crime increase reflects genuine behavioural change, reclassification of offences under revised Criminal Code provisions (particularly post-2019 amendments), or improved reporting mechanisms for domestic violence and sexual assault. The CSI weights offences by average sentence severity, so reclassification of a given act to a more serious category inflates the index even if the underlying behaviour is unchanged.
 
