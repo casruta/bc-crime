@@ -1,36 +1,25 @@
-# Data (too large for git, re-download with src/download.py)
-data/raw/
-data/processed/
+# Generated reports
+output/*.html
+output/*.pdf
+output/*.docx
 
-# Python
-venv/
-.venv/
-__pycache__/
-*.pyc
-*.pyo
-*.egg-info/
-dist/
-build/
+# Data files (user must supply their own)
+data/*.csv
+data/*.xlsx
+data/*.xls
 
-# Jupyter
-.ipynb_checkpoints/
+# R session files
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj
 
-# IDE
-.vscode/
-.idea/
+# R Markdown intermediates
+*_cache/
+*_files/
+*.knit.md
+*.utf8.md
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
-
-# Environment
-.env
-
-# Testing
-.pytest_cache/
-
-# Gas Town (added by gt)
-.runtime/
-.claude/
-.logs/
-.beads/
