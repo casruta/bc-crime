@@ -1,0 +1,5 @@
+iteration	target	hypothesis	composite_before	composite_after	delta	decision	reason
+0	baseline	All 42 charts embedded with basic captions	0	4.85	4.85	keep	baseline
+1	visual_integration	Interleave charts with specific prose paragraphs; add transitions	4.85	5.45	0.60	keep	charts now follow their data; prose references figure numbers
+2	scannability	Add TOC with section links and chart counts	5.45	5.85	0.40	keep	readers can jump to any section; chart count corrected to 42
+3	caption_quality	Point-first captions stating findings not chart types	5.85	6.30	0.45	keep	captions reinforce argument; reader gets finding from alt text

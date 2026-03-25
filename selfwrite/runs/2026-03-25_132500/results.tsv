@@ -1,0 +1,8 @@
+iteration	target	hypothesis	composite_before	composite_after	delta	decision	reason
+0	baseline	Initial draft	0	5.25	5.25	keep	baseline anchored at 4-6 range
+1	actionability	Add Key Implications section with 5 data-driven recommendations	5.25	5.65	0.40	keep	concrete recommendations tied to findings
+2	structure	Point-first paragraphs + executive summary	5.65	6.10	0.45	keep	every section opens with conclusion; finding-as-headline format
+3	specificity	Replace vague claims with specific numbers	6.10	6.60	0.50	keep	population figures, perception table, 5-year change table added
+4	actionability	Operational next steps + monitoring cadence table	6.60	7.00	0.40	keep	FTE modeling, pilot-then-scale, trigger thresholds
+5	analytical_depth	Named confounders + what analysis cannot answer	7.00	7.40	0.40	keep	Criminal Code reclassification, ICAC, structural bounds on claims
+6	audience_calibration	Bottom line callout + why-now framing	7.40	7.75	0.35	keep	10-second executive read; urgency calibrated to evidence
