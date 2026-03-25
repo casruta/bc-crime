@@ -1,78 +1,222 @@
-# BC Crime Data Analysis
+# British Columbia Crime Analysis
 
-An R Markdown analysis of crime trends across British Columbia, Canada, covering 2018--2023.
+> **Bottom line:** BC crime fell 46% from 2003 to 2014 and dropped another 7.4% in 2024, but violent crime's share has been rising since 2014 — the headline decline masks a compositional shift toward more serious offences. Interior communities face per-capita rates 2x the Lower Mainland's, and 42% of residents believe crime is getting worse. The priorities are clear: track the violent crossover, rebalance resources toward the interior, and close the growing gap between public perception and statistical reality.
+
+---
+
+**Crime in BC is falling in volume but shifting in character.** The Crime Severity Index dropped 46% from its 2003 peak of 166.9 to 90.2 in 2014, then fell another 7.4% in 2024. Yet violent crime's share has been climbing since 2014 while property crime collapses beneath it. Interior communities like Chilliwack (11,352 per 100,000) face crime rates double Vancouver's (5,438). And 42% of BC residents believe crime is rising despite two decades of decline. This summary distils five research questions, 41 charts, and 20 years of Statistics Canada data into the findings that matter most.
+
+---
+
+## 1. Crime Is Falling — but the Mix Is Getting Worse
+
+BC's Crime Severity Index peaked at 166.9 in 2003, fell 46% to 90.2 by 2014, and dropped a further 7.4% in 2024 — the second-largest provincial decline after Alberta (-8.5%). Over the full series, BC recorded 18 years of declining crime rates against 8 years of increases. Linear regression confirms the decline is statistically significant (p < 0.05), though the model doesn't capture the non-linear COVID-19 disruption that created an artificial dip in 2020 and partial rebound through 2022.
+
+The composition tells a different story. Violent CSI has risen more steeply than non-violent CSI since 2014: the overall index stabilized because property crime's decline masked a violent-crime crossover. BC still sits roughly 21% above the national average, a gap that has persisted across the entire 20-year series regardless of whether crime was rising or falling. Saskatchewan runs at roughly 2x Ontario's rate. Indexed to 2004 = 100, every comparison province shows a converging downward trajectory, with BC tracking the middle of the pack — the decline is structural, not provincial, driven by demographics, urbanization, and enforcement philosophy more than any single jurisdiction's policy.
+
+**What the data can't tell us:** Whether the violent-crime increase reflects genuine behavioural change, reclassification of offences under revised Criminal Code provisions (particularly post-2019 amendments), or improved reporting mechanisms for domestic violence and sexual assault. The CSI weights offences by average sentence severity, so reclassification of a given act to a more serious category inflates the index even if the underlying behaviour is unchanged.
+
+## 2. Property Crime Is Collapsing; Two Categories Are Surging
+
+Property crime accounts for 51% of the total rate but has been declining steadily since the early 2000s. The five-year absolute drops are steep:
+
+| Violation | 5-Year Change (per 100,000) |
+|---|---|
+| Theft from vehicles | -772 |
+| Breaking and entering | -270 |
+| Theft under $5,000 | -221 |
+| Disturb the peace | -165 |
+
+The theft-from-vehicles decline (-772 per 100,000) is the single largest absolute drop of any violation. Multiple factors likely contribute: improved vehicle security, fewer valuables left visible, contactless payment reducing cash-carrying, and pandemic-era work-from-home patterns. Disentangling these is beyond the scope of police-reported data alone.
+
+Two categories bucked the trend. Child pornography offences rose by 82 per 100,000 and shoplifting by 79. The child exploitation increase almost certainly reflects expanded digital investigation capacity (ICAC task forces, automated hash-matching, mandatory platform reporting) rather than a prevalence increase — though the data can't confirm this without case-initiation source tracking. The shoplifting rise is more ambiguous: genuine behavioural change, reduced in-store security staffing, and lower prosecution thresholds discouraging police response could each play a role.
+
+Violent crime's absolute rate remains relatively flat, but its share of total crime is growing as property crime falls away beneath it. A Pareto analysis shows a small cluster of crime types accounts for roughly 80% of total volume. The chi-squared test for crime-type composition across years is statistically significant (p < 0.05), confirming the shift is real, not noise.
+
+## 3. The Justice System Clears Violent Crime but Loses Property Crime
+
+Clearance rates split sharply by type. Violent crime clears above 50%; property crime clears below 30% — 7 in 10 property crimes go unresolved. These rates have held steady over the 2004-2024 period. The stability itself is the finding: two decades of reforms, technology investment, and budget growth haven't moved the needle on property-crime resolution. This points to a structural constraint — the sheer volume and low individual value of property offences making investigation uneconomical — rather than a fixable capacity gap.
+
+Youth crime severity has diverged from the adult trend, continuing to decline since 2014 while adult CSI rose or stabilized. Three candidate explanations: declining youth population share, diversion programs keeping cases out of the formal system, and generational behavioural shifts (reduced alcohol consumption, more supervised leisure time). The data supports the divergence but can't isolate the cause.
+
+The data rules out two alternative explanations for the overall decline. Unfounded rates (reports classified as non-criminal) have remained stable, so the drop isn't police reclassifying incidents. And the underreporting pattern runs the wrong way: property crime (reported to police ~35% of the time) declined more steeply than violent crime (~24% reported). If the decline were driven by people simply reporting less, the more-reported category would decline more slowly — the opposite of what we observe. The 2019 General Social Survey puts overall reporting at just 29% nationally, ranging from 6% for sexual assault to 60% for motor vehicle theft.
+
+### Policing costs are rising faster than crime is falling
+
+BC police spending grew in both nominal and inflation-adjusted (constant 2020 dollar) terms even as crime severity dropped. Salary and benefits growth outpaced operating and capital spending. BC's population grew 10.4% from 5,000,879 (2018) to 5,519,913 (2023), raising the question of whether staffing kept pace.
+
+The crimes-per-officer workload metric, overlaid with CSI, suggests declining crime volume was absorbed by expanding non-crime demands. Police increasingly respond to mental health crises, overdose calls, welfare checks, and social disorder — work that doesn't generate Criminal Code incidents but consumes patrol hours. Without call-type data, the analysis can't quantify this substitution, but the spending-crime divergence is consistent with it.
+
+## 4. Crime Concentrates in the Interior, Not the Lower Mainland
+
+Vancouver (~48,812 offences) and Surrey (~41,275) lead in absolute volume, but per-capita rates reverse the map:
+
+| Community | Rate per 100,000 | vs. Vancouver |
+|---|---|---|
+| Chilliwack | 11,352 | 2.1x |
+| Kamloops | 10,546 | 1.9x |
+| Vancouver | 5,438 | 1.0x |
+| Victoria | 5,283 | 0.97x |
+
+The interior-coastal divide isn't random. Interior communities share a cluster of compounding risk factors: higher rates of homelessness and visible poverty, acute opioid-crisis exposure, seasonal tourism economies with transient populations, and reliance on RCMP detachments rather than dedicated municipal forces. Homelessness concentrates where winters are milder and services exist; substance use follows; property crime (shoplifting, theft, break-ins) rises with it. Policing alone won't close a gap rooted in housing and addiction.
+
+A composite neighbourhood ranking (60% standardized volume, 40% trend direction) classifies areas as high, moderate, or lower concern — identifying the intersections where intervention has the highest expected return. An ANOVA variance decomposition partitions total crime variation across year, crime type, and neighbourhood. The dimension that explains the most variance determines whether policy should prioritize place-based interventions (housing, treatment, economic development), category-targeted programs (anti-theft technology, digital exploitation units), or time-sensitive responses (seasonal surge planning, post-pandemic adjustment).
+
+## 5. The Public Thinks Crime Is Rising — the Data Disagrees
+
+The perception-reality gap widened between 2014 and 2019:
+
+| Year | "Crime increased" | "About the same" |
+|---|---|---|
+| 2009 | 38% | 43% |
+| 2014 | 30% | 48% |
+| 2019 | 42% | 41% |
+
+From 2009 to 2014, perception tracked reality: crime fell and fewer people believed it was rising. From 2014 to 2019, crime stabilized or rose slightly while perceived increase jumped 12 percentage points. Several mechanisms explain the gap: media coverage increasingly frames crime as an epidemic (amplification bias), visible homelessness and social disorder register as "crime" even when they don't generate police reports, and high-profile violent incidents anchor perceptions more than cumulative statistics.
+
+Confidence in police is middling. In 2019, 30% of BC residents reported "a great deal of confidence," 47% "some confidence," 17% "not very much," and 5% "none at all" — closely mirroring the national distribution (32%/46%/15%/5%).
+
+A person who witnesses shoplifting daily but sees falling CSI numbers has a rational basis for distrust. Their observation is accurate — shoplifting is up 79 per 100,000. The aggregate trend they infer from it is not. Bridging this gap requires meeting people where their experience is valid, then contextualizing it within the broader data.
+
+---
+
+## What These Findings Mean — and What to Do About Them
+
+### Priority 1: Track the violent-crime crossover before it becomes a crisis
+
+**Why now:** Violent CSI has climbed since 2014 while property-crime decline drives the headline 7.4% drop. Every year this compositional shift goes unmonitored, resources stay allocated to a property-crime problem that's solving itself.
+
+**Next steps:** Report violent and non-violent CSI separately in quarterly dashboards. Flag any quarter where the violent-to-total ratio exceeds the previous year's annual average. Tie new investigative resource allocation to the violent-crime share trend, not the total-crime level.
+
+### Priority 2: Rebalance resources toward interior communities
+
+**Why now:** Chilliwack (11,352/100k) and Kamloops (10,546/100k) face per-capita rates 2x Vancouver's (5,438/100k), and the composite ranking shows several interior areas are both high-crime and worsening. Provincial funding formulas that weight absolute volume over per-capita intensity systematically underfund these communities.
+
+**Next steps:** Adopt the composite ranking (volume 60% + trend 40%) as an input to allocation formulas. Conduct root-cause assessments in the top-5 ranked communities targeting housing, substance use, and economic precarity. Policing alone won't close this gap — cross-ministry coordination is the minimum viable intervention.
+
+### Priority 3: Redeploy property-crime investigation capacity
+
+**Why now:** Property crime clears below 30% (7 in 10 cases unresolved) and is declining steeply (theft from vehicles: -772/100k over five years). Violent crime clears above 50% — each additional detective-hour has higher expected clearance yield.
+
+**Next steps:** Audit detective assignment by crime category. Model the clearance-rate gain from shifting one FTE from property to violent-crime investigation. Pilot in one high-composite-rank interior jurisdiction; measure clearance outcomes over 12 months before scaling.
+
+### Priority 4: Close the perception-reality gap
+
+**Why now:** The 12-point jump in perceived crime increase (30% to 42%, 2014-2019) occurred while CSI remained below its historical peak. Left unchecked, this gap creates political pressure to respond to perceptions rather than evidence — driving reactive policy that wastes resources.
+
+**Next steps:** Publish a quarterly plain-language CSI dashboard at the provincial level, covering total and violent/non-violent breakdowns with per-capita rates by community. Pair with visible community policing in the 10 highest-rate jurisdictions. Target: reduce the "crime increased" perception by at least 5 points in the next GSS cycle.
+
+### Priority 5: Separate detection increases from prevalence increases
+
+**Why now:** Child exploitation offences (+82/100k) and shoplifting (+79/100k) lead absolute increases but for opposite reasons. Misdiagnosing expanded detection as a crime wave (or a genuine behavioural shift as a reporting artefact) leads to misallocation in both directions.
+
+**Next steps:** For child exploitation, track case-initiation source (proactive tip vs. victim report) to test the detection-gain hypothesis. For shoplifting, compare incident reports against retail loss surveys and enforcement-hour data to isolate the primary driver.
+
+### Monitoring cadence
+
+| Metric | Frequency | Source | Trigger |
+|---|---|---|---|
+| Total + violent/non-violent CSI | Quarterly | StatsCan 35-10-0063-01 | Violent ratio exceeds prior annual average |
+| Top-5 interior jurisdiction rates | Quarterly | BC Gov Appendix F | Any community exceeds 2x provincial average |
+| Property vs. violent clearance | Annually | StatsCan 35-10-0177-01 | Property clearance below 25% or violent below 45% |
+| Public perception (GSS) | Per cycle (~5 years) | StatsCan 35-10-0066-01 | "Crime increased" exceeds 45% |
+| Child exploitation case source | Annually | Internal police data | Proactive share drops below 60% |
+
+---
+
+## What This Analysis Cannot Answer
+
+This analysis measures what the system records, not what occurs. Three questions remain structurally out of reach:
+
+1. **The true prevalence of crime.** With only 29% of victimizations reported nationally (2019 GSS), and reporting rates varying from 6% (sexual assault) to 60% (motor vehicle theft), the dark figure is large and unevenly distributed. Trends in reported crime may reflect trends in reporting behaviour as much as trends in criminal behaviour.
+
+2. **Causal drivers of the decline.** The 46% CSI drop from 2003 to 2014 is well-documented but its causes are debated: demographic ageing, rising incarceration through the 2000s, improved security technology, economic conditions, and cultural shifts all contribute to varying degrees. This analysis measures the "what" precisely but cannot isolate the "why."
+
+3. **The effectiveness of specific interventions.** Clearance rates, cost trends, and staffing ratios describe system performance at the aggregate level. They can't attribute outcomes to specific programs, policies, or leadership decisions. Answering those questions requires randomized or quasi-experimental evaluation designs that fall outside the scope of observational crime data.
+
+---
+
+## Methodology & Limitations
+
+**Data sources:** Six Statistics Canada tables (35-10-0063-01, 35-10-0177-01, 18-10-0005-01, 35-10-0076-01, 35-10-0059-01, 35-10-0066/0068-01) and four BC Government justice appendices (F-I). BC population estimates from BC Stats (2018: 5,000,879 to 2023: 5,519,913).
+
+**Key metrics:** Crime Severity Index (sentence-severity weighted, base 2006), crime rate per 100,000, clearance rate, unfounded rate, CAGR, chi-squared composition test, ANOVA variance decomposition.
+
+**Statistical methods:** Linear regression with 95% confidence intervals on slope, chi-squared test for compositional independence, Ward's hierarchical clustering for neighbourhood grouping, ANOVA for variance partitioning, 2-year trend projections with fan-chart uncertainty bands.
+
+**Limitations:** Police-reported data only — the "dark figure" of unreported crime (71% nationally per 2019 GSS) is not captured. COVID-19 distorts 2020-2021. Clearance does not equal conviction. Per-capita rates use mid-year population estimates revised post-census. Reporting rates range from 6% (sexual assault) to 60% (motor vehicle theft), creating structural blind spots that no methodology can fully resolve.
+
+---
 
 ## Repository Structure
 
 ```
-BC-CRIME-/
-├── src/                 Source R Markdown files and stylesheets
-│   ├── BC-CRIME.Rmd           Main analysis report (parameterized)
-│   ├── BC-CRIME-Worksheet.Rmd Exploration worksheet with reusable templates
-│   └── custom.css             Custom HTML styling
-├── data/                Place bc_crime.csv here (not tracked in git)
-├── output/              Generated HTML/PDF reports (not tracked in git)
-├── docs/                Project documentation
-│   └── improvement_log.md     Iteration history and scoring
-└── README.md
+bc-crime/
+├── src/
+│   ├── __init__.py
+│   ├── paths.py                       # Centralized path constants
+│   ├── download.py                    # Fetch raw CSVs from StatsCan / BC Gov
+│   ├── clean.py                       # Normalize, rename columns, write parquet
+│   └── analysis/
+│       ├── __init__.py
+│       ├── theme.py                   # Palette, styling helpers (kds wrapper)
+│       ├── q1_is_crime_rising.py      # Section 1 charts (8 PNG)
+│       ├── q2_what_kinds.py           # Section 2 charts (9 PNG)
+│       ├── q3_justice.py              # Section 3 charts (7 PNG)
+│       ├── q3_costs.py                # Policing costs charts (6 PNG)
+│       ├── q4_geography.py            # Section 4 charts (8 PNG + 1 HTML map)
+│       └── q5_perception.py           # Section 5 charts (3 PNG)
+├── data/
+│   ├── README.md                      # Data dictionary with full lineage
+│   ├── raw/                           # Downloaded source files (gitignored)
+│   └── processed/                     # Cleaned parquet files (gitignored)
+├── outputs/
+│   └── charts/
+│       ├── README.md                  # Chart index mapping filenames to figures
+│       ├── q1_*.png ... q5_*.png      # 41 publication-ready charts
+│       └── q4_interactive_map.html    # Plotly interactive map
+├── tests/
+├── notebooks/
+│   └── bc_crime_report.ipynb          # Exploratory Jupyter notebook
+├── generate_report.py                 # Convert README → Word .docx
+├── requirements.txt
+└── CLAUDE.md
 ```
 
-## Analysis Highlights
-
-- **Overall trends**: Year-over-year crime volume with COVID-19 context
-- **Crime type breakdown**: Composition analysis, heatmap, rank changes, small multiples
-- **Neighbourhood analysis**: Top areas, concentration (Lorenz) curve, clustering, crime profiles
-- **Seasonal patterns**: Monthly trends and heatmaps (when data available)
-- **Severity index**: Weighted crime scoring beyond raw counts
-- **Statistical depth**: Chi-squared tests, confidence intervals, correlation matrix, trend projections
-- **Interactive tables**: Searchable, sortable appendix tables via DT
-
-## Requirements
-
-- R >= 4.0
-- Key packages: `ggplot2`, `dplyr`, `tidyr`, `scales`, `knitr`, `rmarkdown`, `glue`, `DT`
-- All packages are auto-installed when the Rmd is knitted
+See [`data/README.md`](data/README.md) for the full data dictionary and [`outputs/charts/README.md`](outputs/charts/README.md) for the complete chart index.
 
 ## How to Run
 
-1. Place `bc_crime.csv` in the `data/` directory
-2. Open `src/BC-CRIME.Rmd` in RStudio
-3. Click **Knit** to generate the HTML or PDF report
-4. Output will be saved in `output/`
-
-### Parameterized Reports
-
-The report supports YAML parameters for customization:
-
-```r
-rmarkdown::render("src/BC-CRIME.Rmd", params = list(
-  data_file = "../data/bc_crime.csv",
-  exclude_neighbourhoods = "Central Business District",
-  top_n_types = 8,
-  top_n_hoods = 10,
-  forecast_years = 2
-))
+```bash
+pip install -r requirements.txt            # Install dependencies
+python -m src.download                     # Download all datasets (~8 GB)
+python -m src.clean                        # Clean and normalize to parquet
+python -m src.analysis.q1_is_crime_rising  # Section 1: Is crime rising? (8 charts)
+python -m src.analysis.q2_what_kinds       # Section 2: What kinds? (9 charts)
+python -m src.analysis.q3_justice          # Section 3: Justice system (7 charts)
+python -m src.analysis.q3_costs            # Section 3: Policing costs (6 charts)
+python -m src.analysis.q4_geography        # Section 4: Geography (8 charts + map)
+python -m src.analysis.q5_perception       # Section 5: Perception (3 charts)
+pytest                                     # Run tests
+python generate_report.py                  # Generate Word report from this README
 ```
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `data_file` | `../data/bc_crime.csv` | Path to the source CSV |
-| `exclude_neighbourhoods` | `Central Business District` | Comma-separated list of neighbourhoods to exclude |
-| `top_n_types` | `8` | Number of top crime types to display |
-| `top_n_hoods` | `10` | Number of top neighbourhoods to display |
-| `forecast_years` | `2` | Number of years to project forward |
+## Data Sources
 
-## Data Format
-
-The analysis expects a CSV file with these columns:
-
-| Column | Description |
-|--------|-------------|
-| `YEAR` | Year of the crime record (e.g., 2018--2023) |
-| `TYPE` | Crime type category (e.g., "Homicide", "Theft from Vehicle") |
-| `NEIGHBOURHOOD` | Geographic area where the crime occurred |
-| `MONTH` | Month of the crime (optional; seasonal analysis is skipped if absent) |
+| Table ID | Description | Coverage |
+|----------|-------------|----------|
+| 35-10-0063-01 | Crime Severity Index by police service | 1998-2024 |
+| 35-10-0177-01 | Incident-based crime statistics (national) | 1998-2024 |
+| 18-10-0005-01 | Consumer Price Index | 1914-2024 |
+| 35-10-0076-01 | Police personnel and selected crime stats | 1986-2023 |
+| 35-10-0059-01 | Police services expenditures (Canada) | 2018-2023 |
+| 35-10-0066-01 | Perception of crime (GSS) | 2004-2019 |
+| 35-10-0068-01 | Confidence in police (GSS) | 2004-2019 |
+| BC Gov Appendix F | Crime Statistics in BC, 2023 | 2022-2023 |
+| BC Gov Appendix G | BC Crime Trends | 2014-2023 |
+| BC Gov Appendix H | BC Regional District Crime Trends | 2014-2023 |
+| BC Gov Appendix I | BC Policing Jurisdiction Crime Trends | 2014-2023 |
 
 ## Author
 
-Casper Kacper Ruta (2024)
+Kacper Ruta (2024-2026)
