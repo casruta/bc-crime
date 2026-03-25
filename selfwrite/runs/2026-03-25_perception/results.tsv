@@ -1,0 +1,11 @@
+iteration	target	hypothesis	composite_before	composite_after	delta	decision	reason
+0	baseline	Corrective tone rewrite of Section 5 for policy-makers	0	5.55	5.55	keep	baseline
+1	policy_utility	Add inline correctives with specific actions per mechanism	5.55	6.10	0.55	keep	each mechanism now has an assignable action
+2	conciseness+flow	Reorder mechanisms macro→micro; tighten to 3-4 sentences	6.10	6.65	0.55	keep	logical arc + shorter paragraphs
+3	corrective_clarity	Assert data authority in opening; frame gap as correctable	6.65	7.10	0.45	keep	p<0.05, sentence-weighted — unhedged data assertion
+4	conciseness+flow	Arc preview sentence; trim mechanisms #2 and #5	7.10	7.55	0.45	keep	progression stated upfront; overall tighter
+5	data_grounding	Clearance-confidence numerical parallel (30%/30%)	7.55	7.80	0.25	keep	feedback loop now data-visible not just asserted
+6	policy_utility	Add corrective action summary table with success metrics	7.80	7.95	0.15	keep	assignment-ready format for policy-makers
+7	corrective_clarity	Closing paragraph reasserting institutional accountability	7.95	8.30	0.35	keep	bookend corrective frame; strongest closing line
+8	conciseness	Compress inline correctives to single sentences	8.30	8.45	0.15	keep	10% shorter; all data preserved
+9	corrective_clarity	Juxtapose +12pt perception swing against -7.4% CSI in opening	8.45	8.45	0.00	keep	equal score, cleaner language

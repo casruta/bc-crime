@@ -174,7 +174,9 @@ A composite neighbourhood ranking (60% standardized volume, 40% trend direction)
 
 ## 5. The Public Thinks Crime Is Rising — the Data Disagrees
 
-The perception-reality gap widened between 2014 and 2019:
+Crime in BC is falling. The Crime Severity Index dropped 46% from 2003 to 2014 and another 7.4% in 2024. These are police-reported, sentence-weighted measures covering every Criminal Code offence in the province — statistically significant (p < 0.05) and consistent across 18 of the last 26 years.
+
+The public moved in the opposite direction. Between 2014 and 2019, while the CSI declined, the share of BC residents who told the General Social Survey that crime had increased jumped from 30% to 42% — a 12-point swing against a falling trend. That perception is factually incorrect at the aggregate level. It persists for five specific, data-traceable reasons, each with an operational corrective.
 
 | Year | "Crime increased" | "About the same" |
 |---|---|---|
@@ -182,35 +184,53 @@ The perception-reality gap widened between 2014 and 2019:
 | 2014 | 30% | 48% |
 | 2019 | 42% | 41% |
 
-Figure 31 overlays the perception data against actual CSI, making the divergence visible.
-
 ![Figure 31: Perception vs. reality — 42% believe crime is rising while CSI remains below its peak](outputs/charts/q5_perception_vs_reality.png)
 
-From 2009 to 2014, perception tracked reality: crime fell and fewer people believed it was rising. From 2014 to 2019, crime stabilized or rose slightly while perceived increase jumped 12 percentage points. The gap isn't a simple case of public ignorance — five concrete mechanisms explain why reasonable people reach the wrong conclusion from accurate observations.
+### Five causes of the perception gap — and the corrective for each
 
-### Why the gap exists
+The causes progress from how the data is presented (#1-2) to how the system performs (#3) to what the data fails to capture (#4-5). Each has an operational fix.
 
-**1. The visibility paradox.** The crimes people witness are rising. Shoplifting (+79 per 100,000) happens in plain sight — in grocery stores, pharmacies, transit stations. The crimes driving the aggregate decline are invisible non-events: a car that wasn't broken into (theft from vehicles: -772/100k, Figure 12), a house that wasn't burglarized. People form perceptions from what they see, not from Statistics Canada tables. A resident who watches someone walk out of a store with unpaid goods every week has a rational basis for believing crime is getting worse. Their observation is accurate. The aggregate trend they infer from it is not.
+**1. The CSI aggregation conceals a violent-crime crossover.** Violent CSI has climbed since 2014; non-violent CSI has fallen (Figure 2). The aggregate drops because property crime's decline is larger in magnitude, but residents are responding to the component that matters more to personal safety: violent offences are getting worse. The single-number CSI buries this signal.
 
-**2. The compositional paradox.** People sensing "crime is getting worse" are partially right. Violent CSI has been climbing since 2014 (Figure 2) — assaults, threats, and weapons offences are genuinely increasing. The headline CSI falls only because property crime's massive decline masks the violent crossover. The public's intuition picks up the shift toward more serious offences; the aggregate statistic buries it under a falling total. When someone says "crime feels worse," they may be responding to the violent trend that the headline number conceals.
+*Corrective:* Report violent and non-violent CSI separately — the single-number index misleads when its components move in opposite directions.
 
-**3. The resolution gap.** Seven in ten property crimes go unresolved — clearance rates sit below 30% (Figures 17-18). When a resident reports a bike theft, a car break-in, or a package stolen from their porch and nothing happens, they conclude the system isn't working. That conclusion is accurate. From there, inferring that crime must be worsening is a short step. Low clearance doesn't just fail victims — it erodes the credibility of the statistics that claim crime is falling. Why trust the numbers from a system that can't solve your case?
+**2. Rising crimes are visible; declining crimes are not.** Shoplifting rose 79 per 100,000 (Figure 16) — visible in stores, pharmacies, and transit daily. The crimes driving the decline are non-events: 772 fewer vehicle thefts and 270 fewer break-ins per 100,000 (Figure 12) produce no observable signal. The public's sample of crime is structurally biased toward the rising categories.
 
-**4. Locally rational perception.** Residents of Chilliwack (11,352/100k) and Kamloops (10,546/100k) live with crime rates roughly 2x Vancouver's (5,438/100k) (Figure 26). For them, crime IS high — their daily experience matches a genuinely elevated local reality, even if the provincial aggregate is declining. The General Social Survey is provincial, so these voices get averaged into a misleading provincial mean. A Kamloops resident who says "crime is rising" may be reporting their environment accurately; the statistic that says otherwise reflects a provincial average dominated by lower-crime coastal populations.
+*Corrective:* Publish a quarterly scorecard pairing rising and declining categories side by side. Lead with the ratio: "For every 1 additional shoplifting incident per 100,000, there were 10 fewer vehicle thefts."
 
-**5. Signal crimes and visible disorder.** Certain crimes reshape perception far beyond their statistical weight. A single violent assault in a neighbourhood communicates more threat than 100 fewer car break-ins. Visible social disorder — open drug use, encampments, aggressive panhandling — functions as a signal that "things are getting worse" even when these aren't Criminal Code offences captured in the CSI. BC's interior communities sit at the intersection of the opioid crisis, housing precarity, and concentrated homelessness. Residents in these areas experience a daily environment of disorder that the crime statistics don't measure but their perception registers. In criminology, these are called "signal crimes" (Innes, 2004) — events or conditions that communicate risk disproportionately to their actual prevalence.
+**3. A 70% unsolved rate destroys trust in the data source.** Property crime clears below 30% (Figures 17-18). This rate has not improved in twenty years despite sustained budget increases. When the institution that produces the crime statistics cannot resolve 7 in 10 reported cases, the public has a rational basis for discounting its claim that crime is falling. The credibility problem is institutional, not informational.
 
-### Confidence and reporting compound the gap
+*Corrective:* Implement closed-loop case reporting. Every filed report receives a status update within 30 days — resolution, referral, or explicit closure with reason. Silence after a report is the single most corrosive factor for public trust.
+
+**4. Provincial averages erase locally high crime.** Chilliwack (11,352/100k) and Kamloops (10,546/100k) face per-capita rates 2x Vancouver's 5,438 (Figure 26). For these communities, the claim "crime is falling" does not match daily reality. The provincial GSS average combines their experience with lower-crime coastal populations, producing a number that misleads both groups.
+
+*Corrective:* Publish jurisdiction-level dashboards and allocate resources proportional to per-capita rates. Interior communities systematically receive less than their crime burden warrants under volume-based formulas.
+
+**5. Visible disorder drives perception but falls outside the CSI.** Open drug use, encampments, and aggressive panhandling are not Criminal Code offences and do not appear in the CSI. In opioid-affected interior communities, they dominate daily experience. The CSI was not designed to capture disorder, and the public was never told this.
+
+*Corrective:* Create a "community disorder index" from police calls for service (wellness checks, trespass, mischief) and publish it alongside the CSI — separating what the public observes from what the Criminal Code captures.
+
+### Low confidence and underreporting lock the gap in place
 
 ![Figure 32: Confidence in police by province — BC's middling confidence mirrors the national pattern](outputs/charts/q5_confidence_by_province.png)
 
-Confidence in police is middling. In 2019, 30% of BC residents reported "a great deal of confidence," 47% "some confidence," 17% "not very much," and 5% "none at all" — closely mirroring the national distribution (32%/46%/15%/5%). Middling confidence reinforces the perception gap: residents who don't trust police also don't trust police-reported statistics.
-
-The reporting rate gap (Figure 33) adds a structural layer. When only 6% of sexual assaults reach police but 60% of motor vehicle thefts do, the statistical record reflects a heavily filtered version of reality. A victim of unreported assault knows their experience is real regardless of whether it appears in the data. Multiply this across the 71% of victimizations that go unreported nationally, and the gap between lived experience and official statistics becomes not just explainable but inevitable.
+Only 30% of BC residents report "a great deal of confidence" in police (2019 GSS), with 47% at "some," 17% "not very much," and 5% "none" — tracking the national distribution (32%/46%/15%/5%). The parallel with clearance rates is striking: property crime clears below 30% (Figures 17-18), and only 30% of the public has strong confidence in the institution producing the crime data. Low clearance and low confidence form a feedback loop — unresolved cases erode trust, eroded trust makes the public discount statistics showing improvement.
 
 ![Figure 33: Reporting rates by crime type — from 6% (sexual assault) to 60% (motor vehicle theft)](outputs/charts/q5_reporting_rates.png)
 
-The perception-reality gap is not a communication failure to be solved with better dashboards alone. It reflects a genuine disconnect between what the statistics measure (police-reported Criminal Code offences, severity-weighted) and what people experience (visible disorder, unsolved cases, rising violence in their community, unreported victimization). Bridging the gap requires not just publishing data, but addressing the underlying conditions — clearance rates, visible disorder, local crime concentration — that make the public's distrust rational.
+Reporting rates range from 6% (sexual assault) to 60% (motor vehicle theft). Nationally, 71% of victimizations go unreported (2019 GSS). The statistics the public is asked to trust are built on a foundation where nearly three-quarters of crime never enters the system. The perception gap will persist until the data gap narrows.
+
+### Corrective action summary
+
+| Cause | Action | Measure of success |
+|---|---|---|
+| CSI aggregation hides violent crossover | Split reporting: violent + non-violent CSI | Public perception of violent trend aligns with data within 2 GSS cycles |
+| Visible-crime sampling bias | Quarterly scorecard pairing rising and declining categories | Media coverage references net change, not isolated categories |
+| Low clearance erodes trust | 30-day closed-loop case updates for all filed reports | Victim satisfaction survey scores rise; "great deal of confidence" exceeds 35% |
+| Provincial average masks interior rates | Jurisdiction-level dashboards; per-capita resource allocation | Interior per-capita rates decline toward provincial mean |
+| Disorder falls outside CSI | Separate community disorder index from calls for service | Public discourse distinguishes disorder from Criminal Code crime |
+
+The crime decline is real. The perception gap is not a failure of public intelligence — it is a failure of institutional communication, measurement scope, and case resolution. All five causes are addressable with existing data and operational changes. The question is not whether the public can be convinced that crime is falling; it is whether the institutions that produce the data can earn the credibility to be believed.
 
 ---
 
