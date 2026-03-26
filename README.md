@@ -1,6 +1,6 @@
 # British Columbia Crime Analysis (1998-2024)
 
-British Columbia's Crime Severity Index (CSI) declined 46% from its 1998 peak of 166.9 to 90.2 in 2014, with a further 7.4% year-over-year decrease in 2024, the second-largest provincial drop after Alberta (-8.5%). This analysis examines the full 1998-2024 CSI series alongside Statistics Canada and BC Government data, addressing five research questions across 42 charts and one interactive map. (The CSI series begins in 1998; other datasets, including provincial comparisons and General Social Survey perception data, begin in 2004.)
+British Columbia's Crime Severity Index (CSI) declined 46% from its 1998 peak of 166.9 to 90.2 in 2014, with a further 7.4% year-over-year decrease in 2024, the second-largest provincial drop after Alberta (-8.5%). This analysis examines the full 1998-2024 CSI series alongside Statistics Canada and BC Government data, addressing five questions across its charts and one interactive map. (The CSI series begins in 1998; other datasets, including provincial comparisons and General Social Survey perception data, begin in 2004.)
 
 > **Key findings:** Crime severity fell sharply over two decades, but the mix of crime types shifted toward violent offences after 2014. Interior communities such as Chilliwack and Kamloops register per-capita rates 1.9-2.1x Vancouver's. Between 2014 and 2019, public perception of rising crime grew from 30% to 42% despite declining aggregate statistics, a gap that five factors in the data help explain (see Section 5).
 
@@ -22,7 +22,7 @@ British Columbia's Crime Severity Index (CSI) declined 46% from its 1998 peak of
 
 ## Key Terms
 
-- **Crime Severity Index (CSI)**: A Statistics Canada measure weighting criminal incidents by the average sentence severity of each offence type (base year: 2006). Higher values indicate more severe crime profiles.
+- **Crime Severity Index (CSI)**: A Statistics Canada measure weighting criminal incidents by the average sentence length and incarceration rate for each offence type (base year: 2006). Higher values indicate more severe crime profiles.
 - **Crime rate**: The number of police-reported incidents per 100,000 population, unadjusted for severity.
 - **Clearance rate**: The proportion of reported incidents where police identified a suspect, whether or not charges were laid.
 - **Unfounded rate**: The proportion of incidents deemed, upon investigation, not to have occurred or not to constitute a criminal offence.
@@ -77,7 +77,7 @@ Second, the underreporting data points away from a reporting-driven decline. The
 
 ## 2. Property Crime Trends and Emerging Offence Categories
 
-Since the early 2000s, property crime declined steadily across all major violation types, constituting 51% of the total crime rate as of 2023. Across all crime categories, the largest absolute five-year changes were:
+Since the early 2000s, property crime declined steadily across all major violation types, making up 51% of total reported incidents as of 2023. Across all crime categories, the largest absolute five-year changes were:
 
 | Violation | 5-Year Change (per 100,000) |
 |---|---|
@@ -126,7 +126,7 @@ Clearance rates split sharply along crime-type lines. Violent crime clearance st
 
 Despite two decades of reforms, technology investment, and budget growth, property-crime clearance rates barely moved. The likeliest explanation is a structural ceiling: the volume and low individual value of property offences may render case-by-case investigation uneconomical at current resource levels.
 
-Youth crime severity split from the adult trend after 2014. Youth CSI continued to decline while adult CSI stabilized or edged upward. Among candidate explanations, diversion programs have the strongest evidentiary backing: formal system contact for youth decreased concurrently with the expansion of extrajudicial measures (programs that divert youth from the formal court system into community-based interventions). Declining youth population share may also contribute, though it does not fully account for the magnitude of the youth-adult divergence.
+Youth crime severity split from the adult trend after 2014. Youth CSI continued to decline while adult CSI stabilized or edged upward. Among candidate explanations, diversion programs are the most commonly cited explanation: formal system contact for youth decreased concurrently with the expansion of extrajudicial measures (programs that divert youth from the formal court system into community-based interventions). Declining youth population share may also contribute, though it does not fully account for the magnitude of the youth-adult divergence.
 
 ![Youth vs. adult CSI divergence: youth crime continues declining while adult crime stabilizes](outputs/charts/q3_youth_vs_adult_csi.png)
 
@@ -138,7 +138,7 @@ RCMP detachments and municipal forces followed different trajectories, a distinc
 
 ### Policing Expenditure Trends
 
-Spending rose as crime fell. Over the 2018-2023 period for which expenditure data is available, police budgets in BC expanded in both nominal and real (constant 2020 dollar) terms, with salary and benefits growth outpacing operating and capital expenditure. Over the period for which expenditure data is available (2018-2023), BC's population rose 10.4% from 5,000,879 to 5,519,913.
+Spending rose as crime fell. Over the 2018-2023 period for which expenditure data is available, police budgets in BC expanded in both nominal and real (constant 2020 dollar) terms, with salary and benefits growing faster than operating and capital spending. Over the period for which expenditure data is available (2018-2023), BC's population rose 10.4% from 5,000,879 to 5,519,913.
 
 ![BC policing expenditure: nominal and inflation-adjusted, both rising](outputs/charts/q3_bc_expenditure_trend.png)
 
@@ -241,7 +241,7 @@ Reporting rates ranged from 6% (sexual assault) to 60% (motor vehicle theft). Na
 
 **2. Rebalance resources toward interior communities.** Adopt the composite ranking (60% volume, 40% trend) as an input to funding formulas. Per-capita rates in interior CMAs are 1.9-2.1x coastal rates, and the gap widened over the study period.
 
-**3. Reassess the balance between property and violent crime investigation.** Property crime clears in the 12-16% range regardless of resource allocation, while violent crime clearance has dropped 21 points since 2014. Whether redeploying capacity from property to violent crime would reverse the clearance decline requires further study, but the current allocation warrants review.
+**3. Reassess the balance between property and violent crime investigation.** Property crime clears in the 12-16% range regardless of resource allocation, while violent crime clearance has dropped 21 points since 2014. It is unclear whether shifting resources from property to violent crime investigation would reverse the clearance decline, but the current balance warrants review.
 
 **4. Address the perception-reality gap.** Publish quarterly plain-language dashboards with total and component breakdowns by community. The 12-percentage-point increase in perceived crime (30% to 42%, 2014-2019) occurred during a period of declining CSI.
 
