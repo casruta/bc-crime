@@ -1,6 +1,6 @@
-# British Columbia Crime Analysis (1998-2024)
+# British Columbia Crime Analysis (2004-2024)
 
-British Columbia's Crime Severity Index (CSI) declined 46% from its 1998 peak of 166.9 to 90.2 in 2014, with a further 7.4% year-over-year decrease in 2024, the second-largest provincial drop after Alberta (-8.5%). This analysis examines the full 1998-2024 CSI series alongside Statistics Canada and BC Government data, addressing five research questions across 42 charts and one interactive map.
+British Columbia's Crime Severity Index (CSI) declined 46% from its 1998 peak of 166.9 to 90.2 in 2014, with a further 7.4% year-over-year decrease in 2024, the second-largest provincial drop after Alberta (-8.5%). This analysis examines 20 years of Statistics Canada and BC Government data across five research questions, producing 42 charts and one interactive map.
 
 > **Key findings:** Crime severity fell sharply over two decades, but the composition shifted toward violent offences after 2014. Interior communities register per-capita rates 1.9-2.1x those of coastal cities. Between 2014 and 2019, public perception of rising crime grew from 30% to 42% despite declining aggregate statistics, a gap traceable to five measurement and communication failures.
 
@@ -32,11 +32,11 @@ British Columbia's Crime Severity Index (CSI) declined 46% from its 1998 peak of
 
 ## 1. Crime Severity Has Declined, but the Composition Has Shifted
 
-Crime in BC is falling. The Crime Severity Index dropped from a peak of 166.9 in 1998 to 90.2 in 2014, a 46% reduction. A further 7.4% decline followed in 2024, the second-largest year-over-year provincial drop after Alberta (-8.5%). Of the 26 year-over-year changes between 1998 and 2024, 18 were declines and 8 were increases. Linear regression corroborates the downward trend (p < 0.05).
+Crime in BC is falling. The Crime Severity Index dropped from a peak of 166.9 in 1998 to 90.2 in 2014, a 46% reduction. A further 7.4% decline followed in 2024, the second-largest year-over-year provincial drop after Alberta (-8.5%). Over the full 1998-2024 series, 18 of 26 year-over-year intervals posted declining rates. Linear regression corroborates the downward trend (p < 0.05).
 
 ![BC Crime Severity Index: 46% decline from 1998 peak (166.9) to 2014 trough (90.2), continued decline through 2024](outputs/charts/q1_bc_csi_trend.png)
 
-After 2014, the compositional pattern decoupled from the aggregate trend. Violent crime severity rose while non-violent severity continued to contract. The aggregate index kept falling only because property crime's absolute decline outweighed the upward movement in violent offences. On average across the series, BC's CSI ran approximately 21% above the national figure.
+After 2014, the compositional pattern decoupled from the aggregate trend. Violent crime severity rose while non-violent severity continued to contract. The aggregate index kept falling only because property crime's absolute decline outweighed the upward movement in violent offences. Throughout the 20-year series, BC's CSI remained approximately 21% above the national average.
 
 ![Violent CSI trending upward since 2014 while non-violent CSI continues to decline](outputs/charts/q1_violent_nonviolent_gap.png)
 
@@ -64,7 +64,7 @@ BC Government data at the jurisdiction level corroborate the same pattern throug
 
 ## 2. Property Crime Trends and Emerging Offence Categories
 
-Since the early 2000s, property crime declined steadily across all major violation types, constituting 51% of the total crime rate as of 2023. Across all crime categories, the largest absolute five-year changes were:
+Since the early 2000s, property crime declined steadily across all major violation types, constituting 51% of the total crime rate as of 2023. Over five years, the largest absolute changes were:
 
 | Violation | 5-Year Change (per 100,000) |
 |---|---|
@@ -105,7 +105,7 @@ While violent crime's absolute rate remained relatively stable, its share of tot
 
 ## 3. Clearance Rates, Youth Crime, and Policing Costs
 
-Clearance rates split sharply along crime-type lines. Violent crime clearance stood at 58.4% in 2014 but fell to 37.4% by 2024, a 21-percentage-point erosion that coincided with rising caseload complexity and staffing constraints. Property crime clearance remained in the 12-16% range throughout the study period: roughly 85% of reported property offences went unresolved across two decades.
+Clearance rates split sharply along crime-type lines. Violent crime clearance, historically above 50%, fell to 37.4% by 2024, a 21-percentage-point erosion from its 2014 level that coincided with rising caseload complexity and staffing constraints. Property crime clearance remained in the 12-16% range throughout the study period: roughly 85% of reported property offences went unresolved across two decades.
 
 ![Clearance rate trends: violent crime clearance declining from above 50% toward 37%; property crime stable at 12-16%](outputs/charts/q3_clearance_rate_trends.png)
 
@@ -131,7 +131,7 @@ But neither of the two leading alternative explanations found support in the dat
 
 ### Policing Expenditure Trends
 
-Spending rose as crime fell. Police budgets in BC expanded in both nominal and real (constant 2020 dollar) terms over the study period, with salary and benefits growth outpacing operating and capital expenditure. Over the period for which expenditure data is available (2018-2023), BC's population rose 10.4% from 5,000,879 to 5,519,913.
+Spending rose as crime fell. Police budgets in BC expanded in both nominal and real (constant 2020 dollar) terms over the study period, with salary and benefits growth outpacing operating and capital expenditure. BC's population rose 10.4% from 5,000,879 in 2018 to 5,519,913 in 2023.
 
 ![BC policing expenditure: nominal and inflation-adjusted, both rising](outputs/charts/q3_bc_expenditure_trend.png)
 
