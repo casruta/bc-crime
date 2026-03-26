@@ -1,0 +1,5 @@
+iteration	target	hypothesis	composite_before	composite_after	delta	decision	reason	mode	research_findings	research_approved	reader_annotations	voice_audit_count	synonym_applied	synonym_rejected
+0	baseline	n/a	0	5.15	5.15	baseline	initial scoring	regular	none	none	0	0	0	0
+1	factual_accuracy	Fix 3 factual errors, add structure, vary AI patterns, apply synonyms	5.15	5.95	0.80	keep	All 6 dimensions improved; factual errors corrected	regular	none	none	8	6	13	2
+2	factual_accuracy	Remove fabricated 83.5 CSI value	5.95	6.20	0.25	keep	Eliminated self-introduced error	regular	none	none	0	0	0	0
+3	analytical_depth	Strengthen 3 weak analytical passages with so-what framing	6.20	6.40	0.20	keep	Added policy implications and specificity	regular	none	none	0	0	0	0
