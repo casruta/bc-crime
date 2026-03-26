@@ -1,0 +1,6 @@
+iteration	target	hypothesis	composite_before	composite_after	delta	decision	reason	mode	research_findings	research_approved
+0	baseline	Initial NYT rewrite with perception gap lede	0	5.15	5.15	keep	baseline anchored at 4-6 range	regular	none	none
+1	narrative_pull	Narrative thread: perception gap as mystery, sections as clues, closing payoff	5.15	5.40	0.25	keep	opening hook + connective tissue between sections	regular	none	none
+2	data_integration+audience	Finding-first chart intros; natural-language CSI alternates; sentence rhythm variation	5.40	5.85	0.45	keep	ratio framing + short punches + alternates	regular	none	none
+3	structure	Point-first paragraphs; compress recommendations 40%	5.85	6.00	0.15	keep	paragraphs lead with findings; recommendations tightened	regular	none	none
+4	narrative_pull	Concrete scene-setting hook (Chilliwack); closing verdict separated from kicker	6.00	6.25	0.25	keep	arc from scene to payoff; closing conviction	regular	none	none
