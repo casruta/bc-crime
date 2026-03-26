@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="banner.png" alt="BC CRIME" width="100%">
+</p>
+
 # British Columbia Crime Analysis (1998-2024)
 
 Crime in British Columbia has fallen steadily for more than two decades. The Crime Severity Index (CSI) dropped 46% from its 1998 peak of 166.9 to 90.2 by 2014, and continued to decline through 2024, when it posted a 7.4% year-over-year decrease (the second-largest provincial drop, after Alberta's 8.5%).
