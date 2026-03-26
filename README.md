@@ -1,54 +1,50 @@
 # British Columbia Crime Analysis
 
-> **Bottom line:** Crime in British Columbia fell 46% over two decades. Yet 42% of residents believe it's getting worse. The data points to five reasons for the gap, and all of them are fixable.
+> **Summary:** The Crime Severity Index (CSI) in British Columbia declined 46% from its 2003 peak of 166.9 to 90.2 in 2014, with a further 7.4% decrease recorded in 2024. Despite this sustained decline, violent crime's share of total severity has increased since 2014. Interior communities such as Chilliwack (11,352 per 100,000) and Kamloops (10,546 per 100,000) report per-capita crime rates 2.1x and 1.9x Vancouver's rate (5,438 per 100,000) respectively. General Social Survey data indicates that 42% of BC residents perceived crime as increasing in 2019, a finding inconsistent with aggregate trends but consistent with five identifiable measurement and communication gaps.
 
 ---
 
-In Chilliwack, a city of 100,000 in BC's Fraser Valley, residents are twice as likely to experience crime as their neighbours in Vancouver. In Kamloops, the rate is nearly as high. Yet when the province releases its annual crime report, the headline reads the same way it has for two decades: crime is falling.
+This analysis examines 20 years of Statistics Canada data across five research questions: whether crime is rising in BC, what types of crime are changing, how effectively the justice system addresses crime, where crime is geographically concentrated, and why public perception diverges from statistical trends. The analysis draws on six Statistics Canada tables and four BC Government justice appendices, producing 42 charts and one interactive map.
 
-It is. The province's Crime Severity Index, a single score that weights every offence by the average sentence it carries, peaked at 166.9 in 2003 and has since fallen 46%. But ask British Columbians whether crime is getting worse, and 42% will say yes.
+## 1. Crime Severity Has Declined, but the Composition Has Shifted
 
-Nearly half the province believes the opposite of what the data shows. That's not ignorance. It's that the single-number headline conceals a more complicated story: a compositional shift toward violent crime, a geographic divide that puts interior communities at double the rate of coastal cities, and a justice system that can't clear 7 in 10 property crimes. Each of these threads feeds the gap between what the data says and what the public feels. What follows traces each one through 20 years of Statistics Canada data and 42 charts.
-
-## 1. Crime Is Falling, but the Mix Is Getting Worse
-
-The headline number is clear. BC's crime severity index dropped from 166.9 in 2003 to 90.2 by 2014 -- a 46% decline. It fell another 7.4% in 2024, the second-largest provincial drop after Alberta's 8.5%. Over the full series, BC posted 18 declining years against 8 increasing ones. The downward trend is statistically significant (p < 0.05).
+BC's Crime Severity Index declined from a peak of 166.9 in 2003 to 90.2 in 2014, a 46% reduction. The index decreased a further 7.4% in 2024, the second-largest year-over-year provincial decline after Alberta (-8.5%). Over the full 1998-2024 series, 18 years recorded declining crime rates against 8 years of increases. Linear regression confirms the downward trend is statistically significant (p < 0.05).
 
 ![Figure 1: BC Crime Severity Index -- peak of 166.9 in 2003, 46% decline to 90.2 by 2014, continued decline in 2024](outputs/charts/q1_bc_csi_trend.png)
 
-But the composition tells a different story. Since 2014, the violent component of the index has been climbing while the non-violent component falls. The overall score keeps dropping because property crime's decline is larger in absolute terms. Underneath, a crossover is underway: the crimes that scare people most are getting worse.
+The compositional pattern diverges from the aggregate trend. Since 2014, the violent component of the CSI has increased while the non-violent component has continued to decline. The aggregate index continued to fall because property crime's decline was larger in absolute terms, masking the upward movement in violent crime severity (Figure 2). BC's CSI remained approximately 21% above the national average throughout the 20-year series.
 
 ![Figure 2: Violent CSI rising while non-violent CSI falls -- the crossover that the headline number hides](outputs/charts/q1_violent_nonviolent_gap.png)
 
-The year-over-year record drives the point home: 18 years of decline against 8 of increase, with the most recent year posting a 7.4% drop.
+Year-over-year data show 18 declining years against 8 increasing, with the most recent year (2024) recording a 7.4% decrease (Figure 3).
 
 ![Figure 3: BC year-over-year crime rate changes -- 18 declining years vs. 8 increasing](outputs/charts/q1_bc_yoy_trend.png)
 
-This isn't a BC-specific trend. Saskatchewan runs at roughly 2x Ontario's rate, but every province follows the same downward arc. Index every province to 2004 = 100 and the lines converge. The decline is structural -- driven by demographics, urbanization, and enforcement philosophy -- not by any single province's policy.
+The decline was not specific to British Columbia. All comparison provinces exhibited converging downward trajectories when indexed to 2004 = 100 (Figures 4-5). Saskatchewan maintained rates approximately 2x Ontario's, but the directional trend was consistent across jurisdictions. This pattern suggests structural factors -- demographic shifts, urbanization, changes in enforcement philosophy -- rather than jurisdiction-specific policy as the primary drivers.
 
 ![Figure 4: Provincial crime rate comparison -- BC consistently above the national average](outputs/charts/q1_provincial_comparison.png)
 
 ![Figure 5: Indexed provincial growth (2004 = 100) -- all provinces converge downward](outputs/charts/q1_indexed_provincial_growth.png)
 
-One gap stands out. BC sits 21% above the national average, and that gap has persisted for the entire 20-year series regardless of whether crime was rising or falling. BC's 7.4% year-over-year decline ranks second among provinces, behind Alberta's 8.5%.
+The BC-Canada gap persisted across the full series (Figure 6). BC's 7.4% year-over-year decline ranked second among provinces (Figure 7).
 
 ![Figure 6: BC-Canada crime rate gap -- persistent across two decades](outputs/charts/q1_bc_canada_gap.png)
 
 ![Figure 7: Year-over-year change by province -- BC's 7.4% drop is second-largest](outputs/charts/q1_yoy_by_province.png)
 
-Not all offences contribute equally. A small cluster of violations carries most of the weight in the severity index, and therefore most of the leverage for policy.
+Figure 8 presents the contribution of individual offence types to BC's overall CSI. A small number of violations accounted for the majority of the index weight, identifying the offence categories with the greatest leverage for policy intervention.
 
 ![Figure 8: CSI contribution by violation type -- which offences drive BC's overall severity index](outputs/charts/q1_csi_contribution.png)
 
-BC Government data confirms the pattern at the most recent granularity.
+BC Government data confirm the pattern at the most recent available granularity.
 
 ![BC Government year-over-year comparison, 2022-2023](outputs/charts/q2_bcgov_yoy_2022_2023.png)
 
-One caveat: the severity index weights offences by average sentence length. When a Criminal Code revision reclassifies an act to a more serious category, the index rises even if the underlying behaviour hasn't changed. Post-2019 amendments to domestic violence and sexual assault definitions may account for some of the violent-crime increase.
+**Caveat:** The CSI weights offences by average sentence severity. Criminal Code revisions that reclassify an act to a more serious category increase the index even if the underlying behaviour is unchanged. Post-2019 amendments to domestic violence and sexual assault definitions may account for some of the observed increase in violent crime severity.
 
-## 2. Property Crime Is Collapsing; Two Categories Are Surging
+## 2. Property Crime Trends and Emerging Offence Categories
 
-Property crime is collapsing. It still accounts for 51% of total crime, but the five-year drops tell the story:
+Property crime declined steadily from the early 2000s across all major violation types. As of the most recent data, property offences accounted for 51% of the total crime rate. Five-year absolute changes for selected violations were as follows:
 
 | Violation | 5-Year Change (per 100,000) |
 |---|---|
@@ -57,67 +53,65 @@ Property crime is collapsing. It still accounts for 51% of total crime, but the 
 | Theft under $5,000 | -221 |
 | Disturb the peace | -165 |
 
-Those are large numbers. To put them in context: the 772-per-100,000 decline in vehicle theft alone is roughly 10x the size of the shoplifting increase that dominates headlines.
+The 772 per 100,000 decline in theft from vehicles was the largest absolute decrease of any violation type. By comparison, shoplifting increased by 79 per 100,000 over the same period.
 
 ![Figure 9: Crime composition over time -- property crime's share shrinking as violent crime's share grows](outputs/charts/q2_stacked_composition.png)
 
 ![Figure 10: Current composition shares -- property crime still dominates at 51% but is declining](outputs/charts/q2_composition_shares.png)
 
-The heatmap makes the shift visible at a glance: property violations cool from red to blue over time while violent types hold steady. The bar chart below it ranks the largest absolute changes.
+The violation-level heatmap (Figure 11) displays intensity patterns across crime types and years. Figure 12 ranks violations by absolute change magnitude.
 
 ![Figure 11: Property violations cool from red to blue over time while violent types hold steady](outputs/charts/q2_heatmap.png)
 
 ![Figure 12: Largest absolute changes in crime rate -- theft from vehicles leads all declines at -772/100k](outputs/charts/q2_top_changes.png)
 
-That vehicle-theft decline is the single largest drop of any violation. The likely drivers: better car security, fewer valuables left visible, contactless payment reducing the cash people carry, and pandemic-era remote work keeping more eyes on parked cars.
+Factors associated with the vehicle-theft decline include improved vehicle security technology, reduced visibility of valuables, increased contactless payment adoption, and pandemic-era remote work patterns.
 
-Two categories bucked the trend. Child pornography offences rose by 82 per 100,000 and shoplifting by 79. The child exploitation increase almost certainly reflects expanded digital investigation capacity -- ICAC task forces, automated hash-matching, mandatory platform reporting -- rather than more offending. The shoplifting rise is harder to parse: genuine behavioural change, reduced store staffing, and lower prosecution thresholds all play a role.
+Two violation categories increased against the overall trend. Child pornography offences rose by 82 per 100,000 and shoplifting by 79 per 100,000. The child exploitation increase is consistent with expanded digital investigation capacity (ICAC task forces, automated hash-matching, mandatory platform reporting) rather than a prevalence increase. The shoplifting increase has multiple potential explanations: behavioural change, reduced retail security staffing, and changes to prosecution thresholds have each been identified as contributing factors.
 
 ![Figure 13: Violation trajectories diverge -- property types slope down while exploitation and shoplifting climb](outputs/charts/q2_slope_ranking.png)
 
 ![Figure 14: Property crime's CAGR is negative while other categories are flat or positive](outputs/charts/q2_category_cagr.png)
 
-The two charts below isolate the individual violations. The spotlight zeroes in on the fastest-growing types.
+Figure 15 displays individual violation trajectories over the study period. Figure 16 isolates the fastest-growing violation types, with child exploitation and shoplifting recording the largest absolute increases.
 
 ![Figure 15: Theft from vehicles plunges while shoplifting and exploitation climb -- individual violation trajectories](outputs/charts/q2_specific_violation_trends.png)
 
 ![Figure 16: The fastest-growing violations -- child exploitation and shoplifting lead absolute increases](outputs/charts/q2_rising_violations_spotlight.png)
 
-The net effect: violent crime's absolute rate is flat, but its share of total crime grows as the property-crime floor drops away. The compositional shift is statistically significant (p < 0.05).
+Violent crime's absolute rate remained relatively stable, but its share of total crime increased as property crime declined. The chi-squared test for crime-type composition across years was statistically significant (p < 0.05), confirming the compositional shift.
 
 ![BC Government year-over-year comparison by crime type, 2022-2023](outputs/charts/q2_bcgov_yoy_2022_2023.png)
 
-## 3. The Justice System Clears Violent Crime but Loses Property Crime
+## 3. Clearance Rates, Youth Crime, and Policing Costs
 
-Here's where the perception gap starts to make sense.
-
-Violent crime clears above 50%. Property crime clears below 30%. That means 7 in 10 property crimes go unresolved. These rates haven't budged in two decades.
+Clearance rates differed substantially by crime type. Violent crime cleared above 50%; property crime cleared below 30% (Figures 17-18). These rates remained stable over the 2004-2024 period, indicating that approximately 70% of reported property crimes went unresolved throughout the study period.
 
 ![Figure 17: Clearance rate trends -- violent crime stays above 50%, property crime stuck below 30%](outputs/charts/q3_clearance_rate_trends.png)
 
 ![Figure 18: Wide clearance variation -- some violations clear above 70% while others languish below 20%](outputs/charts/q3_clearance_by_violation.png)
 
-The stability is itself the finding. Twenty years of reforms, technology investment, and budget growth haven't moved the needle on property-crime resolution. The constraint appears structural: the sheer volume and low individual value of property offences make investigation uneconomical. This isn't a capacity gap waiting to be filled. It's a design limitation of the system.
+The persistence of low property-crime clearance rates across two decades of reforms, technology investment, and budget increases is consistent with a structural constraint hypothesis: the volume and low individual value of property offences may render case-by-case investigation uneconomical at current resource levels.
 
-Youth crime broke from the pattern. Youth severity kept declining after 2014 while adult severity rose or flattened. Three possible explanations: a shrinking youth population, diversion programs keeping cases out of the formal system, and generational behavioural shifts.
+Youth crime severity diverged from the adult trend after 2014 (Figure 19). Youth CSI continued to decline while adult CSI stabilized or increased. Of the candidate explanations, diversion programs are the most directly supported by the data: formal system contact for youth has decreased concurrently with the expansion of extrajudicial measures. Declining youth population share may also contribute, though it does not fully account for the magnitude of the divergence. Generational behavioural shifts remain plausible but are not independently testable with police-reported data alone.
 
 ![Figure 19: Youth vs. adult CSI divergence -- youth crime continues declining while adult crime stabilizes](outputs/charts/q3_youth_vs_adult_csi.png)
 
-The policing model matters too. RCMP detachments and municipal forces show different trajectories, and the COVID-19 dip of 2020, followed by a partial rebound, cuts across categories.
+RCMP detachments and municipal forces exhibited different crime trajectories (Figure 20). The COVID-19 pandemic produced a visible dip in 2020 followed by a partial rebound across categories (Figure 21).
 
 ![Figure 20: RCMP detachments and municipal forces show different crime trajectories](outputs/charts/q3_rcmp_vs_municipal.png)
 
 ![Figure 21: COVID-19 impact -- the 2020 dip and post-pandemic rebound across crime categories](outputs/charts/q3_covid_impact.png)
 
-Two alternative explanations for the overall decline don't hold up. Unfounded rates have stayed stable, so police aren't simply reclassifying more incidents as non-crimes. And the underreporting pattern runs the wrong way: property crime, reported at higher rates (~35%), declined more steeply than violent crime (~24% reported). If the decline were just people reporting less, the more-reported category should fall more slowly. The opposite happened.
+Two alternative explanations for the overall decline were not supported by the data. Unfounded rates remained stable (Figure 22), indicating that police reclassification of incidents did not drive the decline. The underreporting pattern was inconsistent with a reporting-driven decline (Figure 23): property crime, reported at higher rates (~35%), declined more steeply than violent crime (~24% reported).
 
 ![Figure 22: Unfounded rates stable over time -- ruling out reclassification as a driver of decline](outputs/charts/q3_unfounded_rates.png)
 
 ![Figure 23: Underreporting proxy analysis -- the pattern contradicts a reporting-driven decline](outputs/charts/q3_underreporting_proxies.png)
 
-### Policing costs are rising faster than crime is falling
+### Policing Expenditure Trends
 
-Spending kept climbing even as crime fell. Police budgets grew in both nominal and real terms while crime severity dropped. Salary and benefits growth outpaced operating and capital spending. BC's population grew 10.4% from 5.0 million in 2018 to 5.5 million in 2023, but the spending increase outpaced population growth.
+Police spending in BC increased in both nominal and real (constant 2020 dollar) terms while crime severity declined (Figures S1-S3). Salary and benefits growth outpaced operating and capital expenditure growth. BC's population increased 10.4% from 5,000,879 in 2018 to 5,519,913 in 2023.
 
 ![Figure S1: BC policing expenditure -- nominal vs. inflation-adjusted, both rising](outputs/charts/q3_bc_expenditure_trend.png)
 
@@ -125,7 +119,7 @@ Spending kept climbing even as crime fell. Police budgets grew in both nominal a
 
 ![Figure S3: CSI vs. expenditure -- spending rises while crime severity falls](outputs/charts/q3_csi_vs_expenditure.png)
 
-Where did the capacity go? The crimes-per-officer chart tells the story: declining crime volume didn't free up officers because expanding non-crime demands absorbed them. Police now respond to mental health crises, overdose calls, welfare checks, and social disorder -- work that doesn't generate Criminal Code incidents but consumes patrol hours.
+The crimes-per-officer metric (Figure S6) indicates that declining crime volume did not produce a proportional reduction in officer workload. This is consistent with expanding non-crime demands on police services, including mental health crisis response, overdose calls, welfare checks, and social disorder management.
 
 ![Figure S4: Expenditure breakdown -- salaries and benefits outpace operating and capital](outputs/charts/q3_expenditure_breakdown.png)
 
@@ -133,32 +127,28 @@ Where did the capacity go? The crimes-per-officer chart tells the story: declini
 
 ![Figure S6: Crimes per officer with CSI overlay -- declining crime hasn't reduced workload](outputs/charts/q3_crimes_per_officer.png)
 
-## 4. Crime Concentrates in the Interior, Not the Lower Mainland
+## 4. Geographic Distribution of Crime
 
-The crime map is not what most people think it is.
+Vancouver (~48,812 offences) and Surrey (~41,275) recorded the highest absolute crime volumes (Figure 24). However, per-capita rates were substantially higher in interior communities:
 
-Vancouver and Surrey dominate the headlines, and for good reason: Vancouver logged roughly 48,812 offences and Surrey roughly 41,275. But per-capita rates reverse the map entirely.
-
-| Community | Rate per 100,000 | vs. Vancouver |
+| Community | Rate per 100,000 | Ratio to Vancouver |
 |---|---|---|
 | Chilliwack | 11,352 | 2.1x |
 | Kamloops | 10,546 | 1.9x |
 | Vancouver | 5,438 | 1.0x |
 | Victoria | 5,283 | 0.97x |
 
-A resident of Chilliwack is twice as likely to experience crime as a resident of Vancouver. That's not a rounding error. It's a structural divide.
-
 ![Figure 24: Top 20 jurisdictions by total crime count -- Vancouver and Surrey dominate volume](outputs/charts/q4_top_jurisdictions.png)
 
 ![Figure 25: The 8 largest jurisdictions follow different trajectories -- some declining, others flat](outputs/charts/q4_jurisdiction_trends.png)
 
-The per-capita chart is where the interior-coastal divide becomes stark. And the gap is widening.
+Interior CMAs recorded per-capita rates 1.9-2.1x those of Vancouver (5,438/100k) and Victoria (5,283/100k) (Figure 26), and this gap widened over the study period (Figure 27).
 
 ![Figure 26: CMA per-capita crime rate -- interior communities at 2x the rate of coastal metros](outputs/charts/q4_cma_comparison.png)
 
 ![Figure 27: Interior CMA rates diverge upward from coastal CMAs over time](outputs/charts/q4_cma_trends.png)
 
-The divide isn't random. Interior communities share compounding risk factors: higher rates of homelessness and visible poverty, acute opioid-crisis exposure, seasonal tourism economies with transient populations, and reliance on RCMP detachments rather than dedicated municipal forces.
+Several factors are associated with the interior-coastal divide: higher rates of homelessness and visible poverty, acute opioid-crisis exposure, seasonal tourism economies with transient populations, and reliance on RCMP detachments rather than dedicated municipal police services. The relative contribution of each factor cannot be isolated from the available data.
 
 ![Figure 28: Some jurisdictions have disproportionately violent profiles relative to their total crime](outputs/charts/q4_total_vs_violent.png)
 
@@ -168,15 +158,13 @@ The divide isn't random. Interior communities share compounding risk factors: hi
 
 ![Regional crime rate comparison across BC](outputs/charts/q4_region_comparison.png)
 
-A composite ranking (60% standardized volume, 40% trend direction) classifies areas as high, moderate, or lower concern, pinpointing where intervention would yield the highest return.
+A composite ranking (60% standardized volume, 40% trend direction) classified areas as high, moderate, or lower concern to identify communities where intervention would yield the highest expected return.
 
 [Interactive jurisdiction map (HTML)](outputs/charts/q4_interactive_map.html)
 
-## 5. The Public Thinks Crime Is Rising. The Data Disagrees.
+## 5. Public Perception and Statistical Trends
 
-Now the pieces come together.
-
-Crime fell 46% and then another 7.4%. The data is police-reported, sentence-weighted, and statistically significant. Yet 42% of BC residents told the General Social Survey that crime had increased -- a 12-point swing from 30% in 2014 to 42% in 2019, running directly against the trend.
+Between 2014 and 2019, the share of BC residents who reported that crime had increased rose from 30% to 42% (General Social Survey), a 12-percentage-point increase occurring during a period of declining CSI. The aggregate perception was inconsistent with the statistical trend.
 
 | Year | "Crime increased" | "About the same" |
 |---|---|---|
@@ -186,92 +174,84 @@ Crime fell 46% and then another 7.4%. The data is police-reported, sentence-weig
 
 ![Figure 31: Perception vs. reality -- 42% believe crime is rising while CSI remains below its peak](outputs/charts/q5_perception_vs_reality.png)
 
-That perception is factually wrong at the aggregate level. But it persists for five specific, data-traceable reasons. Each has a fix.
+Five data-traceable factors account for this divergence, each with an identified corrective measure.
 
-### Five causes of the perception gap, and the corrective for each
+### Five Factors Contributing to the Perception Gap
 
-The causes progress from how the data is presented (#1-2) to how the system performs (#3) to what the data fails to capture (#4-5).
+**1. CSI aggregation conceals compositional shifts.** The violent component of the CSI increased after 2014 while the non-violent component declined (Figure 2). The aggregate index fell because property crime's absolute decline was larger, but residents may respond to the violent-crime component, which is more salient to personal safety.
 
-**1. The severity index conceals a violent-crime crossover.** Violent severity has climbed since 2014; non-violent severity has fallen (Figure 2). The aggregate drops because property crime's decline is larger, but residents respond to the component that matters most to personal safety. The single-number index buries this signal.
+*Corrective:* Report violent and non-violent CSI components separately.
 
-*Corrective:* Report violent and non-violent severity separately. A single number misleads when its components move in opposite directions.
+**2. Increasing crime types are more visible than decreasing types.** Shoplifting increased by 79 per 100,000 (Figure 16) and is directly observable in retail settings. Offsetting declines -- 772 fewer vehicle thefts and 270 fewer break-ins per 100,000 (Figure 12) -- produce no observable signal. For every additional shoplifting incident per 100,000, approximately 10 vehicle thefts were averted.
 
-**2. Rising crimes are visible; declining crimes are not.** Shoplifting rose 79 per 100,000 (Figure 16) -- visible in stores, pharmacies, and transit daily. The crimes driving the decline are non-events: 772 fewer vehicle thefts and 270 fewer break-ins per 100,000 produce no observable signal. For every 1 additional shoplifting incident, there were 10 fewer vehicle thefts. The public never sees the 10.
+*Corrective:* Publish quarterly scorecards pairing increasing and decreasing crime categories.
 
-*Corrective:* Publish a quarterly scorecard pairing rising and declining categories side by side.
+**3. Low property-crime clearance rates may undermine institutional credibility.** Property crime clearance remained below 30% throughout the study period (Figures 17-18). When the institution reporting crime statistics does not resolve the majority of reported cases, the public may discount its aggregate claims.
 
-**3. A 70% unsolved rate destroys trust in the data source.** Property crime clears below 30% (Figures 17-18). This rate hasn't improved in twenty years. When the institution that produces the crime statistics can't resolve 7 in 10 reported cases, the public has a rational basis for discounting its claims.
+*Corrective:* Implement closed-loop case reporting with 30-day status updates for all filed reports.
 
-*Corrective:* Implement closed-loop case reporting. Every filed report gets a status update within 30 days: resolution, referral, or explicit closure with reason.
-
-**4. Provincial averages erase locally high crime.** Chilliwack (11,352/100k) and Kamloops (10,546/100k) face rates 2x Vancouver's 5,438 (Figure 26). For those communities, "crime is falling" doesn't match daily reality.
+**4. Provincial averages obscure jurisdiction-level variation.** Chilliwack (11,352/100k) and Kamloops (10,546/100k) recorded per-capita rates 2x Vancouver's 5,438 (Figure 26). For residents of these communities, provincial-level claims of declining crime may not reflect local experience.
 
 *Corrective:* Publish jurisdiction-level dashboards and allocate resources proportional to per-capita rates.
 
-**5. Visible disorder drives perception but falls outside the index.** Open drug use, encampments, and aggressive panhandling are not Criminal Code offences and don't appear in the severity index. In opioid-affected interior communities, they dominate daily experience. The index was never designed to capture disorder, and the public was never told this.
+**5. Visible disorder is not captured by the CSI.** Open drug use, encampments, and aggressive panhandling are not Criminal Code offences and do not appear in the CSI. In communities with acute opioid-crisis exposure, these phenomena may dominate daily experience.
 
-*Corrective:* Create a "community disorder index" from police calls for service (wellness checks, trespass, mischief) and publish it alongside the severity index.
+*Corrective:* Develop a community disorder index from police calls for service (wellness checks, trespass, mischief) and publish it alongside the CSI.
 
-### Low confidence and underreporting lock the gap in place
+### Confidence and Reporting Rates
 
 ![Figure 32: Confidence in police by province -- BC's middling confidence mirrors the national pattern](outputs/charts/q5_confidence_by_province.png)
 
-Only 30% of BC residents report "a great deal of confidence" in police (2019 GSS). The parallel with clearance rates is hard to miss: property crime clears below 30%, and only 30% of the public has strong confidence in the institution that produces the crime data. Low clearance and low confidence form a feedback loop: unresolved cases erode trust, and eroded trust makes the public discount statistics showing improvement.
+In the 2019 GSS, 30% of BC residents reported "a great deal of confidence" in police, with 47% reporting "some," 17% "not very much," and 5% "none." These figures tracked the national distribution (32%/46%/15%/5%). The 30% figure parallels the property-crime clearance rate, suggesting a potential relationship between case resolution and institutional confidence.
 
 ![Figure 33: Reporting rates by crime type -- from 6% (sexual assault) to 60% (motor vehicle theft)](outputs/charts/q5_reporting_rates.png)
 
-Reporting rates range from 6% (sexual assault) to 60% (motor vehicle theft). Nationally, 71% of victimizations go unreported. The statistics the public is asked to trust are built on a foundation where nearly three-quarters of crime never enters the system.
+Reporting rates ranged from 6% (sexual assault) to 60% (motor vehicle theft). Nationally, 71% of victimizations went unreported (2019 GSS).
 
-### Corrective action summary
+### Corrective Action Summary
 
-| Cause | Action | Measure of success |
+| Factor | Action | Measure of Success |
 |---|---|---|
-| Index aggregation hides violent crossover | Split reporting: violent + non-violent | Perception of violent trend aligns with data within 2 GSS cycles |
-| Visible-crime sampling bias | Quarterly scorecard pairing rising and declining categories | Media references net change, not isolated categories |
-| Low clearance erodes trust | 30-day closed-loop case updates for all filed reports | "Great deal of confidence" exceeds 35% |
-| Provincial average masks interior rates | Jurisdiction-level dashboards; per-capita resource allocation | Interior per-capita rates decline toward provincial mean |
-| Disorder falls outside the index | Separate community disorder index from calls for service | Public discourse distinguishes disorder from Criminal Code crime |
+| CSI aggregation conceals compositional shift | Report violent and non-violent CSI separately | Perception of violent trend aligns with data within 2 GSS cycles |
+| Visible-crime sampling bias | Quarterly scorecard pairing increasing and decreasing categories | Media coverage references net change |
+| Low clearance undermines credibility | 30-day closed-loop case updates for all filed reports | "Great deal of confidence" exceeds 35% |
+| Provincial average obscures local rates | Jurisdiction-level dashboards; per-capita resource allocation | Interior per-capita rates decline toward provincial mean |
+| Disorder outside CSI scope | Community disorder index from calls for service | Public discourse distinguishes disorder from Criminal Code crime |
 
 ---
 
-## What These Findings Mean
+## Implications
 
-Five priorities emerge from the data, in order of urgency.
+Five priorities emerge from the analysis.
 
-**1. Track the violent-crime crossover.** Report violent and non-violent severity separately in quarterly dashboards. Flag any quarter where the violent-to-total ratio exceeds the previous year's average. The compositional shift has been underway since 2014; every unmonitored year means resources stay allocated to a property-crime problem that's solving itself.
+**1. Monitor the violent-crime compositional shift.** Report violent and non-violent CSI separately in quarterly dashboards. The shift has been underway since 2014; resources remain allocated to declining property-crime categories.
 
-**2. Rebalance resources toward interior communities.** Adopt the composite ranking (60% volume, 40% trend) as an input to funding formulas. Conduct root-cause assessments in the top-5 ranked communities targeting housing, substance use, and economic precarity. Policing alone won't close a 2x per-capita gap; cross-ministry coordination is the minimum viable intervention.
+**2. Rebalance resources toward interior communities.** Adopt the composite ranking (60% volume, 40% trend) as an input to funding formulas. Per-capita rates in interior CMAs (Chilliwack: 11,352/100k; Kamloops: 10,546/100k) are 1.9-2.1x coastal rates (Vancouver: 5,438/100k), and the gap widened over the study period (Figure 27).
 
-**3. Redeploy property-crime investigation capacity.** Model the clearance-rate gain from shifting one detective from property to violent-crime investigation. Pilot in one high-crime interior jurisdiction; measure outcomes over 12 months before scaling. Each additional detective-hour on violent crime has a higher expected clearance yield than on property crime, which clears below 30% regardless.
+**3. Redeploy investigation capacity from property to violent crime.** Each additional investigator-hour on violent crime yields a higher expected clearance rate than on property crime, which clears below 30% regardless of resource allocation.
 
-**4. Close the perception-reality gap.** Publish a quarterly plain-language dashboard with total and violent/non-violent breakdowns by community. The 12-point jump in perceived crime increase (30% to 42%) occurred while the severity index sat below its historical peak. Left unchecked, this gap creates political pressure to respond to perceptions rather than evidence.
+**4. Address the perception-reality gap.** Publish quarterly plain-language dashboards with total and component breakdowns by community. The 12-percentage-point increase in perceived crime (30% to 42%, 2014-2019) occurred during a period of declining CSI.
 
-**5. Separate detection increases from prevalence increases.** For child exploitation, track case-initiation source (proactive tip vs. victim report) to test the detection-gain hypothesis. For shoplifting, compare incident reports against retail loss surveys. These two categories lead absolute increases (+82 and +79 per 100,000) but for opposite reasons, and misdiagnosis leads to misallocation in both directions.
-
----
-
-## What This Analysis Cannot Answer
-
-This analysis measures what the system records, not what occurs. Three questions remain structurally out of reach:
-
-1. **The true prevalence of crime.** With only 29% of victimizations reported nationally (2019 GSS), and reporting rates varying from 6% (sexual assault) to 60% (motor vehicle theft), the dark figure is large and unevenly distributed.
-
-2. **Causal drivers of the decline.** The 46% drop from 2003 to 2014 is well-documented but its causes are debated: demographic ageing, rising incarceration, improved security technology, economic conditions, and cultural shifts all contribute.
-
-3. **The effectiveness of specific interventions.** Clearance rates, cost trends, and staffing ratios describe system performance at the aggregate level. They can't attribute outcomes to specific programs or leadership decisions.
+**5. Distinguish detection increases from prevalence increases.** Child exploitation (+82/100k) and shoplifting (+79/100k) increased for different reasons. Misattribution leads to resource misallocation.
 
 ---
 
-## Methodology & Limitations
+## Limitations
+
+This analysis measures police-reported crime, not the true prevalence of criminal activity. Three questions remain structurally unaddressable:
+
+1. **True crime prevalence.** With 71% of victimizations unreported nationally (2019 GSS) and reporting rates ranging from 6% (sexual assault) to 60% (motor vehicle theft), trends in reported crime may partially reflect trends in reporting behaviour.
+
+2. **Causal drivers of the decline.** The 46% CSI reduction from 2003 to 2014 is documented but its causes remain debated: demographic ageing, incarceration trends, security technology, economic conditions, and cultural shifts all potentially contribute.
+
+3. **Effectiveness of specific interventions.** Aggregate clearance rates, expenditure trends, and staffing ratios cannot attribute outcomes to specific programs or policies.
+
+---
+
+## Methodology
 
 **Data sources:** Six Statistics Canada tables (35-10-0063-01, 35-10-0177-01, 18-10-0005-01, 35-10-0076-01, 35-10-0059-01, 35-10-0066/0068-01) and four BC Government justice appendices (F-I).
 
 **Key metrics:** Crime Severity Index (sentence-severity weighted, base 2006), crime rate per 100,000, clearance rate, unfounded rate, CAGR.
 
-**Limitations:** Police-reported data only: the "dark figure" of unreported crime (71% nationally per 2019 GSS) is not captured. COVID-19 distorts 2020-2021. Clearance does not equal conviction. Reporting rates range from 6% to 60% by crime type, creating structural blind spots no methodology can fully resolve.
-
----
-
-Crime in BC is falling. It has been for twenty years. The perception gap is not a failure of public intelligence; it is a failure of institutional communication, measurement scope, and case resolution. All five causes traced in this analysis are addressable with existing data and operational changes.
-
-The question is not whether the public can be convinced that crime is falling. It is whether the institutions that produce the data can earn the credibility to be believed.
+**Limitations:** Police-reported data only. COVID-19 distorted 2020-2021 data. Clearance does not equal conviction. Reporting rates range from 6% to 60% by crime type.

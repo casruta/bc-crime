@@ -1,0 +1,6 @@
+iteration	target	hypothesis	composite_before	composite_after	delta	decision	reason	mode	research_findings	research_approved
+0	baseline	Institutional rewrite stripping all editorial voice	0	5.70	5.70	keep	baseline	regular	none	none
+1	structure+depth	Finding-first leads; differentiate data-supported explanations	5.70	6.00	0.30	keep	S2/S3 finding-first; causal limits explicit	regular	none	none
+2	register	Neutral headings; remove editorial comparisons; consistent hedging	6.00	6.25	0.25	keep	headings descriptive; zero editorial framing	regular	none	none
+3	data_integration	Neutral post-chart observations	6.25	6.50	0.25	keep	charts have context + finding in neutral language	regular	none	none
+4	specificity	Exact ratios; figure references in implications	6.50	6.70	0.20	keep	"approximately 2x" replaced with exact rates	regular	none	none
