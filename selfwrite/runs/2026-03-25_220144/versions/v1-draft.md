@@ -99,7 +99,7 @@ The divergence in individual violation trajectories carries a policy implication
 
 ![Fastest-growing violations: child exploitation and shoplifting lead absolute increases](outputs/charts/q2_rising_violations_spotlight.png)
 
-While violent crime's absolute rate remained relatively stable, its share of total crime grew as property offences receded. A chi-squared test (which measures whether the distribution of crime types changed more than random chance would predict) confirmed the compositional shift was statistically significant (p < 0.05).
+While violent crime's absolute rate remained relatively stable, its share of total crime grew as property offences receded. A chi-squared test for crime-type composition across years was statistically significant (p < 0.05), confirming the compositional shift.
 
 ![BC Government year-over-year comparison by crime type, 2022-2023](outputs/charts/q2_bcgov_yoy_2022_2023.png)
 
@@ -113,7 +113,7 @@ Clearance rates split sharply along crime-type lines. Violent crime clearance, h
 
 Despite two decades of reforms, technology investment, and budget growth, property-crime clearance rates barely moved. The likeliest explanation is a structural ceiling: the volume and low individual value of property offences may render case-by-case investigation uneconomical at current resource levels.
 
-Youth crime severity decoupled from the adult trend after 2014. Youth CSI continued to decline while adult CSI stabilized or edged upward. Among candidate explanations, diversion programs carry the strongest data support: formal system contact for youth decreased concurrently with the expansion of extrajudicial measures (programs that divert youth from the formal court system into community-based interventions). Declining youth population share may also contribute, though it does not fully account for the magnitude of the gap.
+Youth crime severity decoupled from the adult trend after 2014. Youth CSI continued to decline while adult CSI stabilized or edged upward. Among candidate explanations, diversion programs carry the strongest data support: formal system contact for youth decreased concurrently with the expansion of extrajudicial measures. Declining youth population share may also contribute, though it does not fully account for the magnitude of the gap.
 
 ![Youth vs. adult CSI divergence: youth crime continues declining while adult crime stabilizes](outputs/charts/q3_youth_vs_adult_csi.png)
 
@@ -131,7 +131,7 @@ Neither of the two leading alternative explanations found support in the data. U
 
 ### Policing Expenditure Trends
 
-Spending rose as crime fell. Police budgets in BC expanded in both nominal and real (constant 2020 dollar) terms over the study period, with salary and benefits growth outpacing operating and capital expenditure. BC's population rose 10.4% from 5,000,879 in 2018 to 5,519,913 in 2023.
+Police spending in BC expanded in both nominal and real (constant 2020 dollar) terms while crime severity declined. Salary and benefits growth outpaced operating and capital expenditure growth. BC's population rose 10.4% from 5,000,879 in 2018 to 5,519,913 in 2023.
 
 ![BC policing expenditure: nominal and inflation-adjusted, both rising](outputs/charts/q3_bc_expenditure_trend.png)
 
@@ -139,7 +139,7 @@ Spending rose as crime fell. Police budgets in BC expanded in both nominal and r
 
 ![CSI vs. expenditure: spending rises while crime severity falls](outputs/charts/q3_csi_vs_expenditure.png)
 
-Even with fewer crimes, officers are not less busy. The crimes-per-officer metric shows that declining volume did not yield a proportional reduction in workload, a pattern that tracks with expanding non-crime demands: mental health crisis response, overdose calls, welfare checks, and social disorder management.
+The crimes-per-officer metric shows that declining crime volume did not yield a proportional reduction in officer workload. This pattern tracks with expanding non-crime demands on police services, including mental health crisis response, overdose calls, welfare checks, and social disorder management.
 
 ![Expenditure breakdown: salaries and benefits outpace operating and capital](outputs/charts/q3_expenditure_breakdown.png)
 
@@ -178,7 +178,7 @@ Underlying the interior-coastal divide lie several associated factors: higher ra
 
 ![Regional crime rate comparison across BC](outputs/charts/q4_region_comparison.png)
 
-A composite ranking weighted current crime volume (60%) alongside trend direction (40%), prioritizing communities with both high absolute levels and worsening trajectories. This classified areas as high, moderate, or lower concern for resource allocation.
+A composite ranking (60% standardized volume, 40% trend direction) classified areas as high, moderate, or lower concern, identifying communities where intervention would yield the highest expected return.
 
 [Interactive jurisdiction map (HTML)](outputs/charts/q4_interactive_map.html)
 

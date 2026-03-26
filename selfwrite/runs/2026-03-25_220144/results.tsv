@@ -1,0 +1,5 @@
+iteration	target	hypothesis	composite_before	composite_after	delta	decision	reason	mode	research_findings	research_approved	reader_annotations	voice_audit_count	synonym_applied	synonym_rejected
+0	baseline	n/a	0	6.40	6.40	baseline	carried from run 1	regular	none	none	0	0	0	0
+1	register_discipline+evidence	Vary openers, fix AI-tells, apply 8 synonyms, tighten chart refs	6.40	6.90	0.50	keep	All 3 target dimensions improved; 0 em-dashes	regular	none	none	8	7	8	0
+2	audience_calibration	Add inline definitions for chi-squared, extrajudicial, justify 60/40 ranking	6.90	7.00	0.10	keep	Last dimension lifted to 7	regular	none	none	0	0	0	0
+3	register_discipline	Add short punchy openers to break declarative monotony	7.00	7.00	0.00	keep	Cleaner at equal score; convergence plateau	regular	none	none	0	0	0	0
