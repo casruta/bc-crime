@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import numpy as np
 import pandas as pd
+from scipy.cluster.hierarchy import linkage, fcluster, dendrogram
 
 from src.analysis.theme import (
     FIGSIZE_DOUBLE,
@@ -805,6 +806,224 @@ def chart_violent_share_distribution(save_path: Path | None = None) -> tuple[plt
     return fig, narrative
 
 
+def _cluster_jurisdictions(jur: pd.DataFrame, n_clusters: int = 5):
+    """Ward's hierarchical clustering on crime-type proportions for latest year."""
+    latest_year = jur["year"].max()
+    latest = jur[jur["year"] == latest_year].copy()
+
+    # Pivot: rows = jurisdictions, columns = categories, values = proportions
+    pivot = latest.pivot_table(
+        index="policing_jurisdiction", columns="category", values="count", fill_value=0,
+    )
+    row_totals = pivot.sum(axis=1)
+    # Filter out jurisdictions with zero total
+    pivot = pivot[row_totals > 0]
+    row_totals = pivot.sum(axis=1)
+    proportions = pivot.div(row_totals, axis=0)
+
+    if len(proportions) < 3:
+        return None, None, None, proportions
+
+    # Ward's linkage on Euclidean distance of proportions
+    Z = linkage(proportions.values, method="ward", metric="euclidean")
+    n_clust = min(n_clusters, len(proportions) - 1)
+    clusters = fcluster(Z, t=n_clust, criterion="maxclust")
+
+    return Z, clusters, n_clust, proportions
+
+
+def chart_jurisdiction_clusters(
+    save_path: Path | None = None,
+) -> tuple[plt.Figure, str]:
+    """Dendrogram: Ward's hierarchical clustering of jurisdictions by crime-type profile."""
+    apply_theme()
+    jur = _load_jurisdiction()
+    Z, clusters, n_clusters, proportions = _cluster_jurisdictions(jur)
+
+    if Z is None:
+        fig, ax = plt.subplots(figsize=FIGSIZE_SINGLE)
+        ax.text(0.5, 0.5, "Insufficient data for clustering", ha="center", va="center")
+        narrative = "Insufficient jurisdiction data for hierarchical clustering."
+        if save_path:
+            save_fig(fig, str(save_path))
+        return fig, narrative
+
+    fig, ax = plt.subplots(figsize=FIGSIZE_DOUBLE)
+    dendrogram(
+        Z,
+        labels=proportions.index.tolist(),
+        leaf_rotation=90,
+        leaf_font_size=7,
+        color_threshold=Z[-(n_clusters - 1), 2] if n_clusters > 1 else 0,
+        ax=ax,
+    )
+    latest_year = int(jur["year"].max())
+
+    ax.set_title(f"Jurisdiction Crime Profile Clusters ({latest_year})")
+    add_subtitle(ax, f"Ward's method on crime-type proportions — {n_clusters} clusters")
+    ax.set_ylabel("Distance")
+    ax.set_xlabel("")
+    style_axes(ax)
+    fig.subplots_adjust(bottom=0.30)
+
+    add_source(fig, "Source: BC Government Police Resources in British Columbia")
+
+    # Cluster summary
+    cluster_counts = pd.Series(clusters).value_counts().sort_index()
+    summary = ", ".join([f"Cluster {k}: {v} jurisdictions" for k, v in cluster_counts.items()])
+
+    narrative = (
+        f"Ward's hierarchical clustering on crime-type proportions identifies "
+        f"{n_clusters} distinct jurisdiction profiles. {summary}. "
+        f"Clustering uses Euclidean distance on the proportion of Criminal Code, "
+        f"Violent, and Property offences within each jurisdiction. "
+        f"Source: BC Government Police Resources in British Columbia."
+    )
+
+    logger.info("Ward's clustering: %d clusters from %d jurisdictions", n_clusters, len(proportions))
+
+    if save_path:
+        save_fig(fig, str(save_path))
+    return fig, narrative
+
+
+def _variance_decomposition(jur: pd.DataFrame) -> dict:
+    """ANOVA-style variance decomposition: year, category, and jurisdiction effects.
+
+    Uses manual sum-of-squares calculation (no statsmodels dependency).
+    """
+    data = jur[["year", "category", "policing_jurisdiction", "count"]].dropna().copy()
+    data = data[data["count"] > 0]
+
+    grand_mean = data["count"].mean()
+    ss_total = ((data["count"] - grand_mean) ** 2).sum()
+
+    # Between-group SS for each factor
+    factors = {}
+    for factor_col, label in [
+        ("year", "Year"),
+        ("category", "Crime type"),
+        ("policing_jurisdiction", "Jurisdiction"),
+    ]:
+        group_means = data.groupby(factor_col)["count"].mean()
+        group_sizes = data.groupby(factor_col)["count"].count()
+        ss_factor = (group_sizes * (group_means - grand_mean) ** 2).sum()
+        factors[label] = ss_factor
+
+    ss_residual = ss_total - sum(factors.values())
+    if ss_residual < 0:
+        ss_residual = 0  # Can happen with overlapping factors
+
+    result = {}
+    for label, ss in factors.items():
+        result[label] = {"ss": ss, "pct": ss / ss_total * 100 if ss_total > 0 else 0}
+    result["Residual"] = {"ss": ss_residual, "pct": ss_residual / ss_total * 100 if ss_total > 0 else 0}
+    result["_total_ss"] = ss_total
+
+    return result
+
+
+def _compute_composite_ranking(jur: pd.DataFrame, window: int = 5) -> pd.DataFrame:
+    """Composite ranking: 60% z-scored volume + 40% z-scored trend."""
+    latest_year = jur["year"].max()
+    start_year = latest_year - window
+
+    cc = jur[jur["category"] == "Criminal Code Offences"].copy()
+
+    latest = cc[cc["year"] == latest_year][["policing_jurisdiction", "count"]].rename(
+        columns={"count": "count_end"},
+    )
+    start = cc[cc["year"] == start_year][["policing_jurisdiction", "count"]].rename(
+        columns={"count": "count_start"},
+    )
+
+    merged = latest.merge(start, on="policing_jurisdiction", how="inner")
+    merged = merged[merged["count_start"] >= 50]  # filter tiny jurisdictions
+    merged["pct_change"] = (
+        (merged["count_end"] - merged["count_start"]) / merged["count_start"] * 100
+    )
+
+    if len(merged) < 3:
+        return merged
+
+    # Z-score standardization
+    merged["vol_z"] = (
+        (merged["count_end"] - merged["count_end"].mean()) / merged["count_end"].std()
+    )
+    merged["chg_z"] = (
+        (merged["pct_change"] - merged["pct_change"].mean()) / merged["pct_change"].std()
+    )
+    merged["composite"] = merged["vol_z"] * 0.6 + merged["chg_z"] * 0.4
+    merged["concern"] = merged["composite"].apply(
+        lambda x: "High" if x > 0.5 else ("Moderate" if x > -0.5 else "Lower"),
+    )
+
+    return merged.sort_values("composite", ascending=False).reset_index(drop=True)
+
+
+def chart_composite_ranking(
+    save_path: Path | None = None,
+) -> tuple[plt.Figure, str]:
+    """Horizontal bar chart: top 15 jurisdictions by composite concern score."""
+    apply_theme()
+    jur = _load_jurisdiction()
+    ranking = _compute_composite_ranking(jur)
+
+    if len(ranking) < 3:
+        fig, ax = plt.subplots(figsize=FIGSIZE_SINGLE)
+        ax.text(0.5, 0.5, "Insufficient data for ranking", ha="center", va="center")
+        if save_path:
+            save_fig(fig, str(save_path))
+        return fig, "Insufficient data for composite ranking."
+
+    top15 = ranking.head(15).copy()
+    top15 = top15.sort_values("composite")  # ascending for horizontal bar
+
+    fig, ax = plt.subplots(figsize=FIGSIZE_SINGLE)
+    colors = []
+    for concern in top15["concern"]:
+        if concern == "High":
+            colors.append(PALETTE["bc_red"])
+        elif concern == "Moderate":
+            colors.append(PALETTE["bc_amber"])
+        else:
+            colors.append(PALETTE["bc_teal"])
+
+    ax.barh(top15["policing_jurisdiction"], top15["composite"], color=colors, edgecolor="white")
+
+    ax.axvline(0.5, color=PALETTE["bc_red"], linewidth=0.8, linestyle="--", alpha=0.5)
+    ax.axvline(-0.5, color=PALETTE["bc_teal"], linewidth=0.8, linestyle="--", alpha=0.5)
+
+    latest_year = int(jur["year"].max())
+    ax.set_title(f"Composite Concern Ranking — Top 15 ({latest_year})")
+    add_subtitle(ax, "60% standardized volume + 40% standardized trend (5-year)")
+    ax.set_xlabel("Composite Score")
+    style_axes(ax)
+    ax.grid(axis="y", visible=False)
+    fig.subplots_adjust(left=0.30)
+
+    add_source(fig, "Source: BC Government Police Resources in British Columbia")
+
+    n_high = (ranking["concern"] == "High").sum()
+    n_mod = (ranking["concern"] == "Moderate").sum()
+    n_low = (ranking["concern"] == "Lower").sum()
+    top1 = ranking.iloc[0]
+
+    narrative = (
+        f"The composite ranking (60% volume, 40% trend) classifies {n_high} jurisdictions "
+        f"as High concern, {n_mod} as Moderate, and {n_low} as Lower. "
+        f"{top1['policing_jurisdiction']} ranks highest with a composite score of "
+        f"{top1['composite']:.2f}. "
+        f"Source: BC Government Police Resources in British Columbia."
+    )
+
+    logger.info("Composite ranking: %d High, %d Moderate, %d Lower", n_high, n_mod, n_low)
+
+    if save_path:
+        save_fig(fig, str(save_path))
+    return fig, narrative
+
+
 def run_all() -> dict[str, str]:
     """Generate all Priority 6 charts and return narratives."""
     CHARTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -820,6 +1039,8 @@ def run_all() -> dict[str, str]:
         ("q4_region_comparison", chart_region_comparison),
         ("q4_crime_concentration", chart_crime_concentration),
         ("q4_violent_share_distribution", chart_violent_share_distribution),
+        ("q4_jurisdiction_clusters", chart_jurisdiction_clusters),
+        ("q4_composite_ranking", chart_composite_ranking),
     ]
 
     for name, fn in charts:
@@ -856,6 +1077,13 @@ def run_all() -> dict[str, str]:
     logger.info("\nTop 10 jurisdictions by violent offence count (%d):", int(jur["year"].max()))
     for _, row in ranked_violent.head(10).iterrows():
         logger.info("  #%d  %s: %s", row["rank"], row["policing_jurisdiction"], f"{row['count']:,.0f}")
+
+    # Variance decomposition
+    var_dec = _variance_decomposition(jur)
+    logger.info("\nVariance decomposition (ANOVA):")
+    for factor, vals in var_dec.items():
+        if not factor.startswith("_"):
+            logger.info("  %s: %.1f%%", factor, vals["pct"])
 
     return narratives
 

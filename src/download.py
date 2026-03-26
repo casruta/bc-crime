@@ -73,15 +73,19 @@ STATCAN_TABLES = [
         name="cpi_annual",
         description="Consumer Price Index, annual averages",
     ),
+    # NOTE: These table IDs were reorganized by StatsCan and now point to
+    # hate crime (0066) and homicide (0068) data, not the GSS surveys.
+    # The q5_perception module uses hardcoded fallback constants from
+    # Cotter (2021), Juristat catalogue 85-002-X.
     StatCanTable(
         table_id="35-10-0066-01",
         name="gss_perception_neighbourhood",
-        description="Perception of crime in neighbourhood, by province (GSS)",
+        description="Perception of crime in neighbourhood (GSS) [stale table ID]",
     ),
     StatCanTable(
         table_id="35-10-0068-01",
         name="gss_confidence_police",
-        description="Confidence in police, by province (GSS)",
+        description="Confidence in police (GSS) [stale table ID]",
     ),
     StatCanTable(
         table_id="35-10-0076-01",

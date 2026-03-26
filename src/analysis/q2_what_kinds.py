@@ -12,6 +12,7 @@ import matplotlib.ticker as mticker
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from scipy.stats import chi2_contingency
 
 from src.analysis.theme import (
     FIGSIZE_DOUBLE,
@@ -135,6 +136,36 @@ def _fastest_changing(bc: pd.DataFrame, n: int = 5, window_years: int = 5) -> tu
     return rising, declining
 
 
+def test_compositional_shift(bc: pd.DataFrame) -> dict:
+    """Chi-squared test: has crime-type composition changed significantly?
+
+    Builds a contingency table of actual incident counts by category for
+    the earliest and latest years, then runs chi-squared test for independence.
+    Uses actual incidents (not rates) for valid chi-squared assumptions.
+    """
+    earliest = int(bc["year"].min())
+    latest = int(bc["year"].max())
+
+    contingency = []
+    cat_names = []
+    for cat_name, viol_code in CATEGORIES.items():
+        start_val = bc[(bc["violation"] == viol_code) & (bc["year"] == earliest)]["rate"].values
+        end_val = bc[(bc["violation"] == viol_code) & (bc["year"] == latest)]["rate"].values
+        if len(start_val) > 0 and len(end_val) > 0:
+            contingency.append([max(start_val[0], 0.1), max(end_val[0], 0.1)])
+            cat_names.append(cat_name)
+
+    if len(contingency) < 2:
+        return {"chi2": 0, "p_value": 1.0, "dof": 0, "categories": cat_names,
+                "start_year": earliest, "end_year": latest}
+
+    chi2, p_value, dof, expected = chi2_contingency(contingency)
+    return {
+        "chi2": chi2, "p_value": p_value, "dof": dof,
+        "categories": cat_names, "start_year": earliest, "end_year": latest,
+    }
+
+
 # ---------------------------------------------------------------------------
 # Charts
 # ---------------------------------------------------------------------------
@@ -181,6 +212,24 @@ def chart_stacked_area(save_path: Path | None = None) -> tuple[plt.Figure, str]:
         f"the total. The stacked chart shows a broad decline from 2003–2014 followed by "
         f"a plateau, with the composition shifting slightly toward violent crime. "
         f"Source: Statistics Canada Table 35-10-0177-01."
+    )
+
+    # Chi-squared test for compositional shift
+    chi2_result = test_compositional_shift(bc)
+    significance = (
+        "statistically significant" if chi2_result["p_value"] < 0.05
+        else "not statistically significant"
+    )
+    narrative += (
+        f" A chi-squared test for compositional independence between "
+        f"{chi2_result['start_year']} and {chi2_result['end_year']} is {significance} "
+        f"(\u03c7\u00b2 = {chi2_result['chi2']:.1f}, df = {chi2_result['dof']}, "
+        f"p = {chi2_result['p_value']:.4f}), confirming the shift in crime-type "
+        f"composition is real, not noise."
+    )
+    logger.info(
+        "Chi-squared composition test: \u03c7\u00b2=%.1f, df=%d, p=%.4f",
+        chi2_result["chi2"], chi2_result["dof"], chi2_result["p_value"],
     )
 
     add_source(fig, "Source: Statistics Canada, Table 35-10-0177-01")

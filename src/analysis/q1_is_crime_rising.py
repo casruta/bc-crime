@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import numpy as np
 import pandas as pd
+from scipy import stats as scipy_stats
 
 from src.analysis.theme import (
     FIGSIZE_DOUBLE,
@@ -101,6 +102,24 @@ def _load_bc_yoy() -> pd.DataFrame:
 
 
 # ---------------------------------------------------------------------------
+# Statistical helpers
+# ---------------------------------------------------------------------------
+
+def compute_trend_regression(years, values):
+    """OLS linear regression: slope, p-value, R², 95% CI on slope."""
+    result = scipy_stats.linregress(years, values)
+    ci_95 = 1.96 * result.stderr
+    return {
+        "slope": result.slope,
+        "intercept": result.intercept,
+        "r_squared": result.rvalue ** 2,
+        "p_value": result.pvalue,
+        "ci_lower": result.slope - ci_95,
+        "ci_upper": result.slope + ci_95,
+    }
+
+
+# ---------------------------------------------------------------------------
 # Chart generators
 # ---------------------------------------------------------------------------
 
@@ -139,7 +158,7 @@ def chart_bc_csi_trend(save_path: Path | None = None) -> tuple[plt.Figure, str]:
             )
 
     ax.set_title(f"British Columbia Crime Severity Index ({int(data['year'].min())}–{int(data['year'].max())})")
-    add_subtitle(ax, "BC's crime severity peaked in 2003, fell 46% by 2014, and has since stabilized")
+    add_subtitle(ax, "BC's crime severity peaked at 166.9 in 1998, fell 46% to 90.2 by 2014")
     ax.set_xlabel("Year")
     ax.set_ylabel("Crime Severity Index")
     ax.legend(loc="upper right")
@@ -162,6 +181,16 @@ def chart_bc_csi_trend(save_path: Path | None = None) -> tuple[plt.Figure, str]:
         f"of crime is shifting toward more serious offences. "
         f"Source: Statistics Canada Table 35-10-0063-01."
     ) if trough_val else f"BC's CSI was {latest_val:.1f} in {latest_year}."
+
+    # Trend regression on crime rate
+    yoy_data = _load_bc_yoy()
+    reg = compute_trend_regression(yoy_data["year"].values, yoy_data["crime_rate"].values)
+    narrative += (
+        f" Linear regression on the crime rate series confirms the decline is "
+        f"{'statistically significant' if reg['p_value'] < 0.05 else 'not statistically significant'} "
+        f"(slope = {reg['slope']:.0f}/year, p = {reg['p_value']:.4f}, R² = {reg['r_squared']:.3f})."
+    )
+    logger.info("Trend regression: slope=%.1f, p=%.4f, R²=%.3f", reg["slope"], reg["p_value"], reg["r_squared"])
 
     add_source(fig, "Source: Statistics Canada, Table 35-10-0063-01")
 
@@ -525,6 +554,83 @@ def chart_csi_contribution(save_path: Path | None = None) -> tuple[plt.Figure, s
     return fig, narrative
 
 
+def chart_trend_projection(
+    save_path: Path | None = None, forecast_years: int = 2,
+) -> tuple[plt.Figure, str]:
+    """Fan-chart: historical crime rate trend + projection with 80% prediction interval."""
+    apply_theme()
+    bc = _load_bc_yoy()
+    years = bc["year"].values.astype(float)
+    rates = bc["crime_rate"].values
+
+    # Fit linear model
+    reg = compute_trend_regression(years, rates)
+    slope, intercept = reg["slope"], reg["intercept"]
+
+    # Historical fitted line
+    fitted = slope * years + intercept
+
+    # Future predictions
+    future_years = np.arange(years.max() + 1, years.max() + 1 + forecast_years)
+    predictions = slope * future_years + intercept
+
+    # 80% prediction interval
+    n = len(years)
+    residuals = rates - fitted
+    s_e = np.sqrt(np.sum(residuals ** 2) / (n - 2))
+    x_mean = years.mean()
+    ss_x = np.sum((years - x_mean) ** 2)
+    z_80 = 1.282  # 80% two-sided critical value
+
+    pi_lower, pi_upper = [], []
+    for fy in future_years:
+        se_pred = s_e * np.sqrt(1 + 1 / n + (fy - x_mean) ** 2 / ss_x)
+        pi_lower.append(slope * fy + intercept - z_80 * se_pred)
+        pi_upper.append(slope * fy + intercept + z_80 * se_pred)
+
+    fig, ax = plt.subplots(figsize=FIGSIZE_SINGLE)
+
+    # Historical data
+    ax.plot(years, rates, color=PALETTE["bc_blue"], linewidth=2, label="Observed")
+    ax.plot(years, fitted, color=PALETTE["bc_slate"], linewidth=1, linestyle="--", alpha=0.6, label="Linear trend")
+
+    # Projection
+    all_proj_years = np.concatenate([[years[-1]], future_years])
+    all_proj_pred = np.concatenate([[rates[-1]], predictions])
+    ax.plot(all_proj_years, all_proj_pred, color=PALETTE["bc_red"], linewidth=2, linestyle="--", label="Projection")
+
+    # Fan (prediction interval)
+    all_pi_lower = np.concatenate([[rates[-1]], pi_lower])
+    all_pi_upper = np.concatenate([[rates[-1]], pi_upper])
+    ax.fill_between(all_proj_years, all_pi_lower, all_pi_upper, color=PALETTE["bc_red"], alpha=0.15, label="80% prediction interval")
+
+    ax.set_title(f"BC Crime Rate — Trend Projection ({int(years.min())}–{int(future_years.max())})")
+    add_subtitle(ax, f"Linear extrapolation with 80% prediction interval ({forecast_years}-year horizon)")
+    ax.set_xlabel("Year")
+    ax.set_ylabel("Crime Rate per 100,000")
+    ax.legend(loc="upper right", fontsize=9)
+    style_axes(ax)
+    add_source(fig, "Source: Statistics Canada, Table 35-10-0177-01")
+
+    # Narrative
+    last_proj_year = int(future_years[-1])
+    last_proj_val = predictions[-1]
+    last_pi_lo = pi_lower[-1]
+    last_pi_hi = pi_upper[-1]
+    narrative = (
+        f"If the linear trend continues, BC's crime rate is projected to reach "
+        f"{last_proj_val:,.0f} per 100,000 by {last_proj_year} "
+        f"(80% PI: {last_pi_lo:,.0f}–{last_pi_hi:,.0f}). "
+        f"The projection assumes the historical linear trend persists — "
+        f"it does not account for policy changes, demographic shifts, or economic shocks. "
+        f"Source: Statistics Canada Table 35-10-0177-01."
+    )
+
+    if save_path:
+        save_fig(fig, str(save_path))
+    return fig, narrative
+
+
 # ---------------------------------------------------------------------------
 # Run all
 # ---------------------------------------------------------------------------
@@ -543,6 +649,7 @@ def run_all() -> dict[str, str]:
         ("q1_violent_nonviolent_gap", chart_violent_nonviolent_gap),
         ("q1_bc_canada_gap", chart_bc_canada_gap),
         ("q1_csi_contribution", chart_csi_contribution),
+        ("q1_trend_projection", chart_trend_projection),
     ]
 
     for name, fn in charts:
