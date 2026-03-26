@@ -36,7 +36,7 @@ This analysis covers the full 1998-2024 CSI series alongside Statistics Canada a
 
 ## 1. Crime Severity Has Declined, but the Mix Has Shifted
 
-The trend is clear. BC's Crime Severity Index dropped from 166.9 in 1998 to 90.2 in 2014, a 46% reduction. It fell a further 7.4% in 2024. Of the 26 year-over-year changes between 1998 and 2024, 18 were declines and 8 were increases. A linear regression test confirms the downward trend is statistically significant (p < 0.05), meaning it is unlikely to reflect random year-to-year variation.
+BC's Crime Severity Index dropped from 166.9 in 1998 to 90.2 in 2014, a 46% reduction. It kept falling. A further 7.4% decline followed in 2024. Of the 26 year-over-year changes between 1998 and 2024, 18 were declines and 8 were increases. A linear regression test confirms the downward trend is statistically significant (p < 0.05), meaning it is unlikely to reflect random year-to-year variation.
 
 ![BC Crime Severity Index: 46% decline from 1998 peak (166.9) to 2014 trough (90.2), continued decline through 2024](outputs/charts/q1_bc_csi_trend.png)
 
@@ -149,7 +149,7 @@ COVID-19 produced a visible dip in 2020 followed by a partial rebound, though cr
 
 ### Policing Expenditure Trends
 
-Spending rose as crime fell. Over the 2018-2023 period for which expenditure data is available, police budgets in BC expanded in both nominal and real (constant 2020 dollar) terms, with salary and benefits growing faster than operating and capital spending.
+Police budgets in BC expanded in both nominal and real (constant 2020 dollar) terms over the 2018-2023 period, even as crime severity declined. Salary and benefits grew faster than operating and capital spending.
 
 BC's population grew 10.4% over the same window (from 5,000,879 to 5,519,913), meaning per-capita policing costs rose even after accounting for population growth.
 
@@ -159,7 +159,7 @@ BC's population grew 10.4% over the same window (from 5,000,879 to 5,519,913), m
 
 ![CSI vs. expenditure: spending rises while crime severity falls](outputs/charts/q3_csi_vs_expenditure.png)
 
-Even with fewer crimes, officers are not less busy. The crimes-per-officer metric shows that declining crime volume did not lead to a proportional reduction in workload. Police services attribute this to expanding non-crime demands such as mental health crisis response, overdose calls, and welfare checks, though this analysis does not independently measure non-crime call volume.
+Declining crime volume did not lead to a proportional reduction in officer workload. The crimes-per-officer metric shows the gap clearly. Police services attribute this to expanding non-crime demands such as mental health crisis response, overdose calls, and welfare checks, though this analysis does not independently measure non-crime call volume.
 
 ![Expenditure breakdown: salaries and benefits outpace operating and capital](outputs/charts/q3_expenditure_breakdown.png)
 
