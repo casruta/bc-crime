@@ -2,7 +2,7 @@
 
 British Columbia's Crime Severity Index (CSI) declined 46% from its 1998 peak of 166.9 to 90.2 in 2014, with a further 7.4% year-over-year decrease in 2024, the second-largest provincial drop after Alberta (-8.5%). This analysis examines the full 1998-2024 CSI series alongside Statistics Canada and BC Government data, addressing five research questions across 42 charts and one interactive map. (The CSI series begins in 1998; other datasets, including provincial comparisons and General Social Survey perception data, begin in 2004.)
 
-> **Key findings:** Crime severity fell sharply over two decades, but the composition shifted toward violent offences after 2014. Interior communities register per-capita rates 1.9-2.1x those of coastal cities. Between 2014 and 2019, public perception of rising crime grew from 30% to 42% despite declining aggregate statistics, a gap traceable to five measurement and communication factors.
+> **Key findings:** Crime severity fell sharply over two decades, but the mix of crime types shifted toward violent offences after 2014. Interior communities such as Chilliwack and Kamloops register per-capita rates 1.9-2.1x Vancouver's. Between 2014 and 2019, public perception of rising crime grew from 30% to 42% despite declining aggregate statistics, a gap that five factors in the data help explain (see Section 5).
 
 ---
 
@@ -33,21 +33,21 @@ British Columbia's Crime Severity Index (CSI) declined 46% from its 1998 peak of
 
 ## 1. Crime Severity Has Declined, but the Composition Has Shifted
 
-Crime in BC is falling. The Crime Severity Index dropped from a peak of 166.9 in 1998 to 90.2 in 2014, a 46% reduction. A further 7.4% decline followed in 2024, the second-largest year-over-year provincial drop after Alberta (-8.5%). Of the 26 year-over-year changes between 1998 and 2024, 18 were declines and 8 were increases. Linear regression corroborates the downward trend (p < 0.05).
+Crime in BC is falling. The Crime Severity Index dropped from a peak of 166.9 in 1998 to 90.2 in 2014, a 46% reduction. A further 7.4% year-over-year decline followed in 2024. Of the 26 year-over-year changes between 1998 and 2024, 18 were declines and 8 were increases. A linear regression test confirms the downward trend is statistically significant (p < 0.05), meaning it is unlikely to be random fluctuation.
 
 ![BC Crime Severity Index: 46% decline from 1998 peak (166.9) to 2014 trough (90.2), continued decline through 2024](outputs/charts/q1_bc_csi_trend.png)
 
-After 2014, the types of crime driving the index began moving in opposite directions. Violent crime severity rose while non-violent severity kept falling. The overall index still declined because property crime's drop was large enough to offset the increase in violent offences. On average across the series, BC's CSI ran approximately 21% above the national figure.
+After 2014, the types of crime driving the index began moving in opposite directions. Violent crime severity rose while non-violent severity kept falling. The overall index still declined because property crime's drop was large enough to offset the increase in violent offences. On average across the 1998-2024 CSI series, BC ran approximately 21% above the national figure.
 
 ![Violent CSI trending upward since 2014 while non-violent CSI continues to decline](outputs/charts/q1_violent_nonviolent_gap.png)
 
-The decline was not unique to BC. Every province saw crime fall over the same period. When each province's 2004 crime rate is set to a baseline of 100, all trajectories slope downward at similar rates. Saskatchewan's crime rate stayed roughly 2.8x Ontario's in absolute terms, but both fell at comparable speeds. Because every province moved in the same direction at the same time, the most likely drivers are structural (an ageing population, urbanization, changes in enforcement philosophy) rather than any one province's policies.
+The decline was not unique to BC. Every province saw crime fall over the same period. When each province's 2004 crime rate is set to a baseline of 100, all trajectories slope downward at similar rates. Saskatchewan's crime rate stayed roughly 2.8x Ontario's in absolute terms, but both fell at comparable speeds. Because every province moved in the same direction at the same time, the pattern is more consistent with broad forces shared across provinces (an ageing population, urbanization, changes in enforcement philosophy) than with any one province's policies, though this analysis does not test these explanations directly.
 
 ![Provincial crime rate comparison: BC consistently above the national average](outputs/charts/q1_provincial_comparison.png)
 
 ![Indexed provincial growth (2004 = 100): all provinces converge downward](outputs/charts/q1_indexed_provincial_growth.png)
 
-BC's gap with the national average persisted across the full series, as shown below alongside the province-by-province year-over-year comparison.
+BC's crime rate stayed above the national average throughout the entire 1998-2024 period, as shown below alongside the province-by-province year-over-year comparison.
 
 ![BC-Canada crime rate gap: persistent across two decades](outputs/charts/q1_bc_canada_gap.png)
 
@@ -69,7 +69,7 @@ First, unfounded rates (the share of reports that police determine are not actua
 
 ![Unfounded rates stable over time: reclassification did not drive the decline](outputs/charts/q3_unfounded_rates.png)
 
-Second, the underreporting data points away from a reporting-driven decline. The reasoning works as follows: if fewer people were reporting crimes to police at a broadly similar rate across crime types, offences with low reporting rates would show the largest apparent drops, because even a small change in reporting would have a big proportional effect on their recorded numbers. Violent crime has a lower reporting rate (~24%) than property crime (~35%), so a uniform drop in reporting should make violent crime numbers fall faster. The opposite happened: property crime fell more steeply. This is inconsistent with a uniform decline in reporting, though it does not rule out crime-type-specific changes in reporting behaviour.
+Second, the underreporting data points away from a reporting-driven decline. The logic is straightforward: if people were simply reporting fewer crimes to police, the numbers would drop fastest for crime types that are already underreported, because even a small reporting change has a big effect when the baseline reporting rate is low. Violent crime is reported at a lower rate (~24%) than property crime (~35%). So if reporting were falling, violent crime numbers should drop faster. The opposite happened: property crime fell more steeply. That pattern does not match a decline driven by fewer people calling the police, though it does not rule out reporting changes affecting specific crime types differently.
 
 ![Underreporting proxy analysis: the pattern is inconsistent with a reporting-driven decline](outputs/charts/q3_underreporting_proxies.png)
 
@@ -100,7 +100,7 @@ By violation type, the heatmap below shows property offence rates cooling from e
 
 Factors plausibly behind the vehicle-theft decline include improved vehicle security technology, reduced visibility of valuables, and contactless payment adoption. The relative contribution of each has not been empirically isolated.
 
-Two violation categories bucked the overall trend. The rate of police-reported sexual violations against children rose by 82 per 100,000 over five years, and shoplifting rose by 79 per 100,000. The child exploitation increase aligns with expanded digital investigation capacity (ICAC task forces, automated hash-matching, mandatory platform reporting) rather than an actual increase in offending, a distinction that affects where funding should go. Shoplifting's rise has multiple candidate explanations: behavioural change, reduced retail security staffing, and changes to prosecution thresholds have each been cited.
+Two violation categories bucked the overall trend. The rate of police-reported sexual violations against children rose by 82 per 100,000 over five years, and shoplifting rose by 79 per 100,000. The child exploitation increase aligns with expanded digital investigation capacity (ICAC task forces, automated hash-matching, mandatory platform reporting) rather than an actual increase in offending. If the increase is driven by better detection, the policy response differs from one targeting rising prevalence. Shoplifting's rise has multiple candidate explanations: behavioural change, reduced retail security staffing, and changes to prosecution thresholds have each been cited.
 
 ![Property violation trajectories declining while exploitation and shoplifting trend upward](outputs/charts/q2_slope_ranking.png)
 
@@ -118,7 +118,7 @@ While violent crime's absolute rate remained relatively stable, its share of tot
 
 ## 3. Clearance Rates, Youth Crime, and Policing Costs
 
-Clearance rates split sharply along crime-type lines. Violent crime clearance stood at 58.4% in 2014 but fell to 37.4% by 2024, a 21-percentage-point erosion that coincided with rising caseload complexity and staffing constraints. Property crime clearance remained in the 12-16% range throughout the study period: roughly 85% of reported property offences went unresolved across two decades.
+Clearance rates split sharply along crime-type lines. Violent crime clearance stood at 58.4% in 2014 but fell to 37.4% by 2024, a 21-percentage-point drop. The causes of this decline are not established in the available data. Property crime clearance remained in the 12-16% range throughout the study period: roughly 85% of reported property offences went unresolved across two decades.
 
 ![Clearance rate trends: violent crime clearance declining from above 50% toward 37%; property crime stable at 12-16%](outputs/charts/q3_clearance_rate_trends.png)
 
@@ -126,7 +126,7 @@ Clearance rates split sharply along crime-type lines. Violent crime clearance st
 
 Despite two decades of reforms, technology investment, and budget growth, property-crime clearance rates barely moved. The likeliest explanation is a structural ceiling: the volume and low individual value of property offences may render case-by-case investigation uneconomical at current resource levels.
 
-Youth crime severity decoupled from the adult trend after 2014. Youth CSI continued to decline while adult CSI stabilized or edged upward. Among candidate explanations, diversion programs have the strongest evidentiary backing: formal system contact for youth decreased concurrently with the expansion of extrajudicial measures (programs that divert youth from the formal court system into community-based interventions). Declining youth population share may also contribute, though it does not fully account for the magnitude of the gap.
+Youth crime severity split from the adult trend after 2014. Youth CSI continued to decline while adult CSI stabilized or edged upward. Among candidate explanations, diversion programs have the strongest evidentiary backing: formal system contact for youth decreased concurrently with the expansion of extrajudicial measures (programs that divert youth from the formal court system into community-based interventions). Declining youth population share may also contribute, though it does not fully account for the magnitude of the youth-adult divergence.
 
 ![Youth vs. adult CSI divergence: youth crime continues declining while adult crime stabilizes](outputs/charts/q3_youth_vs_adult_csi.png)
 
@@ -138,7 +138,7 @@ RCMP detachments and municipal forces followed different trajectories, a distinc
 
 ### Policing Expenditure Trends
 
-Spending rose as crime fell. Over the five years for which expenditure data is available, police budgets in BC expanded in both nominal and real (constant 2020 dollar) terms, with salary and benefits growth outpacing operating and capital expenditure. Over the period for which expenditure data is available (2018-2023), BC's population rose 10.4% from 5,000,879 to 5,519,913.
+Spending rose as crime fell. Over the 2018-2023 period for which expenditure data is available, police budgets in BC expanded in both nominal and real (constant 2020 dollar) terms, with salary and benefits growth outpacing operating and capital expenditure. Over the period for which expenditure data is available (2018-2023), BC's population rose 10.4% from 5,000,879 to 5,519,913.
 
 ![BC policing expenditure: nominal and inflation-adjusted, both rising](outputs/charts/q3_bc_expenditure_trend.png)
 
@@ -146,7 +146,7 @@ Spending rose as crime fell. Over the five years for which expenditure data is a
 
 ![CSI vs. expenditure: spending rises while crime severity falls](outputs/charts/q3_csi_vs_expenditure.png)
 
-Even with fewer crimes, officers are not less busy. The crimes-per-officer metric shows that declining volume did not yield a proportional reduction in workload, a pattern consistent with expanding non-crime demands: mental health crisis response, overdose calls, welfare checks, and social disorder management.
+Even with fewer crimes, officers are not less busy. The crimes-per-officer metric shows that declining volume did not yield a proportional reduction in workload, a pattern that police services attribute to expanding non-crime workloads such as mental health crisis response, overdose calls, and welfare checks (though this analysis does not independently measure non-crime call volume).
 
 ![Expenditure breakdown: salaries and benefits outpace operating and capital](outputs/charts/q3_expenditure_breakdown.png)
 
@@ -201,15 +201,15 @@ Between 2014 and 2019, the share of BC residents who reported that crime had inc
 
 ![Perception vs. reality: 42% of residents believe crime is rising while CSI remains below its peak](outputs/charts/q5_perception_vs_reality.png)
 
-Five data-traceable factors account for this divergence, each with an identified corrective.
+Five factors visible in the data help explain the gap. For each, a potential corrective action is proposed.
 
-### Factor 1: Compositional Concealment
+### Factor 1: The Headline Number Hides the Violent Crime Increase
 
 The violent component of the CSI increased after 2014 while the non-violent component declined. Because property crime's absolute decline was larger, the aggregate index fell; yet residents likely respond to the violent-crime component, which matters more for personal safety. Reporting violent and non-violent CSI components separately would surface the divergence.
 
 ### Factor 2: Visibility Bias
 
-Shoplifting increased by 79 per 100,000 and is directly observable in retail settings. Offsetting declines (772 fewer vehicle thefts and 270 fewer break-ins per 100,000) produce no observable signal. To put the scale in context: for every 1-unit increase in the shoplifting rate, the vehicle theft rate fell by roughly 10 units over the same period (these are independent trends, not causally linked). Publishing quarterly scorecards pairing increasing and decreasing categories would offset this asymmetry.
+Shoplifting increased by 79 per 100,000 and is directly observable in retail settings. Offsetting declines (772 fewer vehicle thefts and 270 fewer break-ins per 100,000) produce no observable signal. The net effect: the shoplifting increase (79 per 100,000) was dwarfed by the vehicle theft decrease (772 per 100,000), but shoplifting is far more visible to the public. Publishing quarterly scorecards pairing increasing and decreasing categories would offset this asymmetry.
 
 ### Factor 3: Institutional Credibility Erosion
 
@@ -263,7 +263,7 @@ This analysis measures police-reported crime, not the true prevalence of crimina
 
 ## Methodology
 
-**Data sources:** Six Statistics Canada tables (35-10-0063-01, 35-10-0177-01, 18-10-0005-01, 35-10-0076-01, 35-10-0059-01) and four BC Government justice appendices (F-I). General Social Survey perception data (2004-2019) sourced from published Juristat reports.
+**Data sources:** Five Statistics Canada tables (35-10-0063-01, 35-10-0177-01, 18-10-0005-01, 35-10-0076-01, 35-10-0059-01) and four BC Government justice appendices (F-I). General Social Survey perception data (2004-2019) sourced from published Juristat reports.
 
 **Key metrics:** Crime Severity Index (sentence-severity weighted, base 2006), crime rate per 100,000, clearance rate, unfounded rate, compound annual growth rate (CAGR).
 
